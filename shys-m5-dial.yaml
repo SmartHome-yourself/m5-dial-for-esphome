@@ -1,0 +1,60 @@
+substitutions:
+  name: "m5-dial"
+  friendly_name: "M5 Dial"
+  m5_textsensor_id: "m5_textsensor_id"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password  
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: false
+  project:
+    name: smarthomeyourself.m5_dial
+    version: "1.0"
+    
+  platformio_options:
+    lib_deps:
+      - WiFi
+      - SPI
+      - FS
+      - Wire
+      - EEPROM
+      - m5stack/M5Unified
+      - m5stack/M5Dial
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/SmartHome-yourself/m5-dial-for-esphome
+      ref: main
+    components: [shys_m5_dial]
+ 
+dashboard_import:
+  package_import_url: github://SmartHome-yourself/m5-dial-for-esphome/shys-m5-dial.yaml@main
+  import_full_config: false
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+logger:
+  level: DEBUG
+  
+api:
+ota:
+
+improv_serial:
+captive_portal:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    password: "12345678"
+
+external_components:
+  - source:
+      type: local
+      path: my_components
+      

@@ -1,5 +1,6 @@
 # example configuration:
 
+```
 substitutions:
   devicename: "m5-dial"
   display_name: "M5 Dial"
@@ -27,3 +28,4 @@ text_sensor:
         name: Light 2
       - entity: cover.my_cover1
         name: Cover 1
+```

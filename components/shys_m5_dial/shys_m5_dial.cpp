@@ -6,7 +6,7 @@ namespace esphome
     namespace shys_m5_dial
     {
         static const char *TAG = "shys_m5_dial";
-    
+
         /**
          * @brief SETUP
          *
@@ -26,8 +26,9 @@ namespace esphome
         void ShysM5Dial::loop()
         {
             M5Dial.update();
+            esphome::delay(1);
             ShysM5Dial::doLoop();
-            esphome::delay(2);
+            esphome::delay(1);
         }
 
         /**

@@ -15,7 +15,6 @@ namespace esphome
 
                 int longPressMs = 1500;
 
-
                 long oldPosition = 0;
                 bool longPress = false;
 
@@ -34,6 +33,10 @@ namespace esphome
 
                 void on_long_button_press(std::function<void(void)> callback){
                     this->long_button_press_action = callback;
+                }
+
+                void setLongPressDuration(int value){
+                    longPressMs = value;
                 }
 
 

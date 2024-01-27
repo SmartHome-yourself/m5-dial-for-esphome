@@ -55,6 +55,8 @@ wifi:
 
 external_components:
   - source:
-      type: local
-      path: my_components
+      type: git
+      url: https://github.com/SmartHome-yourself/m5-dial-for-esphome
+      ref: main
+    components: [shys_m5_tough]
       

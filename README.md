@@ -1,3 +1,10 @@
+# M5 Stack Dial Custom Component für ESPHome
+![image](https://github.com/SmartHome-yourself/m5-dial-for-esphome/assets/705724/6d268fe4-ef71-40bb-b70c-797453b1d06b)
+
+Mit dieser Komponente wird der M5 Stack Dial zu einer universal-Fernbedienung für Home Assistant.  
+Aktuell werden nur Light-Entitäten unterstützt, in Zukunft sollen aber auch weitere Gerätearten darüber steuerbar sein.  
+
+  
 # Beispiel Konfiguration:
 ```yaml
 substitutions:
@@ -12,10 +19,8 @@ packages:
     file: shys-m5-dial.yaml
     refresh: 1h
 
-text_sensor:
-  - platform: shys_m5_dial
+shys_m5_dial:
     name: dial
-
     devices:
       - entity: light.my_light1
         name: Light 1
@@ -53,29 +58,27 @@ Der Hostname des Geräts.
 ## Text-Sensor
 **Beispiel:**  
 ```
-text_sensor:
-  - platform: shys_m5_dial
-    name: Dial
-    screenOffTime: 45000
-    rotaryStepWidth: 5
-    longPressDuration: 1200
+shys_m5_dial:
+  name: Dial
+  screenOffTime: 45000
+  rotaryStepWidth: 5
+  longPressDuration: 1200
 
-    devices:
-      - entity: light.my_light1
-        name: Light 1
-        rgb_enabled: true
-        dimm_enabled: true
-      - entity: light.my_light2
-        name: Light 2
-        rgb_enabled: true
-      - entity: light.my_light3
-        name: Light 3
-        rgb_enabled: false        
+  devices:
+    - entity: light.my_light1
+      name: Light 1
+      rgb_enabled: true
+      dimm_enabled: true
+    - entity: light.my_light2
+      name: Light 2
+      rgb_enabled: true
+    - entity: light.my_light3
+      name: Light 3
+      rgb_enabled: false        
 ```
-### platform
-Die Platform muss auf jeden Fall **shys_m5_dial** sein!
-### screenOffTime (optional)
-
+  
+### name
+Legt den Namen der Komponente fest.
 ### screenOffTime (optional)
 Gibt an, nach wie viel Millisekunden das Display sich automatisch abschaltet *(Default: 30000)*  
 ### rotaryStepWidth (optional)
@@ -104,4 +107,8 @@ Gibt die Verzögerung in Millisekunden an, die bei Wertänderung gewartet wird, 
 Das ist gerade bei Verwendung des Rotary-Encoders wichtig um nicht unnötig viele API-Aufrufe zu erzeugen. *(Default: 1200)*  
 ### receiveValueDelay
 Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor neue Werte vom Zielgerät als gültig angesehen werden. *(Default: 3000)*  
+
+&nbsp;
+
+
 

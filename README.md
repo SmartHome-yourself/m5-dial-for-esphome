@@ -21,18 +21,18 @@ packages:
     refresh: 1h
 
 shys_m5_dial:
-    name: dial
-    devices:
-      - entity: light.my_light1
-        name: Light 1
-        rgb_enabled: true
-        dimm_enabled: true
-      - entity: light.my_light2
-        name: Light 2
-      - entity: light.my_light3
-        name: Light 3
-      - entity: light.my_light4
-        name: Light 4
+  name: dial
+  devices:
+    - entity: light.my_light1
+      name: Light 1
+      rgb_enabled: true
+      dimm_enabled: true
+    - entity: light.my_light2
+      name: Light 2
+    - entity: light.my_light3
+      name: Light 3
+    - entity: light.my_light4
+      name: Light 4
 ```
   
 &nbsp;  

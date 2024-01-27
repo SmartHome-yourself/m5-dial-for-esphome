@@ -50,11 +50,3 @@ wifi:
   password: ${wifi_password}
   ap:
     password: "12345678"
-
-external_components:
-  - source:
-      type: git
-      url: https://github.com/SmartHome-yourself/m5-dial-for-esphome
-      ref: main
-    components: [shys_m5_tough]
-      

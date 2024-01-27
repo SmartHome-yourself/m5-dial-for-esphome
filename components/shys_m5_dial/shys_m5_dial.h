@@ -11,7 +11,7 @@ namespace esphome
   namespace shys_m5_dial
   {
 
-    class ShysM5Dial : public text_sensor::TextSensor, public Component
+    class ShysM5Dial : public Component
     {
     protected:
       int timeToScreenOff = 30000;
@@ -403,6 +403,10 @@ namespace esphome
       {
         devices[deviceAnzahl].init(entity_id, name, rgb_enabled, dimm_enabled);
         deviceAnzahl++;
+      }
+
+      void publish_state(const std::string txt){
+        
       }
 
     };

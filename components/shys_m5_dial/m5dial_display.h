@@ -15,7 +15,7 @@ namespace esphome
 
                 int timeToScreenOff = 30000;
                 unsigned long lastEvent = 0;
-                std::function<void(const char*)> publish_state_action;
+                std::function<void(const std::string)> publish_state_action;
 
                 typedef struct rgb {
                     float r, g, b;
@@ -225,7 +225,7 @@ namespace esphome
 
 
             public:
-                void on_publish_state(std::function<void(const char*)> callback){
+                void on_publish_state(std::function<void(const std::string)> callback){
                     this->publish_state_action = callback;
                 }
 

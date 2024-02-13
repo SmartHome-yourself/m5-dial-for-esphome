@@ -12,7 +12,6 @@ namespace esphome
                 std::function<void(void)> short_button_press_action;
                 std::function<void(void)> long_button_press_action;
 
-
                 int longPressMs = 1500;
 
                 long oldPosition = 0;
@@ -40,16 +39,17 @@ namespace esphome
                 }
 
 
-
-
                 void handleRotary(){
                     long newPosition = M5Dial.Encoder.read();
                     if (newPosition != this->oldPosition) {
                         if(newPosition > this->oldPosition){
+                            ESP_LOGI("DEVICE", "Rotary right");
                             this->rotary_right_action();
                         } else {
+                            ESP_LOGI("DEVICE", "Rotary left");
                             this->rotary_left_action();
                         }
+
                         this->oldPosition = newPosition;
                     }
                 }
@@ -72,8 +72,10 @@ namespace esphome
                     if (M5Dial.BtnA.wasReleased()) {
                         if(longPress){
                             this->long_button_press_action();
+                            ESP_LOGI("DEVICE", "Long press");
                         } else {
                             this->short_button_press_action();
+                            ESP_LOGI("DEVICE", "Short press");
                         }
                         is_event = true;
                     }

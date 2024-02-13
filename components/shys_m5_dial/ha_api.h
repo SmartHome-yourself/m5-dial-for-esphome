@@ -11,6 +11,10 @@ namespace esphome
                 esphome::api::HomeassistantServiceMap resp_kv;
                 
             public:
+                void turnLightOn(String entity){
+                    turnLightOn(entity, -1, -1);
+                }
+
                 void turnLightOn(String entity, int brightness){
                     turnLightOn(entity, brightness, -1);
                 }
@@ -24,10 +28,12 @@ namespace esphome
                     resp_kv.value = entity.c_str();
                     resp.data.push_back(resp_kv);
                     
-                    resp_kv.key = "brightness_pct";
-                    resp_kv.value = String(brightness).c_str();
-                    resp.data.push_back(resp_kv);
-                    
+                    if(brightness >= 0){
+                        resp_kv.key = "brightness_pct";
+                        resp_kv.value = String(brightness).c_str();
+                        resp.data.push_back(resp_kv);
+                    }
+
                     if(color >= 0){
                         colorValue = str_sprintf("{{(%d,100)|list}}", color);
                         ESP_LOGD("HA_API", "light on: %s (%i) HS-Color: %s", entity.c_str(), brightness, colorValue.c_str());

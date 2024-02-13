@@ -56,11 +56,6 @@ def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
 
-    if CONF_DEVICES in config:
-        confDevices = config[CONF_DEVICES]
-        for deviceEntry in confDevices:
-            cg.add(var.addDevice(deviceEntry[CONF_DEVICE_ENTRY_ID], deviceEntry[CONF_DEVICE_ENTRY_NAME], deviceEntry[CONF_DEVICE_RGB], deviceEntry[CONF_DEVICE_DIMM]))
-
     if CONF_SCREEN_OFF_TIME in config:
         screenOffTime = config[CONF_SCREEN_OFF_TIME]
         cg.add(var.setScreenOffTime(screenOffTime))
@@ -80,4 +75,9 @@ def to_code(config):
     if CONF_ROTARY_STEP_WIDTH in config:
         rotaryStepWidth = config[CONF_ROTARY_STEP_WIDTH]
         cg.add(var.setRotaryStepWidth(rotaryStepWidth))
+
+    if CONF_DEVICES in config:
+        confDevices = config[CONF_DEVICES]
+        for deviceEntry in confDevices:
+            cg.add(var.addDevice(deviceEntry[CONF_DEVICE_ENTRY_ID], deviceEntry[CONF_DEVICE_ENTRY_NAME]))
 

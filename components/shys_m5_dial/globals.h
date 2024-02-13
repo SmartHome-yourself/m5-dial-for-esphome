@@ -28,24 +28,17 @@
         TOUCH_STATE_TMP, TOUCH_STATE_FLICK, TOUCH_STATE_FLICK_END, TOUCH_STATE_FLICK_BEGIN,
         TOUCH_STATE_TMP, TOUCH_STATE_DRAG, TOUCH_STATE_DRAG_END, TOUCH_STATE_DRAG_BEGIN };
 
-    static const uint16_t DEVICE_MODE_BRIGHTNESS = 0;
-    static const uint16_t DEVICE_MODE_COLOR = 1;
-    static const uint16_t DEVICE_MODE_POSITION = 2;
-    static const uint16_t DEVICE_MODE_POWER = 3;
-
-    static std::vector<uint16_t> LIGHT_MODES = {DEVICE_MODE_BRIGHTNESS, DEVICE_MODE_COLOR};
-    static std::vector<uint16_t> COVER_MODES = {DEVICE_MODE_POSITION};
-    static std::vector<uint16_t> FAN_MODES = {DEVICE_MODE_POWER};
-
-    static constexpr size_t lightModeListSize = sizeof(LIGHT_MODES) / sizeof(LIGHT_MODES[0]);
-    static constexpr size_t coverModeListSize = sizeof(COVER_MODES) / sizeof(COVER_MODES[0]);
-    static constexpr size_t fanModeListSize = sizeof(FAN_MODES) / sizeof(FAN_MODES[0]);
-
     static const char *TOUCH_SWIPE_NONE = "none";
     static const char *TOUCH_SWIPE_UP = "up";
     static const char *TOUCH_SWIPE_DOWN = "down";
     static const char *TOUCH_SWIPE_LEFT = "left";
     static const char *TOUCH_SWIPE_RIGHT = "right";
+
+    static const char *ROTARY_LEFT = "left";
+    static const char *ROTARY_RIGHT = "right";
+
+    static const char *BUTTON_SHORT = "short";
+    static const char *BUTTON_LONG = "long";    
 
 #endif
 

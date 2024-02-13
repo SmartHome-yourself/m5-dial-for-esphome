@@ -27,9 +27,11 @@ namespace esphome
 
             public:
                 void on_touch(std::function<void(uint16_t, uint16_t)> callback){
+                    ESP_LOGD("DEVICE", "register on_touch Callback");
                     this->touch_action = callback;
                 }
                 void on_swipe(std::function<void(const char*)> callback){
+                    ESP_LOGD("DEVICE", "register on_swipe Callback");
                     this->swipe_action = callback;
                 }
 
@@ -70,11 +72,15 @@ namespace esphome
 
                             if(swipeDirection == TOUCH_SWIPE_NONE){
                                 this->touch_action(t.x, t.y);
+                                ESP_LOGI("TOUCH", "%s: %i / %i", "Touch: ", t.x, t.y);
                             } else {
                                 this->swipe_action(swipeDirection);
+                                ESP_LOGI("TOUCH", "Swipe: %s", swipeDirection);
                             }
+                            
                         } else if( strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_TOUCH_END) == 0){
                             this->touch_action(t.x, t.y);
+                            ESP_LOGI("TOUCH", "%s: %i / %i", "Touch: ", t.x, t.y);
                         }
 
                     }

@@ -6,7 +6,7 @@ namespace esphome
     {
         class HaDeviceModePercentage: public esphome::shys_m5_dial::HaDeviceMode {
             protected:
-                void showPercentageMenu(LovyanGFX* gfx, uint16_t currentValue, HaDevice& currentDevice){
+                void showPercentageMenu(LovyanGFX* gfx, uint16_t currentValue){
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
 
@@ -25,7 +25,7 @@ namespace esphome
                                     height / 2 - 30);
                     
                     gfx->setTextSize(1);
-                    gfx->drawString(currentDevice.getName().c_str(),
+                    gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
                     gfx->drawString("Brightness",
@@ -36,10 +36,16 @@ namespace esphome
                 }
 
             public:
-                void refreshDisplay(M5DialDisplay& display, HaDevice& currentDevice, bool init) override {
+                HaDeviceModePercentage(HaDevice& device) : HaDeviceMode(device){}
+
+                void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Percentage-Modus");
-                    showPercentageMenu(display.getGfx(), round((float)getValue()), currentDevice);
+                    showPercentageMenu(display.getGfx(), round((float)getValue()));
                 }
+
+                void registerHAListener() override {
+                }
+                
 
         };
     }

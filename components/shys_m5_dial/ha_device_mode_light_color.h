@@ -7,8 +7,8 @@ namespace esphome
     {
         class HaDeviceModeLightColor: public esphome::shys_m5_dial::HaDeviceMode {
             protected:
-                void sendValueToHomeAssistant(HaDevice& device, int value) override {
-                    haApi.turnLightOn(device.getEntityId(), -1, value);
+                void sendValueToHomeAssistant(int value) override {
+                    haApi.turnLightOn(this->device.getEntityId(), -1, value);
                 }
 
                 typedef struct rgb {
@@ -107,7 +107,7 @@ namespace esphome
                     }
                 }
 
-                void refreshColorMenu(LovyanGFX* gfx, HaDevice& currentDevice){
+                void refreshColorMenu(LovyanGFX* gfx){
                     int currentValue = getValue();
                     uint32_t complementary_color = getComplementaryByDegree(currentValue);
 
@@ -127,7 +127,7 @@ namespace esphome
                                     height / 2 - 20);
 
                     gfx->setTextSize(1);
-                    gfx->drawString(currentDevice.getName().c_str(),
+                    gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
                     gfx->drawString("Color",
@@ -138,7 +138,7 @@ namespace esphome
                     gfx->endWrite();                      // Release SPI bus
                 }
 
-                void showColorMenu(LovyanGFX* gfx, HaDevice& currentDevice){
+                void showColorMenu(LovyanGFX* gfx){
                     int currentValue = getValue();
                     uint32_t complementary_color = getComplementaryByDegree(currentValue);
 
@@ -155,26 +155,52 @@ namespace esphome
 
                     gfx->endWrite();                      // Release SPI bus
 
-                    refreshColorMenu(gfx, currentDevice);
+                    refreshColorMenu(gfx);
                 }
 
 
             public:
-                HaDeviceModeLightColor() : HaDeviceMode(){
+                HaDeviceModeLightColor(HaDevice& device) : HaDeviceMode(device){
                     this->maxValue = 360;
                     this->endlessRotaryValue = true;
                 }
 
-                void refreshDisplay(M5DialDisplay& display, HaDevice& currentDevice, bool init) override {
+                void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Farbwahl-Modus");
                     if(init){
-                        showColorMenu(display.getGfx(), currentDevice);
+                        showColorMenu(display.getGfx());
                     } else {
-                        refreshColorMenu(display.getGfx(), currentDevice);
+                        refreshColorMenu(display.getGfx());
                     }
                 }
 
-                bool onTouch(M5DialDisplay& display, HaDevice& currentDevice, uint16_t x, uint16_t y) override {
+                void registerHAListener() override {
+                    std::string attrName = "hs_color";
+                    api::global_api_server->subscribe_home_assistant_state(
+                                this->device.getEntityId().c_str(),
+                                attrName, 
+                                [this](const std::string &state) {
+
+                            std::string colorString = "";          
+                            std::string::size_type pos = state.find(',');
+                            
+                            if (pos != std::string::npos) {
+                                colorString = state.substr(1, pos-1);
+                            }
+                            ESP_LOGD("HA_API", "HS_Color value %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
+
+                            auto val = parse_number<float>(colorString.c_str());
+                            if (!val.has_value()) {
+                                this->setReceivedValue(0);
+                                ESP_LOGD("HA_API", "No Color value in %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
+                            } else {
+                                this->setReceivedValue(val.value());
+                                ESP_LOGI("HA_API", "Got Color value %f for %s", val.value(), this->device.getEntityId().c_str());
+                            }
+                    });
+                }
+                
+                bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
                     uint16_t degree = display.getDegByCoord(x, y);
                     setValue(degree);
                     ESP_LOGD("TOUCH", "Neuen Farbwert auf %d gesetzt", degree);
@@ -182,7 +208,7 @@ namespace esphome
                     return true;
                 }
 
-                bool onRotary(M5DialDisplay& display, HaDevice& currentDevice, const char * direction) override {
+                bool onRotary(M5DialDisplay& display, const char * direction) override {
                     if (strcmp(direction, ROTARY_LEFT)==0){
                         this->raiseCurrentValue();
                     } else if (strcmp(direction, ROTARY_RIGHT)==0){
@@ -192,9 +218,9 @@ namespace esphome
                     return true;
                 }      
 
-                bool onButton(M5DialDisplay& display, HaDevice& currentDevice, const char * clickType) override {
+                bool onButton(M5DialDisplay& display, const char * clickType) override {
                     if (strcmp(clickType, BUTTON_SHORT)==0){
-                        haApi.toggleLight(currentDevice.getEntityId());
+                        haApi.toggleLight(this->device.getEntityId());
                         return true;
                     } 
                     return false;

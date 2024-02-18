@@ -11,15 +11,15 @@ namespace esphome
                 esphome::api::HomeassistantServiceMap resp_kv;
                 
             public:
-                void turnLightOn(String entity){
+                void turnLightOn(const std::string& entity){
                     turnLightOn(entity, -1, -1);
                 }
 
-                void turnLightOn(String entity, int brightness){
+                void turnLightOn(const std::string& entity, int brightness){
                     turnLightOn(entity, brightness, -1);
                 }
 
-                void turnLightOn(String entity, int brightness, int color){
+                void turnLightOn(const std::string& entity, int brightness, int color){
                     ESP_LOGD("HA_API", "light on values: %s (%i) Color: %i", entity.c_str(), brightness, color);
 
                     resp.service = "light.turn_on";
@@ -50,7 +50,30 @@ namespace esphome
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                 }
 
-                void turnLightOff(String entity){
+
+                void turnLightOnWhite(const std::string& entity, int kelvin){
+                    ESP_LOGD("HA_API", "light on values: %s Kelvin: %i", entity.c_str(),  kelvin);
+
+                    resp.service = "light.turn_on";
+                    
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    if(kelvin >= 0){
+                        resp_kv.key = "kelvin";
+                        resp_kv.value = String(kelvin).c_str();
+                        resp.data_template.push_back(resp_kv);                    
+                        
+                        ESP_LOGI("HA_API", "turn light on: %s  Kelvin: %s", entity.c_str(), colorValue.c_str());
+                    } else {
+                        ESP_LOGI("HA_API", "turn light on: %s", entity.c_str());
+                    }
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                }
+
+                void turnLightOff(const std::string& entity){
                     esphome::api::HomeassistantServiceResponse resp;
                     esphome::api::HomeassistantServiceMap resp_kv;
 
@@ -65,7 +88,7 @@ namespace esphome
                     ESP_LOGI("HA_API", "turn light off: %s", entity.c_str());
                 }
 
-                void toggleLight(String entity){
+                void toggleLight(const std::string& entity){
                     esphome::api::HomeassistantServiceResponse resp;
                     esphome::api::HomeassistantServiceMap resp_kv;
 

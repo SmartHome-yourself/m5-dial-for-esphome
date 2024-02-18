@@ -26,6 +26,7 @@ namespace esphome
                 bool endlessRotaryValue = false;
 
                 HaApi haApi;
+                HaDevice& device;
 
                 bool isApiCallNeeded(){
                     if ( esphome::millis() - lastApiCall < apiSendLock ) {
@@ -40,49 +41,85 @@ namespace esphome
                 }
 
                 void raiseCurrentValue(){
-                    if(this->value <= this->maxValue - rotaryStepWidth){
-                        setValue(this->value + rotaryStepWidth);
-                    } else {
+                    int newValue = this->value + rotaryStepWidth;
+                    newValue = getNextToRotaryStepwidth(newValue);
+
+                    if(newValue > this->maxValue){
                         setValue(endlessRotaryValue?this->minValue:this->maxValue);
+                    } else {
+                        setValue(newValue);
                     }
                 }
 
                 void reduceCurrentValue(){
-                    if(this->value >= this->minValue + rotaryStepWidth){
-                        setValue(this->value - rotaryStepWidth);
+                    int newValue = this->value - rotaryStepWidth;
+                    newValue = getNextToRotaryStepwidth(newValue);
+
+                    if(newValue >= this->minValue){
+                        setValue(newValue);
                     } else {
                         setValue(endlessRotaryValue?this->maxValue:this->minValue);
                     }
                 }
 
-                virtual void sendValueToHomeAssistant(HaDevice& device, int value) = 0;
+                int getNextToRotaryStepwidth(int val){
+                    int rst = (val % rotaryStepWidth);
+                    if(rst >= (rotaryStepWidth/2)){
+                        val += rotaryStepWidth-rst;
+                    } else {
+                        val -= rst;
+                    }
+                    return val;
+                }
+
+                uint16_t getValueForXPosition(uint16_t x){
+                    return map(x, 0, M5Dial.Display.width(), this->minValue, this->maxValue);
+                }
+
+                uint16_t getValueForYPosition(uint16_t y){
+                    return this->maxValue - map(y, 0, M5Dial.Display.height(), this->minValue, this->maxValue) + this->minValue;
+                }
+
+                uint16_t getDisplayPositionX(uint16_t currentValue){
+                    return map(currentValue, this->minValue, this->maxValue, 0, M5Dial.Display.width());
+                }
+
+                uint16_t getDisplayPositionY(uint16_t currentValue){
+                    return map(currentValue, this->minValue, this->maxValue, 0, M5Dial.Display.height());
+                }
+
+
+                virtual void sendValueToHomeAssistant(int value) = 0;
 
             public:
-                virtual void refreshDisplay(M5DialDisplay& display, HaDevice& currentDevice, bool init) = 0;
+                HaDeviceMode(HaDevice& device) : device(device) {}
+
+                virtual void refreshDisplay(M5DialDisplay& display, bool init) = 0;
+                virtual void registerHAListener() = 0;
 
 
-                virtual bool onTouch(M5DialDisplay& display, HaDevice& currentDevice, uint16_t x, uint16_t y) {
+                virtual bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) {
                     return false;
                 }
 
-                virtual bool onSwipe(M5DialDisplay& display, HaDevice& currentDevice, const char * direction) {
+                virtual bool onSwipe(M5DialDisplay& display, const char * direction) {
                     return false;
                 }
 
-                virtual bool onRotary(M5DialDisplay& display, HaDevice& currentDevice, const char * direction) {                    
+                virtual bool onRotary(M5DialDisplay& display, const char * direction) {                    
                     return false;
                 }
 
-                virtual bool onButton(M5DialDisplay& display, HaDevice& currentDevice, const char * clickType) {
+                virtual bool onButton(M5DialDisplay& display, const char * clickType) {
                     return false;
                 }
 
 
-                void updateHomeAssistantValue(HaDevice& device){
+                void updateHomeAssistantValue(){
                     if(this->isValueModified() && this->isApiCallNeeded() ) {
                         lastApiCall = esphome::millis();
 
-                        this->sendValueToHomeAssistant(device, getValue());
+                        this->sendValueToHomeAssistant(getValue());
 
                         currentValueModified = false;
                     }
@@ -115,6 +152,9 @@ namespace esphome
                     return this->currentValueModified;
                 }
 
+                void setRotaryStepWidth(int stepWidth){
+                    this->rotaryStepWidth = stepWidth;
+                }
 
         };
     }

@@ -6,15 +6,15 @@ namespace esphome
     {
         class HaDeviceModeLightOnOff: public esphome::shys_m5_dial::HaDeviceMode {
             protected:
-                void sendValueToHomeAssistant(HaDevice& device, int value) override {
+                void sendValueToHomeAssistant(int value) override {
                     if(getValue()<=0){
-                        haApi.turnLightOff(device.getEntityId());
+                        haApi.turnLightOff(this->device.getEntityId());
                     } else {
-                        haApi.turnLightOn(device.getEntityId());
+                        haApi.turnLightOn(this->device.getEntityId());
                     }
                 }
 
-                void showBrightnessMenu(LovyanGFX* gfx, HaDevice& currentDevice){
+                void showOnOffMenu(LovyanGFX* gfx){
                     uint16_t currentValue = getValue();
 
                     uint16_t height = gfx->height();
@@ -34,7 +34,7 @@ namespace esphome
                                     height / 2 - 30);                        
                     
                     gfx->setTextSize(1);
-                    gfx->drawString(currentDevice.getName().c_str(),
+                    gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
                     gfx->drawString("On/Off",
@@ -45,24 +45,45 @@ namespace esphome
                 }
 
             public:
-                void refreshDisplay(M5DialDisplay& display, HaDevice& currentDevice, bool init) override {
-                    this->showBrightnessMenu(display.getGfx(), currentDevice);
+                HaDeviceModeLightOnOff(HaDevice& device) : HaDeviceMode(device){}
+
+                void refreshDisplay(M5DialDisplay& display, bool init) override {
+                    this->showOnOffMenu(display.getGfx());
                     ESP_LOGD("DISPLAY", "An/Aus-Modus");
                 }
 
-                bool onTouch(M5DialDisplay& display, HaDevice& currentDevice, uint16_t x, uint16_t y) override {
-                    haApi.toggleLight(currentDevice.getEntityId());
+                void registerHAListener() override {
+                    std::string attrName = "";
+                    api::global_api_server->subscribe_home_assistant_state(
+                                this->device.getEntityId().c_str(),
+                                attrName, 
+                                [this](const std::string &state) {
+
+                        int newState = strcmp("on", state.c_str())==0?1:0;
+
+                        this->setReceivedValue(newState);
+                        ESP_LOGI("HA_API", "Got value %s for %s", state.c_str(), this->device.getEntityId().c_str());
+                    });
+                }
+
+                bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
+                    haApi.toggleLight(this->device.getEntityId());
                     return true;
                 }
 
-                bool onRotary(M5DialDisplay& display, HaDevice& currentDevice, const char * direction) override {                    
-                    haApi.toggleLight(currentDevice.getEntityId());
+                bool onRotary(M5DialDisplay& display, const char * direction) override {
+                    if(strcmp(direction, ROTARY_LEFT)==0){
+                        haApi.turnLightOff(this->device.getEntityId());
+                    } else if(strcmp(direction, ROTARY_RIGHT)==0){
+                        haApi.turnLightOn(this->device.getEntityId());
+                    }
+
                     return true;
                 }
 
-                bool onButton(M5DialDisplay& display, HaDevice& currentDevice, const char * clickType) override {
+                bool onButton(M5DialDisplay& display, const char * clickType) override {
                     if (strcmp(clickType, BUTTON_SHORT)==0){
-                        haApi.toggleLight(currentDevice.getEntityId());
+                        haApi.toggleLight(this->device.getEntityId());
                         return true;
                     } 
                     return false;

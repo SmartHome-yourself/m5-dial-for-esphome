@@ -1,6 +1,6 @@
 #pragma once
 #include "ha_device_mode.h"
-
+#include <ArduinoJson.h>
 namespace esphome
 {
     namespace shys_m5_dial
@@ -9,10 +9,14 @@ namespace esphome
         class HaDevice {
             protected:
                 int index;
-                String entity;
-                String name;
+                std::string entity;
+                std::string name;
 
-                uint16_t currentModeCount;
+                static const size_t bufferSize = 1024;
+                StaticJsonDocument<bufferSize> jsonBuffer;
+                JsonObject modeConfig;
+
+                uint16_t currentModeCount = 0;
                 uint16_t currentModeIndex = 0;
                 uint16_t maxRotary = 100;
                 int lastValue = 0;
@@ -22,6 +26,7 @@ namespace esphome
                 std::vector<HaDeviceMode*> deviceModes = {};
 
                 void addMode(HaDeviceMode* newMode){
+                    newMode->registerHAListener();
                     this->deviceModes.push_back(newMode);
                     currentModeCount++;
                 }
@@ -30,21 +35,28 @@ namespace esphome
                     return deviceModes[currentModeIndex];
                 }
 
-                void initDefault(String entity_id, String name){
-                    this->entity       = entity_id;
-                    this->name         = name;
-                    this->lastValue    = 0;
+                void loadModesConfigJson(const std::string& modesJsonString){
+                    DeserializationError error = deserializeJson(jsonBuffer, modesJsonString);
+                    if (error) {
+                        ESP_LOGW("DEVICE", "Fehler beim Parsen des JSON: %s", error.c_str());
+                        return;
+                    }
+                    this->modeConfig = jsonBuffer.as<JsonObject>();
                 }
 
-
             public:
-                virtual void init(String entity_id, String name) = 0;
+                HaDevice(const std::string& entity_id, const std::string& name, const std::string& modesJsonString) : entity(entity_id), name(name) {
+                    this->lastValue    = 0;
+                    loadModesConfigJson(modesJsonString);
+                }    
+
+                virtual void init() = 0;
                 
-                String getName(){
+                std::string getName(){
                     return this->name;
                 }
 
-                String getEntityId(){
+                std::string getEntityId(){
                     return this->entity;
                 }
 
@@ -75,31 +87,33 @@ namespace esphome
                 }
 
                 void refreshDisplay(M5DialDisplay& display, bool deviceChanged){
-                    getCurrentMode()->refreshDisplay(display, *this, deviceChanged || modeChanged);
+                    getCurrentMode()->refreshDisplay(display, deviceChanged || modeChanged);
                     modeChanged = false;
                 }
 
                 void updateHomeAssistantValue(){
-                    getCurrentMode()->updateHomeAssistantValue(*this);
+                    getCurrentMode()->updateHomeAssistantValue();
                 }
 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y){
-                    return getCurrentMode()->onTouch(display, *this, x, y);
+                    ESP_LOGD("DEVICE", "HaDevice.onTouch: %i/%i", x, y);
+                    return getCurrentMode()->onTouch(display, x, y);
                 }
 
                 bool onSwipe(M5DialDisplay& display, const char * direction){
-                    return getCurrentMode()->onSwipe(display, *this, direction);
+                    ESP_LOGD("DEVICE", "HaDevice.onSwipe: %s", direction);
+                    return false; // getCurrentMode()->onSwipe(display, *this, direction);
                 }
 
                 bool onRotary(M5DialDisplay& display, const char * direction){
-                    return getCurrentMode()->onRotary(display, *this, direction);
+                    ESP_LOGD("DEVICE", "HaDevice.onRotary: %s", direction);
+                    return getCurrentMode()->onRotary(display, direction);
                 }
 
                 bool onButton(M5DialDisplay& display, const char * clickType){
-                    return getCurrentMode()->onButton(display, *this, clickType);
+                    ESP_LOGD("DEVICE", "HaDevice.onButton: %s", clickType);
+                    return getCurrentMode()->onButton(display, clickType);
                 }
-
-
 
         };
 

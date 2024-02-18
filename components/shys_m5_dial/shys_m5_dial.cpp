@@ -25,6 +25,7 @@ namespace esphome
          */
         void ShysM5Dial::loop()
         {
+            M5.delay(1);
             M5Dial.update();
             esphome::delay(1);
             ShysM5Dial::doLoop();

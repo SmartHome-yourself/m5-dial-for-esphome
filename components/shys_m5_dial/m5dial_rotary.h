@@ -19,26 +19,36 @@ namespace esphome
 
             public:
                 void on_rotary_right(std::function<void(void)> callback){
+                    ESP_LOGD("DEVICE", "register on_rotary_right Callback");
                     this->rotary_right_action = callback;
                 }
 
                 void on_rotary_left(std::function<void(void)> callback){
+                    ESP_LOGD("DEVICE", "register on_rotary_left Callback");
                     this->rotary_left_action = callback;
                 }
 
                 void on_short_button_press(std::function<void(void)> callback){
+                    ESP_LOGD("DEVICE", "register on_short_button_press Callback");
                     this->short_button_press_action = callback;
                 }
 
                 void on_long_button_press(std::function<void(void)> callback){
+                    ESP_LOGD("DEVICE", "register on_long_button_press Callback");
                     this->long_button_press_action = callback;
                 }
 
+
+               /**
+                * 
+                */
                 void setLongPressDuration(int value){
                     longPressMs = value;
                 }
 
-
+               /**
+                * 
+                */
                 void handleRotary(){
                     long newPosition = M5Dial.Encoder.read();
                     if (newPosition != this->oldPosition) {
@@ -54,7 +64,9 @@ namespace esphome
                     }
                 }
 
-
+               /**
+                * 
+                */
                 bool handleButtonPress(){
                     bool is_event = false;
 

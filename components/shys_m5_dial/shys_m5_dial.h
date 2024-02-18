@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "ha_api.h"
 #include "ha_device.h"
+#include "ha_device_light.h"
 #include "M5Dial.h"
 
 namespace esphome
@@ -36,6 +37,8 @@ namespace esphome
       unsigned long lastReceiveEvent = 0;
       unsigned long lastDisplayRefresh = 0;
       
+      int lastLoop = 0;
+
       bool enableRFID = true;
       bool enableEncoder = true;
 
@@ -46,14 +49,6 @@ namespace esphome
 
       bool startsWith(const char *pre, const char *str){
           return strncmp(pre, str, strlen(pre)) == 0;
-      }
-
-      HaDevice* getNewDevice(String entity_id){
-        if(this->startsWith("light.", entity_id.c_str())){
-          return new HaDeviceLight();
-        } 
-
-        return nullptr;
       }
 
       int getCurrentValue(){
@@ -93,6 +88,22 @@ namespace esphome
         }
       }
 
+      
+     /**
+      * 
+      */
+      void addDevice(HaDevice* device){
+        if (device != nullptr) {
+          ESP_LOGD("DEVICE", "New Device: %s", device->getName().c_str());
+
+          devices[deviceAnzahl] = device;
+          devices[deviceAnzahl]->init();
+          deviceAnzahl++;
+          ESP_LOGD("DEVICE", "Device added");
+        }
+      }
+
+
     public:
       void dump_config() override;
       void setup() override;
@@ -127,6 +138,19 @@ namespace esphome
         this->rotaryStepWidth = value;
       }
 
+
+     /**
+      * 
+      */
+      void addLight(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceLight* light = new HaDeviceLight(entity_id, name, modes);
+
+        //ESP_LOGD("DEVICE", "mode_config: %s", modes.c_str());
+        addDevice(light);
+      }
+
+
+
      /**
       * 
       */
@@ -147,14 +171,14 @@ namespace esphome
 
         m5DialTouch->on_touch(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchInput, this, _1, _2));
         m5DialTouch->on_swipe(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchSwipe, this, _1));
-
-        ESP_LOGI("DEVICE", "Initialisierung abgeschlossen");
       }
+
+
+
 
      /**
       * 
       */
-      int lastLoop = 0;
       void doLoop(){
         if(api::global_api_server->is_connected()){
           m5DialRotary->handleRotary();
@@ -188,26 +212,6 @@ namespace esphome
           lastLoop = 3;          
         }
       }
-
-
-     /**
-      * 
-      */
-      void addDevice(String entity_id, String name)
-      {
-        HaDevice* device = getNewDevice(entity_id);
-
-        if (device != nullptr) {
-          ESP_LOGD("DEVICE", "New Device: %s", entity_id.c_str());
-
-          devices[deviceAnzahl] = device;
-          devices[deviceAnzahl]->init(entity_id, name);
-          deviceAnzahl++;
-        }
-        ESP_LOGD("DEVICE", "Device added");
-      }
-
-
 
 
 
@@ -255,6 +259,7 @@ namespace esphome
       void longButtonPress(){
         if(m5DialDisplay->isDisplayOn()){
           m5DialDisplay->resetLastEventTimer();
+          devices[currentDevice]->nextMode();
         }
       }
 
@@ -272,20 +277,24 @@ namespace esphome
       * 
       */
       void touchSwipe(const char* direction){
+        ESP_LOGD("TOUCH", "touchSwipe direction: %s", direction);
         m5DialDisplay->resetLastEventTimer();
-        if(! devices[currentDevice]->onSwipe(*m5DialDisplay, direction) ){
-          if(strcmp(direction, TOUCH_SWIPE_LEFT)==0){
-            this->previousDevice();
-          } else if(strcmp(direction, TOUCH_SWIPE_RIGHT)==0){
-            this->nextDevice();
-          } else if(strcmp(direction, TOUCH_SWIPE_UP)==0){
-            devices[currentDevice]->previousMode();
-          } else if(strcmp(direction, TOUCH_SWIPE_DOWN)==0){
-            devices[currentDevice]->nextMode();
-          } 
+        if(m5DialDisplay->isDisplayOn()){
+          if(! devices[currentDevice]->onSwipe(*m5DialDisplay, direction) ){
+
+            if(strcmp(direction, TOUCH_SWIPE_LEFT)==0){
+              this->previousDevice();
+            } else if(strcmp(direction, TOUCH_SWIPE_RIGHT)==0){
+              this->nextDevice();
+            } else if(strcmp(direction, TOUCH_SWIPE_UP)==0){
+              devices[currentDevice]->previousMode();
+            } else if(strcmp(direction, TOUCH_SWIPE_DOWN)==0){
+              devices[currentDevice]->nextMode();
+            } 
+
+          }
         }
       }
-
 
     };
   }

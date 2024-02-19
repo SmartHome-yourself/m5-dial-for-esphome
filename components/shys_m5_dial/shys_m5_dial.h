@@ -18,10 +18,11 @@ namespace esphome
     protected:
       int timeToScreenOff = 30000;
       int longPressMs = 1200;
-      int sendValueDelay = 1200;
-      int receiveValueDelay = 3000;
       int rotaryStepWidth = 10;
       uint16_t displayRefeshPause = 700;
+
+      int apiSendDelay = 1000; // Verzögerung nach Wert-Änderung (um nicht jeden Wert beim drehen des Rades zu senden)
+      int apiSendLock = 3000;  // Wartezeit zwischen einzelnden API-Aufrufen
 
       // -------------------------------
 
@@ -71,7 +72,6 @@ namespace esphome
         }
       }
 
-
       void nextDevice(){
         if(currentDevice >= deviceAnzahl-1){
           currentDevice = 0;
@@ -87,7 +87,6 @@ namespace esphome
           currentDevice = deviceAnzahl-1;
         }
       }
-
       
      /**
       * 
@@ -97,7 +96,13 @@ namespace esphome
           ESP_LOGD("DEVICE", "New Device: %s", device->getName().c_str());
 
           devices[deviceAnzahl] = device;
+
+          devices[deviceAnzahl]->setApiSendDelay(this->apiSendDelay);
+          devices[deviceAnzahl]->setApiSendLock(this->apiSendLock);
+          devices[deviceAnzahl]->setRotaryStepWidth(this->rotaryStepWidth);
+
           devices[deviceAnzahl]->init();
+
           deviceAnzahl++;
           ESP_LOGD("DEVICE", "Device added");
         }
@@ -123,14 +128,14 @@ namespace esphome
         m5DialRotary->setLongPressDuration(value);
       }
 
-      void setSendValueDelay(int value){
-        ESP_LOGI("DEVICE", "setSendValueDelay %i", value);
-        this->sendValueDelay = value;
+      void setApiSendDelay(int delayInMs){
+          ESP_LOGI("DEVICE", "setApiSendDelay %i", delayInMs);
+          this->apiSendDelay = delayInMs;
       }
-
-      void setReceiveValueDelay(int value){
-        ESP_LOGI("DEVICE", "setReceiveValueDelay %i", value);
-        this->receiveValueDelay = value;
+      
+      void setApiSendLock(int delayInMs){
+          ESP_LOGI("DEVICE", "setApiSendLock %i", delayInMs);
+          this->apiSendLock = delayInMs;
       }
 
       void setRotaryStepWidth(int value){
@@ -145,10 +150,8 @@ namespace esphome
       void addLight(const std::string& entity_id, const std::string& name, const std::string& modes){
         HaDeviceLight* light = new HaDeviceLight(entity_id, name, modes);
 
-        //ESP_LOGD("DEVICE", "mode_config: %s", modes.c_str());
         addDevice(light);
       }
-
 
 
      /**
@@ -172,8 +175,6 @@ namespace esphome
         m5DialTouch->on_touch(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchInput, this, _1, _2));
         m5DialTouch->on_swipe(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchSwipe, this, _1));
       }
-
-
 
 
      /**

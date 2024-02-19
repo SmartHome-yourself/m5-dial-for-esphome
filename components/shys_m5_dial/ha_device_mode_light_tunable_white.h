@@ -98,7 +98,10 @@ namespace esphome
                                 this->device.getEntityId().c_str(),
                                 attrName, 
                                 [this](const std::string &state) {
-                        ESP_LOGD("HA_API", "color_temp_kelvin value %s for %s", state.c_str(), this->device.getEntityId().c_str());
+
+                        if(this->isValueModified()){
+                            return;
+                        }
 
                         auto val = parse_number<int>(state);
                         if (!val.has_value()) {

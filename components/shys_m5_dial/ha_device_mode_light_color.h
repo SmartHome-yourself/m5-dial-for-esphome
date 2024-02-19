@@ -180,23 +180,27 @@ namespace esphome
                                 this->device.getEntityId().c_str(),
                                 attrName, 
                                 [this](const std::string &state) {
+                                
+                        if(this->isValueModified()){
+                            return;
+                        }
 
-                            std::string colorString = "";          
-                            std::string::size_type pos = state.find(',');
-                            
-                            if (pos != std::string::npos) {
-                                colorString = state.substr(1, pos-1);
-                            }
-                            ESP_LOGD("HA_API", "HS_Color value %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
+                        std::string colorString = "";          
+                        std::string::size_type pos = state.find(',');
+                        
+                        if (pos != std::string::npos) {
+                            colorString = state.substr(1, pos-1);
+                        }
+                        ESP_LOGD("HA_API", "HS_Color value %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
 
-                            auto val = parse_number<float>(colorString.c_str());
-                            if (!val.has_value()) {
-                                this->setReceivedValue(0);
-                                ESP_LOGD("HA_API", "No Color value in %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
-                            } else {
-                                this->setReceivedValue(val.value());
-                                ESP_LOGI("HA_API", "Got Color value %f for %s", val.value(), this->device.getEntityId().c_str());
-                            }
+                        auto val = parse_number<float>(colorString.c_str());
+                        if (!val.has_value()) {
+                            this->setReceivedValue(0);
+                            ESP_LOGD("HA_API", "No Color value in %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
+                        } else {
+                            this->setReceivedValue(val.value());
+                            ESP_LOGI("HA_API", "Got Color value %f for %s", val.value(), this->device.getEntityId().c_str());
+                        }
                     });
                 }
                 

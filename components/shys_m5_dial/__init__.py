@@ -15,20 +15,24 @@ CONF_DEVICE_ENTRY_ID                = "entity"
 CONF_DEVICE_ENTRY_NAME              = "name"
 CONF_DEVICE_MODES                   = "modes"
 
+CONF_SCREEN_OFF_TIME                = "screen_off_time"
+CONF_LONG_PRESS_DURATION            = "long_press_duration"
+CONF_SEND_VALUE_DELAY               = "send_value_delay"
+CONF_SEND_VALUE_LOCK                = "send_value_lock"
+CONF_ROTARY_STEP_WIDTH              = "rotary_step_width"
+
 CONF_DEVICE_LIGHTS                  = "lights"
 CONF_DEVICE_LIGHT_RGB_MODE          = "rgb_mode"
 CONF_DEVICE_LIGHT_DIMM_MODE         = "dimm_mode"
 CONF_DEVICE_LIGHT_WHITE_MODE        = "white_mode"
 
-
+# ALLGEMEINE MODE PARAMETER
 CONF_DEVICE_MODE_ENABLE             = "enable"
 CONF_DEVICE_MODE_ROTARY_STEPWIDTH   = "rotary_step_width"
 
-CONF_SCREEN_OFF_TIME                = "screen_off_time"
-CONF_LONG_PRESS_DURATION            = "long_press_duration"
-CONF_SEND_VALUE_DELAY               = "send_value_delay"
-CONF_RECEIVE_VALUE_DELAY            = "receive_value_delay"
-CONF_ROTARY_STEP_WIDTH              = "rotary_step_width"
+# WHITE-MODE PARAMETER
+CONF_DEVICE_MODE_WHITE_MIN_KELVIN   = "min_kelvin"
+CONF_DEVICE_MODE_WHITE_MAX_KELVIN   = "max_kelvin"
 
 
 # DEFAULTS
@@ -36,8 +40,10 @@ DEFAULT_NAME                = "M5 Stack Dial"
 DEFAULT_SCREEN_OFF_TIME     = 30000
 DEFAULT_LONG_PRESS_DURATION = 1200
 DEFAULT_SEND_VALUE_DELAY    = 1200
-DEFAULT_RECEIVE_VALUE_DELAY = 3000
+DEFAULT_SEND_VALUE_LOCK     = 3000
 DEFAULT_ROTARY_STEP_WIDTH   = 10
+DEFAULT_WHITE_MIN_KELVIN   = "2000"
+DEFAULT_WHITE_MAX_KELVIN   = "6500"
 
 
 shys_m5_dial_ns = cg.esphome_ns.namespace('shys_m5_dial')
@@ -51,9 +57,8 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_SCREEN_OFF_TIME, default=DEFAULT_SCREEN_OFF_TIME): cv.int_range(0, 999999),
     cv.Optional(CONF_LONG_PRESS_DURATION, default=DEFAULT_LONG_PRESS_DURATION): cv.int_range(0, 5000),
     cv.Optional(CONF_SEND_VALUE_DELAY, default=DEFAULT_SEND_VALUE_DELAY): cv.int_range(0, 999999),
-    cv.Optional(CONF_RECEIVE_VALUE_DELAY, default=DEFAULT_RECEIVE_VALUE_DELAY): cv.int_range(0, 999999),
+    cv.Optional(CONF_SEND_VALUE_LOCK, default=DEFAULT_SEND_VALUE_LOCK): cv.int_range(0, 999999),
     cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_ROTARY_STEP_WIDTH): cv.int_range(0, 100),
-
 
     cv.Optional(CONF_DEVICES, default=dict()): cv.All(dict({
     
@@ -64,17 +69,20 @@ CONFIG_SCHEMA = cv.Schema({
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_LIGHT_RGB_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH, default=20): cv.int_range(1, 100)
+                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 100)
                 })),
 
                 cv.Optional(CONF_DEVICE_LIGHT_DIMM_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH, default=10): cv.int_range(1, 100)
+                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 100)
                 })),
                 
                 cv.Optional(CONF_DEVICE_LIGHT_WHITE_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH, default=100): cv.int_range(1, 500)
+                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_DEVICE_MODE_WHITE_MIN_KELVIN, default=DEFAULT_WHITE_MIN_KELVIN): cv.int_range(1000, 10000),
+                    cv.Optional(CONF_DEVICE_MODE_WHITE_MAX_KELVIN, default=DEFAULT_WHITE_MAX_KELVIN): cv.int_range(1000, 10000)
+                    
                 }))
             }))
         })])
@@ -98,12 +106,12 @@ def to_code(config):
         cg.add(var.setLongPressDuration(longPressDuration))
 
     if CONF_SEND_VALUE_DELAY in config:
-        sendValueDelay = config[CONF_SEND_VALUE_DELAY]
-        cg.add(var.setSendValueDelay(sendValueDelay))
+        apiSendDelay = config[CONF_SEND_VALUE_DELAY]
+        cg.add(var.setApiSendDelay(apiSendDelay))
 
-    if CONF_RECEIVE_VALUE_DELAY in config:
-        receiveValuedelay = config[CONF_RECEIVE_VALUE_DELAY]
-        cg.add(var.setReceiveValueDelay(receiveValuedelay))
+    if CONF_SEND_VALUE_LOCK in config:
+        apiSendLock = config[CONF_SEND_VALUE_LOCK]
+        cg.add(var.setApiSendLock(apiSendLock))
 
     if CONF_ROTARY_STEP_WIDTH in config:
         rotaryStepWidth = config[CONF_ROTARY_STEP_WIDTH]

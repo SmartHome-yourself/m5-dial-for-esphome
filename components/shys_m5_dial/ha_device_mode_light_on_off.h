@@ -58,6 +58,10 @@ namespace esphome
                                 this->device.getEntityId().c_str(),
                                 attrName, 
                                 [this](const std::string &state) {
+                                    
+                        if(this->isValueModified()){
+                            return;
+                        }
 
                         int newState = strcmp("on", state.c_str())==0?1:0;
 

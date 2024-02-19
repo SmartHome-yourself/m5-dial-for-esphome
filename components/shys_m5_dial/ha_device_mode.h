@@ -16,8 +16,8 @@ namespace esphome
 
                 int rotaryStepWidth = 10;
 
-                int apiSendDelay = 1000; // Verzögerung nach Wert-Änderung (um nicht jeden Wert beim drehen des Rades zu senden)
-                int apiSendLock = 2000; // Wartezeit zwischen einzelnden API-Aufrufen
+                int apiSendDelay = 1000;
+                int apiSendLock = 2000;
             
                 bool currentValueModified = false;
                 unsigned long lastApiCall = 0;
@@ -144,8 +144,16 @@ namespace esphome
                     return this->minValue;
                 }
 
+                void setMinValue(int val){
+                    this->minValue = val;
+                }
+
                 int getMaxValue(){
                     return this->maxValue;
+                }
+
+                void setMaxValue(int val){
+                    this->maxValue = val;
                 }
 
                 bool isValueModified(){
@@ -156,6 +164,13 @@ namespace esphome
                     this->rotaryStepWidth = stepWidth;
                 }
 
+                void setApiSendDelay(int delayInMs){
+                    this->apiSendDelay = delayInMs;
+                }
+                
+                void setApiSendLock(int delayInMs){
+                    this->apiSendLock = delayInMs;
+                }
         };
     }
 }

@@ -18,15 +18,23 @@ namespace esphome
 
                 uint16_t currentModeCount = 0;
                 uint16_t currentModeIndex = 0;
-                uint16_t maxRotary = 100;
-                int lastValue = 0;
+
+                int apiSendDelay = 1000;
+                int apiSendLock = 2000;
+
+                int rotaryStepWidth = 10;
 
                 bool modeChanged = true;
 
                 std::vector<HaDeviceMode*> deviceModes = {};
 
                 void addMode(HaDeviceMode* newMode){
+                    newMode->setApiSendDelay(this->apiSendDelay);
+                    newMode->setApiSendLock(this->apiSendLock);
+                    newMode->setRotaryStepWidth(this->rotaryStepWidth);
+
                     newMode->registerHAListener();
+
                     this->deviceModes.push_back(newMode);
                     currentModeCount++;
                 }
@@ -37,6 +45,8 @@ namespace esphome
 
                 void loadModesConfigJson(const std::string& modesJsonString){
                     DeserializationError error = deserializeJson(jsonBuffer, modesJsonString);
+                    ESP_LOGW("DEVICE", "Modes JSON: %s", modesJsonString.c_str());
+
                     if (error) {
                         ESP_LOGW("DEVICE", "Fehler beim Parsen des JSON: %s", error.c_str());
                         return;
@@ -46,7 +56,6 @@ namespace esphome
 
             public:
                 HaDevice(const std::string& entity_id, const std::string& name, const std::string& modesJsonString) : entity(entity_id), name(name) {
-                    this->lastValue    = 0;
                     loadModesConfigJson(modesJsonString);
                 }    
 
@@ -66,6 +75,18 @@ namespace esphome
 
                 uint16_t getMaxRotary(){
                     return getCurrentMode()->getMaxValue();
+                }
+
+                void setRotaryStepWidth(int stepWidth){
+                    this->rotaryStepWidth = stepWidth;
+                }
+
+                void setApiSendDelay(int delayInMs){
+                    this->apiSendDelay = delayInMs;
+                }
+                
+                void setApiSendLock(int delayInMs){
+                    this->apiSendLock = delayInMs;
                 }
 
                 void nextMode(){

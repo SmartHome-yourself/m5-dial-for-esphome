@@ -53,7 +53,9 @@ namespace esphome
                                 this->device.getEntityId().c_str(),
                                 attrName, 
                                 [this](const std::string &state) {
-
+                        if(this->isValueModified()){
+                            return;
+                        }
                         auto val = parse_number<int>(state);
                         if (!val.has_value()) {
                             this->setReceivedValue(0);

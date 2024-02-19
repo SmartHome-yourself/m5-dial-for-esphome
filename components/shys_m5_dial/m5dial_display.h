@@ -32,11 +32,9 @@ namespace esphome
                     return gfx;
                 }
 
-
                 bool isDisplayOn(){
                     return M5Dial.Display.getBrightness() > 0;
                 }
-
 
                 void validateTimeout(){
                     if (esphome::millis() - lastEvent > timeToScreenOff ) {
@@ -51,8 +49,6 @@ namespace esphome
                 }
 
                 void showOffline(){
-                    ESP_LOGI("DISPLAY", "Display offline");
-
                     uint16_t height = this->getHeight();
                     uint16_t width  = this->getWidth();
 

@@ -6,6 +6,8 @@
 #include "ha_api.h"
 #include "ha_device.h"
 #include "ha_device_light.h"
+#include "ha_device_climate.h"
+#include "ha_device_cover.h"
 #include "M5Dial.h"
 
 namespace esphome
@@ -149,9 +151,27 @@ namespace esphome
       */
       void addLight(const std::string& entity_id, const std::string& name, const std::string& modes){
         HaDeviceLight* light = new HaDeviceLight(entity_id, name, modes);
-
         addDevice(light);
       }
+
+
+     /**
+      * 
+      */
+      void addClimate(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceClimate* climate = new HaDeviceClimate(entity_id, name, modes);
+        addDevice(climate);
+      }
+
+
+     /**
+      * 
+      */
+      void addCover(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceCover* climate = new HaDeviceCover(entity_id, name, modes);
+        addDevice(climate);
+      }
+
 
 
      /**
@@ -251,6 +271,7 @@ namespace esphome
         m5DialDisplay->resetLastEventTimer();
         M5Dial.Speaker.tone(4000, 20);
         if(m5DialDisplay->isDisplayOn()){
+          devices[currentDevice]->onButton(*m5DialDisplay, BUTTON_SHORT);
         }
       }
 

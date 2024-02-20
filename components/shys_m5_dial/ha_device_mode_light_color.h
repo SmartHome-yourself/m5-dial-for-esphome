@@ -213,13 +213,7 @@ namespace esphome
                 }
 
                 bool onRotary(M5DialDisplay& display, const char * direction) override {
-                    if (strcmp(direction, ROTARY_LEFT)==0){
-                        this->raiseCurrentValue();
-                    } else if (strcmp(direction, ROTARY_RIGHT)==0){
-                        this->reduceCurrentValue();
-                    }
-
-                    return true;
+                    return this->defaultOnRotary(display, direction);
                 }      
 
                 bool onButton(M5DialDisplay& display, const char * clickType) override {

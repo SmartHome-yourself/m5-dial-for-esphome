@@ -16,8 +16,8 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height-(height*currentValue/100), RED);
-                    gfx->fillRect(0, height-(height*currentValue/100), width, height, YELLOW);
+                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue) , RED);
+                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
 
                     gfx->setTextSize(3);
                     gfx->drawString((String(currentValue) + "%").c_str(),
@@ -28,7 +28,7 @@ namespace esphome
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
-                    gfx->drawString("Brightness",
+                    gfx->drawString("Percentage",
                                     width / 2,
                                     height / 2 + 50);  
 
@@ -42,11 +42,14 @@ namespace esphome
                     ESP_LOGD("DISPLAY", "refresh Display: Percentage-Modus");
                     showPercentageMenu(display.getGfx(), round((float)getValue()));
                 }
-
-                void registerHAListener() override {
-                }
                 
+                bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
+                    return this->defaultOnTouch(display, x, y);        
+                }
 
+                bool onRotary(M5DialDisplay& display, const char * direction) override {
+                    return this->defaultOnRotary(display, direction);
+                }
         };
     }
 }

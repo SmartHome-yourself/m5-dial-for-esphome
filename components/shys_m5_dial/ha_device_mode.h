@@ -63,11 +63,13 @@ namespace esphome
                 }
 
                 int getNextToRotaryStepwidth(int val){
-                    int rst = (val % rotaryStepWidth);
-                    if(rst >= (rotaryStepWidth/2)){
-                        val += rotaryStepWidth-rst;
-                    } else {
-                        val -= rst;
+                    if(rotaryStepWidth > 1){
+                        int rst = (val % rotaryStepWidth);
+                        if(rst >= (rotaryStepWidth/2)){
+                            val += rotaryStepWidth-rst;
+                        } else {
+                            val -= rst;
+                        }
                     }
                     return val;
                 }
@@ -85,7 +87,34 @@ namespace esphome
                 }
 
                 uint16_t getDisplayPositionY(uint16_t currentValue){
-                    return map(currentValue, this->minValue, this->maxValue, 0, M5Dial.Display.height());
+                    return M5Dial.Display.height() - map(currentValue, this->minValue, this->maxValue, 0, M5Dial.Display.height());
+                }
+
+
+                bool defaultOnTouch(M5DialDisplay& display, uint16_t x, uint16_t y)  {
+                    if(y > display.getHeight() * .97){
+                        y = display.getHeight();
+                    } else if (y < display.getHeight() * .03){
+                        y = 0;
+                    }
+                    
+                    uint16_t result = this->getValueForYPosition(y);
+                    result = getNextToRotaryStepwidth(result);
+
+                    this->setValue(result); 
+                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
+                    
+                    return true;                    
+                }
+
+                bool defaultOnRotary(M5DialDisplay& display, const char * direction)  {
+                    if (strcmp(direction, ROTARY_LEFT)==0){
+                        this->reduceCurrentValue();
+                    } else if (strcmp(direction, ROTARY_RIGHT)==0){
+                        this->raiseCurrentValue();
+                    }
+
+                    return true;
                 }
 
 

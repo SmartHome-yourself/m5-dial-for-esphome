@@ -20,8 +20,8 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height-(height*currentValue/100), RED);
-                    gfx->fillRect(0, height-(height*currentValue/100), width, height, YELLOW);
+                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue), RED);
+                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
 
                     gfx->setTextSize(3);
                     gfx->drawString((String(currentValue) + "%").c_str(),
@@ -68,29 +68,11 @@ namespace esphome
                 }
 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
-                    if(y > display.getHeight() * .97){
-                        y = display.getHeight();
-                    } else if (y < display.getHeight() * .03){
-                        y = 0;
-                    }
-                    
-                    uint16_t result = this->getValueForYPosition(y);
-                    result = getNextToRotaryStepwidth(result);
-
-                    this->setValue(result); 
-                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
-                    
-                    return true;                    
+                    return this->defaultOnTouch(display, x, y);
                 }
 
                 bool onRotary(M5DialDisplay& display, const char * direction) override {
-                    if (strcmp(direction, ROTARY_LEFT)==0){
-                        this->reduceCurrentValue();
-                    } else if (strcmp(direction, ROTARY_RIGHT)==0){
-                        this->raiseCurrentValue();
-                    }
-
-                    return true;
+                    return this->defaultOnRotary(display, direction);
                 }
 
                 bool onButton(M5DialDisplay& display, const char * clickType) override {

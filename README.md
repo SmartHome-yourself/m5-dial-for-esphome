@@ -4,7 +4,11 @@ Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-es
   
 Mit dieser Komponente wird der M5 Stack Dial zu einer universal-Fernbedienung für Home Assistant.  
 Aktuell werden nur Light-Entitäten unterstützt, in Zukunft sollen aber auch weitere Gerätearten darüber steuerbar sein.  
+  
+## Video
+[![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial als Home Assistant Fernbedienung")
 
+&nbsp;
   
 # Beispiel Konfiguration:
 ```yaml
@@ -37,8 +41,6 @@ shys_m5_dial:
             rotary_step_width: 5
       - entity: light.my_light2
         name: Light 2
-      - entity: light.my_light3
-        name: Light 3
         modes:
           dimm_mode:
             enable: true
@@ -47,8 +49,8 @@ shys_m5_dial:
             rotary_step_width: 100
             min_kelvin: 2500
             min_kelvin: 7000        
-      - entity: light.my_light4
-        name: Light 4
+      - entity: light.my_light3
+        name: Light 3
 ```
   
 &nbsp;  
@@ -58,7 +60,7 @@ In den Substitutions muss auf jeden Fall der `devicename` angegeben werden.
 Die Funknetzwerk-Verbindung muss entweder über den normalen `wifi:` Abschnitt vollständig konfiguriert werden, oder man kann alternativ auch einfach die WLAN-SSID und das WLAN-Passwort in den Substitutions angeben. 
   
 ## Substitutions
-**Alle zur Verfügung stehenden Parameter:**
+**Alle zur Verfügung stehenden Parameter:**  
 ```
 substitutions:
   name: "m5-dial"
@@ -66,13 +68,13 @@ substitutions:
   wifi_password: !secret wifi_password
 ```
   
-**name**
+**name**  
 Der Hostname des Geräts.  *(default: m5-dial)*  
 
-**wifi_ssid**
+**wifi_ssid**  
 Der Hostname des Geräts.  *(default: !secret wifi_ssid)*  
 
-**wifi_password**
+**wifi_password**  
 Der Hostname des Geräts.  *(default: !secret wifi_password)*  
 
   
@@ -125,7 +127,7 @@ Der hier eingestellte Wert gilt für alle Modi, bei denen keine abweichende Schr
 **longPressDuration (optional)** *(Default: 1200)*  
 Gibt die Dauer an, ab wie viel Millisekunden ein Tastendruck als Long-Press gelten soll.  
   
-----------
+------
 
 ## devices
 Unter Devices werden alle Entitäten angegeben, die mit dem M5 Dial gesteuert werden sollen.  
@@ -135,10 +137,10 @@ Die Angabe der Entitäten erfolgt in einzelnen Listen je Geräteart (Domain) wie
   
 ## **LIGHTS**
 
-**entity**
+**entity**  
 Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
   
-**name**
+**name**  
 Der auf dem Display angezeigte Name der Entität.  
   
 ## modes
@@ -150,7 +152,7 @@ Durch setzen auf true wird der Modus für die Entität aktiviert.
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Helligkeits-Modus.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Helligkeits-Modus dieser Light Entität.  
 *Gültige Werte 1-100*  
   
 &nbsp;
@@ -163,10 +165,10 @@ Durch setzen auf true wird der Modus für die Entität aktiviert.
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Weiß-Ton Modus.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Weiß-Ton Modus dieser Light Entität.  
 *Gültige Werte 1-500*  
   
-**min_kelvin (optional)** *(Default: 2000)*
+**min_kelvin (optional)** *(Default: 2000)*  
 Gibt den Minimalwert in Kelvin für die Weiß-Ton Steuerung an. 
 *Gültige Werte 1000-10000*  
   
@@ -179,32 +181,80 @@ Gibt den Maximalwert in Kelvin für die Weiß-Ton Steuerung an.
 #### rgb_mode
 Mit Hilfe des RGB-Mode (Farbwahl) lässt sich die Farbe für die Light-Entität auswählen.  
   
-**enable** *Default: false*
+**enable** *Default: false*  
 Durch setzen auf true wird der Modus für die Entität aktiviert.
   
-**rotary_step_width (optional)**
+**rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Farbwahl-Modus.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Farbwahl-Modus dieser Light Entität.  
 *Gültige Werte 1-100*  
   
-------
-  
-  
+&nbsp;  
   
 ------
+  
+## **CLIMATES**
+
+**entity**  
+Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+  
+**name**  
+Der auf dem Display angezeigte Name der Entität.  
+  
+## modes
+#### temp_mode
+Mit Hilfe des Temp-Mode lässt sich die Temperatur der Climate-Entität regeln.  
+  
+**enable** *(Default: false)*  
+Durch setzen auf true wird der Modus für die Entität aktiviert.  
+  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
+*Gültige Werte 1-100*  
+  
+&nbsp;  
+  
 ------
+  
+## **COVER**
+
+**entity**  
+Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+  
+**name**  
+Der auf dem Display angezeigte Name der Entität.  
+  
+## modes
+#### position_mode
+Mit Hilfe des Position-Mode lässt sich die Position der Cover-Entität steuern.  
+  
+**enable** *(Default: false)*  
+Durch setzen auf true wird der Modus für die Entität aktiviert.  
+  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
+*Gültige Werte 1-100*  
+  
+------  
+------  
   
 ## Advanced
 Die folgenden Attribute sind zwar vorhanden, sollten aber eigentlich nicht geändert werden müssen.  
   
-**send_value_delay**
+**send_value_delay**  
 Gibt die Verzögerung in Millisekunden an, die bei Wertänderung gewartet wird, bevor die Änderung an Home Assistant übertragen wird.  
 Das ist gerade bei Verwendung des Rotary-Encoders wichtig um nicht unnötig viele API-Aufrufe zu erzeugen. *(Default: 1200)*
-
-**send_value_lock**
+  
+**send_value_lock**  
 Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor der nächste API Aufruf erfolgen darf. *(Default: 3000)*  
-
+  
+  
+------  
+------  
+    
 &nbsp;
-
+  
 
 

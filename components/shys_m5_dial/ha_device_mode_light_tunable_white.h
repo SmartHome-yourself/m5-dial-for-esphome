@@ -51,7 +51,7 @@ namespace esphome
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
 
-                    uint16_t ypos = height - getDisplayPositionY(currentValue);
+                    uint16_t ypos = getDisplayPositionY(currentValue);
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
@@ -115,29 +115,11 @@ namespace esphome
                 }
                 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
-                    if(y > display.getHeight() * .97){
-                        y = display.getHeight();
-                    } else if (y < display.getHeight() * .03){
-                        y = 0;
-                    }
-                    
-                    uint16_t result = this->getValueForYPosition(y);
-                    result = getNextToRotaryStepwidth(result);
-
-                    this->setValue(result);
-                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
-                    
-                    return true;                    
+                    return defaultOnTouch(display, x, y);        
                 }
 
                 bool onRotary(M5DialDisplay& display, const char * direction) override {
-                    if (strcmp(direction, ROTARY_LEFT)==0){
-                        this->reduceCurrentValue();
-                    } else if (strcmp(direction, ROTARY_RIGHT)==0){
-                        this->raiseCurrentValue();
-                    }
-
-                    return true;
+                    return defaultOnRotary(display, direction);
                 }
 
                 bool onButton(M5DialDisplay& display, const char * clickType) override {

@@ -11,6 +11,9 @@ namespace esphome
                 esphome::api::HomeassistantServiceMap resp_kv;
                 
             public:
+// ---------------------------------
+//              LIGHT
+// ---------------------------------
                 void turnLightOn(const std::string& entity){
                     turnLightOn(entity, -1, -1);
                 }
@@ -102,6 +105,85 @@ namespace esphome
                     
                     ESP_LOGI("HA_API", "toggle light: %s", entity.c_str());
                 }
+
+// ---------------------------------
+//          CLIMATE
+// ---------------------------------
+
+                void turnClimateOn(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "climate.turn_on";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                }
+
+                void turnClimateOff(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "climate.turn_off";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                }
+
+                void setClimateTemperature(const std::string& entity, int temperature) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "climate.set_temperature";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+                    if(temperature >= 0){
+                        resp_kv.key = "temperature";
+                        resp_kv.value = String(temperature).c_str();
+                        resp.data.push_back(resp_kv);
+                    }
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                }
+
+
+
+                void setCoverPosition(const std::string& entity, int position) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "cover.set_cover_position";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+                    if(position >= 0){
+                        resp_kv.key = "position";
+                        resp_kv.value = String(position).c_str();
+                        resp.data.push_back(resp_kv);
+                    }
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "cover set position: %s", entity.c_str());
+                }
+
         };
 
     }

@@ -21,18 +21,32 @@ CONF_SEND_VALUE_DELAY               = "send_value_delay"
 CONF_SEND_VALUE_LOCK                = "send_value_lock"
 CONF_ROTARY_STEP_WIDTH              = "rotary_step_width"
 
+# ALLGEMEINE MODE PARAMETER
+CONF_DEVICE_MODE_ENABLE             = "enable"
+
+# LIGHTS
 CONF_DEVICE_LIGHTS                  = "lights"
 CONF_DEVICE_LIGHT_RGB_MODE          = "rgb_mode"
 CONF_DEVICE_LIGHT_DIMM_MODE         = "dimm_mode"
 CONF_DEVICE_LIGHT_WHITE_MODE        = "white_mode"
 
-# ALLGEMEINE MODE PARAMETER
-CONF_DEVICE_MODE_ENABLE             = "enable"
-CONF_DEVICE_MODE_ROTARY_STEPWIDTH   = "rotary_step_width"
-
 # WHITE-MODE PARAMETER
 CONF_DEVICE_MODE_WHITE_MIN_KELVIN   = "min_kelvin"
 CONF_DEVICE_MODE_WHITE_MAX_KELVIN   = "max_kelvin"
+
+
+# CLIMATES
+CONF_DEVICE_CLIMATES                = "climates"
+CONF_DEVICE_CLIMATE_TEMP_MODE       = "temp_mode"
+
+# WHITE-MODE PARAMETER
+CONF_DEVICE_MODE_TEMP_MIN_TEMP      = "min_temperature"
+CONF_DEVICE_MODE_TEMP_MAX_TEMP      = "max_temperature"
+
+
+# COVER
+CONF_DEVICE_COVER                   = "covers"
+CONF_DEVICE_COVER_POSITION_MODE     = "position_mode"
 
 
 # DEFAULTS
@@ -42,8 +56,10 @@ DEFAULT_LONG_PRESS_DURATION = 1200
 DEFAULT_SEND_VALUE_DELAY    = 1200
 DEFAULT_SEND_VALUE_LOCK     = 3000
 DEFAULT_ROTARY_STEP_WIDTH   = 10
-DEFAULT_WHITE_MIN_KELVIN   = "2000"
-DEFAULT_WHITE_MAX_KELVIN   = "6500"
+DEFAULT_WHITE_MIN_KELVIN    = "2000"
+DEFAULT_WHITE_MAX_KELVIN    = "6500"
+DEFAULT_WHITE_MIN_TEMP      = "4"
+DEFAULT_WHITE_MAX_TEMP      = "30"
 
 
 shys_m5_dial_ns = cg.esphome_ns.namespace('shys_m5_dial')
@@ -69,23 +85,51 @@ CONFIG_SCHEMA = cv.Schema({
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_LIGHT_RGB_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 100)
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100)
                 })),
 
                 cv.Optional(CONF_DEVICE_LIGHT_DIMM_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 100)
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100)
                 })),
                 
                 cv.Optional(CONF_DEVICE_LIGHT_WHITE_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_DEVICE_MODE_ROTARY_STEPWIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                     cv.Optional(CONF_DEVICE_MODE_WHITE_MIN_KELVIN, default=DEFAULT_WHITE_MIN_KELVIN): cv.int_range(1000, 10000),
-                    cv.Optional(CONF_DEVICE_MODE_WHITE_MAX_KELVIN, default=DEFAULT_WHITE_MAX_KELVIN): cv.int_range(1000, 10000)
-                    
+                    cv.Optional(CONF_DEVICE_MODE_WHITE_MAX_KELVIN, default=DEFAULT_WHITE_MAX_KELVIN): cv.int_range(1000, 10000)                    
+                }))
+            }))
+        })]),
+
+
+        cv.Optional(CONF_DEVICE_CLIMATES, default=[]): cv.All([dict({
+            cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
+            cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
+
+            cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
+                cv.Optional(CONF_DEVICE_CLIMATE_TEMP_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_DEVICE_MODE_TEMP_MIN_TEMP, default=DEFAULT_WHITE_MIN_TEMP): cv.int_range(0, 500),
+                    cv.Optional(CONF_DEVICE_MODE_TEMP_MAX_TEMP, default=DEFAULT_WHITE_MAX_TEMP): cv.int_range(0, 500)
+                }))
+            }))
+        })]),
+
+
+        cv.Optional(CONF_DEVICE_COVER, default=[]): cv.All([dict({
+            cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
+            cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
+
+            cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
+                cv.Optional(CONF_DEVICE_COVER_POSITION_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                 }))
             }))
         })])
+
 
     }))
 
@@ -126,5 +170,21 @@ def to_code(config):
                 cg.add(var.addLight(lightEntry[CONF_DEVICE_ENTRY_ID], 
                                     lightEntry[CONF_DEVICE_ENTRY_NAME], 
                                     json.dumps(lightEntry[CONF_DEVICE_MODES])
-                                    ))
+                                   ))
+
+        if CONF_DEVICE_CLIMATES in confDevices:
+            confClimates = confDevices[CONF_DEVICE_CLIMATES]
+            for climateEntry in confClimates:
+                cg.add(var.addClimate(climateEntry[CONF_DEVICE_ENTRY_ID], 
+                                      climateEntry[CONF_DEVICE_ENTRY_NAME], 
+                                      json.dumps(climateEntry[CONF_DEVICE_MODES])
+                                     ))
+
+        if CONF_DEVICE_COVER in confDevices:
+            confCover = confDevices[CONF_DEVICE_COVER]
+            for coverEntry in confCover:
+                cg.add(var.addCover(coverEntry[CONF_DEVICE_ENTRY_ID], 
+                                      coverEntry[CONF_DEVICE_ENTRY_NAME], 
+                                      json.dumps(coverEntry[CONF_DEVICE_MODES])
+                                     ))
 

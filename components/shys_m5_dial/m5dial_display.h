@@ -1,5 +1,6 @@
 #pragma once
 #include "M5Dial.h"
+#include "esphome.h"
 
 namespace esphome
 {

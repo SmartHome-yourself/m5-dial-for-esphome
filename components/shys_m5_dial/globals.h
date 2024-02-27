@@ -40,6 +40,9 @@
     static const char *BUTTON_SHORT = "short";
     static const char *BUTTON_LONG = "long";    
 
+    static const char *FAN_DIRECTION_FORWARD = "forward";
+    static const char *FAN_DIRECTION_REVERSE = "reverse";
+
 #endif
 
 #ifndef M_PI

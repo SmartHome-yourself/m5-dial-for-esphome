@@ -8,6 +8,9 @@
 #include "ha_device_light.h"
 #include "ha_device_climate.h"
 #include "ha_device_cover.h"
+#include "ha_device_switch.h"
+#include "ha_device_fan.h"
+
 #include "M5Dial.h"
 
 namespace esphome
@@ -35,6 +38,7 @@ namespace esphome
 
       int lastDisplayDevice = -1;
       float lastDisplayValue = -1;
+      int lastModeIndex = -1;
       
       unsigned long lastRotaryEvent = 0;
       unsigned long lastReceiveEvent = 0;
@@ -59,7 +63,10 @@ namespace esphome
       }
 
       bool isDisplayRefreshNeeded(){
-        if (getCurrentValue() != lastDisplayValue || currentDevice != lastDisplayDevice){
+        if (getCurrentValue() != lastDisplayValue || 
+              currentDevice != lastDisplayDevice ||
+              devices[currentDevice]->getCurrentModeIndex() != lastModeIndex || 
+              devices[currentDevice]->isDisplayRefreshNeeded()){
           return esphome::millis() - lastDisplayRefresh > displayRefeshPause;
         }
         return false;
@@ -69,8 +76,9 @@ namespace esphome
         if(forceRefresh || isDisplayRefreshNeeded()){
             devices[currentDevice]->refreshDisplay(*m5DialDisplay, lastDisplayDevice != currentDevice);
 
-            lastDisplayDevice = currentDevice;
-            lastDisplayValue = getCurrentValue();
+            lastDisplayDevice  = currentDevice;
+            lastModeIndex      = devices[currentDevice]->getCurrentModeIndex();
+            lastDisplayValue   = getCurrentValue();
         }
       }
 
@@ -172,6 +180,23 @@ namespace esphome
         addDevice(climate);
       }
 
+
+     /**
+      * 
+      */
+      void addSwitch(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceSwitch* switchDevice = new HaDeviceSwitch(entity_id, name, modes);
+        addDevice(switchDevice);
+      }
+
+
+     /**
+      * 
+      */
+      void addFan(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceFan* fan = new HaDeviceFan(entity_id, name, modes);
+        addDevice(fan);
+      }
 
 
      /**

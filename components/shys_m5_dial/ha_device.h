@@ -1,11 +1,14 @@
 #pragma once
+
+#include "m5dial_display.h"
+
 #include "ha_device_mode.h"
 #include <ArduinoJson.h>
+
 namespace esphome
 {
     namespace shys_m5_dial
     {
-        class HaDeviceMode;
         class HaDevice {
             protected:
                 int index;
@@ -29,11 +32,11 @@ namespace esphome
                 std::vector<HaDeviceMode*> deviceModes = {};
 
                 void addMode(HaDeviceMode* newMode){
-                    newMode->setApiSendDelay(this->apiSendDelay);
-                    newMode->setApiSendLock(this->apiSendLock);
-                    newMode->setRotaryStepWidth(this->rotaryStepWidth);
-
                     newMode->registerHAListener();
+
+                    newMode->setApiSendDelay(getApiSendDelay());
+                    newMode->setApiSendLock(getApiSendLock());
+                    newMode->setRotaryStepWidth(getRotaryStepWidth());
 
                     this->deviceModes.push_back(newMode);
                     currentModeCount++;
@@ -80,13 +83,26 @@ namespace esphome
                 void setRotaryStepWidth(int stepWidth){
                     this->rotaryStepWidth = stepWidth;
                 }
-
+                int getRotaryStepWidth(){
+                    return this->rotaryStepWidth;
+                }
+                
                 void setApiSendDelay(int delayInMs){
                     this->apiSendDelay = delayInMs;
+                }
+                int getApiSendDelay(){
+                    return this->apiSendDelay;
                 }
                 
                 void setApiSendLock(int delayInMs){
                     this->apiSendLock = delayInMs;
+                }
+                int getApiSendLock(){
+                    return this->apiSendLock;
+                }
+
+                int getCurrentModeIndex(){
+                    return this->currentModeIndex;
                 }
 
                 void nextMode(){
@@ -110,6 +126,10 @@ namespace esphome
                 void refreshDisplay(M5DialDisplay& display, bool deviceChanged){
                     getCurrentMode()->refreshDisplay(display, deviceChanged || modeChanged);
                     modeChanged = false;
+                }
+
+                bool isDisplayRefreshNeeded(){
+                    return this->getCurrentMode()->isDisplayRefreshNeeded();
                 }
 
                 void updateHomeAssistantValue(){

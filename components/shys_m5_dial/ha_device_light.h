@@ -33,11 +33,13 @@ namespace esphome
 
                     if(brightnessModeActive){
                         ESP_LOGD("HA_DEVICE", "Dimm-Mode enabled (steps: %i)", dimm_mode["rotary_step_width"].as<int>());
+                        
                         this->addMode(modeBrightness);
 
                         if (dimm_mode.containsKey("rotary_step_width")) {
                             modeBrightness->setRotaryStepWidth(dimm_mode["rotary_step_width"].as<int>());
                         }
+
                     } else {
                         this->addMode(modeOnOff);
                     }
@@ -48,6 +50,7 @@ namespace esphome
 
                         if (rgb_mode.containsKey("enable") && rgb_mode["enable"].as<bool>()) {
                             ESP_LOGD("HA_DEVICE", "Color-Mode enabled (steps: %i)", rgb_mode["rotary_step_width"].as<int>());
+
                             this->addMode(modeColor);
 
                             if (rgb_mode.containsKey("rotary_step_width")) {
@@ -62,7 +65,8 @@ namespace esphome
 
                         if (white_mode.containsKey("enable") && white_mode["enable"].as<bool>()) {
                             ESP_LOGD("HA_DEVICE", "White-Mode enabled (steps: %i)", white_mode["rotary_step_width"].as<int>());
-                            this->addMode(modeTunableWhite);
+
+                            this->addMode(modeTunableWhite);                            
 
                             if (white_mode.containsKey("rotary_step_width")) {
                                 modeTunableWhite->setRotaryStepWidth(white_mode["rotary_step_width"].as<int>());
@@ -73,8 +77,6 @@ namespace esphome
                             if (white_mode.containsKey("max_kelvin")) {
                                 modeTunableWhite->setMaxValue(white_mode["max_kelvin"].as<int>());
                             }
-
-                            
                         }
                     }
 

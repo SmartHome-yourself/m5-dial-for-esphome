@@ -16,18 +16,15 @@ namespace esphome
                 void init() override {
                     ESP_LOGD("HA_DEVICE", "Init Climate: %s", this->getEntityId().c_str());
 
+                    this->addMode(modeTemp);
+
                     if (this->modeConfig.containsKey("temp_mode")) {
                         JsonObject temp_mode = this->modeConfig["temp_mode"];
 
-                        if (temp_mode.containsKey("enable") && temp_mode["enable"].as<bool>()) {
-                            ESP_LOGD("HA_DEVICE", "Temperature-Mode enabled (steps: %i)", temp_mode["rotary_step_width"].as<int>());
-                            this->addMode(modeTemp);
-
-                            if (temp_mode.containsKey("rotary_step_width")) {
-                                modeTemp->setRotaryStepWidth(temp_mode["rotary_step_width"].as<int>());
-                            }
+                        if (temp_mode.containsKey("rotary_step_width")) {
+                            modeTemp->setRotaryStepWidth(temp_mode["rotary_step_width"].as<int>());
                         }
-                    }
+                    }                    
                 }
 
         };

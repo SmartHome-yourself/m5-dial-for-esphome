@@ -1,5 +1,7 @@
 #pragma once
+
 #include "ha_device.h"
+#include "ha_api.h"
 #include "m5dial_display.h"
 #include "M5Dial.h"
 
@@ -25,8 +27,15 @@ namespace esphome
 
                 bool endlessRotaryValue = false;
 
+                bool displayRefreshNeeded = false;
+
                 HaApi haApi;
                 HaDevice& device;
+
+
+                HaDevice& getDevice() const {
+                    return this->device; 
+                }
 
                 bool isApiCallNeeded(){
                     if ( esphome::millis() - lastApiCall < apiSendLock ) {
@@ -41,7 +50,7 @@ namespace esphome
                 }
 
                 void raiseCurrentValue(){
-                    int newValue = this->value + rotaryStepWidth;
+                    int newValue = this->getValue() + rotaryStepWidth;
                     newValue = getNextToRotaryStepwidth(newValue);
 
                     if(newValue > this->maxValue){
@@ -52,7 +61,7 @@ namespace esphome
                 }
 
                 void reduceCurrentValue(){
-                    int newValue = this->value - rotaryStepWidth;
+                    int newValue = this->getValue() - rotaryStepWidth;
                     newValue = getNextToRotaryStepwidth(newValue);
 
                     if(newValue >= this->minValue){
@@ -117,7 +126,6 @@ namespace esphome
                     return true;
                 }
 
-
                 virtual void sendValueToHomeAssistant(int value) = 0;
 
             public:
@@ -126,6 +134,10 @@ namespace esphome
                 virtual void refreshDisplay(M5DialDisplay& display, bool init) = 0;
                 virtual void registerHAListener() = 0;
 
+
+                virtual bool isDisplayRefreshNeeded(){
+                    return displayRefreshNeeded;
+                }
 
                 virtual bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) {
                     return false;
@@ -154,7 +166,7 @@ namespace esphome
                     }
                 }
 
-                int getValue(){
+                virtual int getValue(){
                     return this->value;
                 }
 

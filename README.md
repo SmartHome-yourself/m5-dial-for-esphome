@@ -1,6 +1,6 @@
 # M5 Stack Dial Custom Component für ESPHome
 ![image](https://github.com/SmartHome-yourself/m5-dial-for-esphome/assets/705724/6d268fe4-ef71-40bb-b70c-797453b1d06b)
-Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen)
+Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen?ref=smarthomeyourself)
   
 Mit dieser Komponente wird der M5 Stack Dial zu einer universal-Fernbedienung für Home Assistant.  
 Aktuell werden nur Light-Entitäten unterstützt, in Zukunft sollen aber auch weitere Gerätearten darüber steuerbar sein.  
@@ -39,6 +39,7 @@ shys_m5_dial:
           dimm_mode:
             enable: true
             rotary_step_width: 5
+
       - entity: light.my_light2
         name: Light 2
         modes:
@@ -46,11 +47,37 @@ shys_m5_dial:
             enable: true
           white_mode: 
             enable: true
-            rotary_step_width: 100
-            min_kelvin: 2500
-            min_kelvin: 7000        
+
       - entity: light.my_light3
         name: Light 3
+
+    switches:
+      - entity: switch.my_switch
+        name: Switch 1
+		
+    climates:
+      - entity: climate.my_climate1
+        name: Heater
+        modes:
+          temp_mode:
+            rotary_step_width: 1
+            min_temperature: 4
+            max_temperature: 30
+			
+    covers:
+      - entity: cover.my_cover1
+        name: Cover 1
+        modes:
+          position_mode:
+            rotary_step_width: 5
+
+    fans:
+      - entity: fan.my_fan1
+        name: Fan 1
+        modes:
+          speed_mode:
+            changeable_direction: true
+            rotary_step_width: 10
 ```
   
 &nbsp;  
@@ -81,7 +108,7 @@ Der Hostname des Geräts.  *(default: !secret wifi_password)*
 &nbsp;  
   
 ## Custom-Component
-**Beispiel:**  
+**Beispiel mit allen möglichen Parametern:**  
 ```
 shys_m5_dial:
   name: Dial
@@ -96,21 +123,44 @@ shys_m5_dial:
         modes:
           dimm_mode:
             enable: true
+            rotary_step_width: 10
           rgb_mode: 
             enable: true
-            rotary_step_width: 30            
+            rotary_step_width: 30
           white_mode: 
             enable: true
             rotary_step_width: 100
             min_kelvin: 2500
             min_kelvin: 7000
 
-      - entity: light.my_light2
-        name: Light 2
-        
-      - entity: light.my_light3
-        name: Light 3
-        
+    switches:
+      - entity: switch.my_switch
+        name: Switch 1
+		
+    climates:
+      - entity: climate.my_climate1
+        name: Heater
+        modes:
+          temp_mode:
+            rotary_step_width: 1
+            min_temperature: 4
+            max_temperature: 30
+			
+    covers:
+      - entity: cover.my_cover1
+        name: Cover 1
+        modes:
+          position_mode:
+            rotary_step_width: 5
+
+    fans:
+      - entity: fan.my_fan1
+        name: Fan 1
+        modes:
+          speed_mode:
+            changeable_direction: true
+            rotary_step_width: 10
+
 ```
   
 ## Allgemeine Attribute
@@ -205,9 +255,6 @@ Der auf dem Display angezeigte Name der Entität.
 #### temp_mode
 Mit Hilfe des Temp-Mode lässt sich die Temperatur der Climate-Entität regeln.  
   
-**enable** *(Default: false)*  
-Durch setzen auf true wird der Modus für die Entität aktiviert.  
-  
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
@@ -229,13 +276,40 @@ Der auf dem Display angezeigte Name der Entität.
 #### position_mode
 Mit Hilfe des Position-Mode lässt sich die Position der Cover-Entität steuern.  
   
-**enable** *(Default: false)*  
-Durch setzen auf true wird der Modus für die Entität aktiviert.  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
+*Gültige Werte 1-100*  
+  
+&nbsp;  
+  
+------
+  
+## **FANS**
+
+**entity**  
+Angabe der Fan-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+  
+**name**  
+Der auf dem Display angezeigte Name des Ventilators.  
+  
+## modes
+#### speed_mode
+Mit Hilfe des Speed-Mode lässt sich die Geschwindigkeit der Fan-Entität steuern.  
+  
+**changeable_direction (optional)**  *(Default: false)*  
+Gibt an, ob der Ventilator zwei Laufrichtungen hat und somit zwischen vorwärts und rückwärts umgestellt werden kann.  
+*Gültige Werte true / false*  
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
 *Gültige Werte 1-100*  
+  
+  
+&nbsp;  
+  
+&nbsp;  
   
 ------  
 ------  

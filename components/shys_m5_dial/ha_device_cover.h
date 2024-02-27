@@ -16,16 +16,13 @@ namespace esphome
                 void init() override {
                     ESP_LOGD("HA_DEVICE", "Init Cover: %s", this->getEntityId().c_str());
 
+                    this->addMode(modePosition);
+
                     if (this->modeConfig.containsKey("position_mode")) {
                         JsonObject position_mode = this->modeConfig["position_mode"];
 
-                        if (position_mode.containsKey("enable") && position_mode["enable"].as<bool>()) {
-                            ESP_LOGD("HA_DEVICE", "Position-Mode enabled (steps: %i)", position_mode["rotary_step_width"].as<int>());
-                            this->addMode(modePosition);
-
-                            if (position_mode.containsKey("rotary_step_width")) {
-                                modePosition->setRotaryStepWidth(position_mode["rotary_step_width"].as<int>());
-                            }
+                        if (position_mode.containsKey("rotary_step_width")) {
+                            modePosition->setRotaryStepWidth(position_mode["rotary_step_width"].as<int>());
                         }
                     }
                 }

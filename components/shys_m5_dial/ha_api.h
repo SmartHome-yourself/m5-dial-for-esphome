@@ -1,4 +1,5 @@
 #pragma once
+#include "esphome.h"
 
 namespace esphome
 {
@@ -122,7 +123,7 @@ namespace esphome
 
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                     
-                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                    ESP_LOGI("HA_API", "turn on climate: %s", entity.c_str());
                 }
 
                 void turnClimateOff(const std::string& entity) {
@@ -137,7 +138,7 @@ namespace esphome
 
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                     
-                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                    ESP_LOGI("HA_API", "turn off climate: %s", entity.c_str());
                 }
 
                 void setClimateTemperature(const std::string& entity, int temperature) {
@@ -158,11 +159,14 @@ namespace esphome
 
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                     
-                    ESP_LOGI("HA_API", "toggle climate: %s", entity.c_str());
+                    ESP_LOGI("HA_API", "set temperature: %i for %s", temperature, entity.c_str());
                 }
 
 
 
+// ---------------------------------
+//              COVER
+// ---------------------------------
                 void setCoverPosition(const std::string& entity, int position) {
                     esphome::api::HomeassistantServiceResponse resp;
                     esphome::api::HomeassistantServiceMap resp_kv;
@@ -181,8 +185,153 @@ namespace esphome
 
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                     
-                    ESP_LOGI("HA_API", "cover set position: %s", entity.c_str());
+                    ESP_LOGI("HA_API", "cover set position %i for %s", position, entity.c_str());
                 }
+
+
+
+
+// ---------------------------------
+//             SWITCH
+// ---------------------------------
+                void turnSwitchOn(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "switch.turn_on";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "switch turn on: %s", entity.c_str());
+                }
+
+                void turnSwitchOff(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "switch.turn_off";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "switch turn off: %s", entity.c_str());
+                }
+
+                void toggleSwitch(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "switch.toggle";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "switch toggle: %s", entity.c_str());
+                }
+
+
+
+
+// ---------------------------------
+//              FAN
+// ---------------------------------
+                void turnFanOn(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "fan.turn_on";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "fan turn on: %s", entity.c_str());
+                }
+
+                void turnFanOff(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "fan.turn_off";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "fan turn off: %s", entity.c_str());
+                }
+
+                void toggleFan(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "fan.toggle";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "fan toggle: %s", entity.c_str());
+                }
+
+                void setFanDirection(const std::string& entity, const char* direction){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "fan.set_direction";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    resp_kv.key = "direction";
+                    resp_kv.value = direction;
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "fan direction: %s for %s", direction, entity.c_str());
+                }
+
+                void setFanSpeed(const std::string& entity, int speed){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "fan.set_percentage";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    resp_kv.key = "percentage";
+                    resp_kv.value = String(speed).c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "fan speed: %s for %s", String(speed).c_str(), entity.c_str());
+                }
+
+
+
+
+
 
         };
 

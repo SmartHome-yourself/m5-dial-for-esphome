@@ -59,16 +59,17 @@ CONF_DEVICE_FAN_SPEED_MODE          = "speed_mode"
 CONF_CHANGEABLE_DIRECTION           = "changeable_direction"
 
 # DEFAULTS
-DEFAULT_NAME                = "M5 Stack Dial"
-DEFAULT_SCREEN_OFF_TIME     = 30000
-DEFAULT_LONG_PRESS_DURATION = 1200
-DEFAULT_SEND_VALUE_DELAY    = 1200
-DEFAULT_SEND_VALUE_LOCK     = 3000
-DEFAULT_ROTARY_STEP_WIDTH   = 10
-DEFAULT_WHITE_MIN_KELVIN    = "2000"
-DEFAULT_WHITE_MAX_KELVIN    = "6500"
-DEFAULT_WHITE_MIN_TEMP      = "4"
-DEFAULT_WHITE_MAX_TEMP      = "30"
+DEFAULT_NAME                        = "M5 Stack Dial"
+DEFAULT_SCREEN_OFF_TIME             = 30000
+DEFAULT_LONG_PRESS_DURATION         = 1200
+DEFAULT_SEND_VALUE_DELAY            = 1200
+DEFAULT_SEND_VALUE_LOCK             = 3000
+DEFAULT_ROTARY_STEP_WIDTH           = 10
+DEFAULT_WHITE_MIN_KELVIN            = 2000
+DEFAULT_WHITE_MAX_KELVIN            = 6500
+DEFAULT_WHITE_MIN_TEMP              = 4
+DEFAULT_WHITE_MAX_TEMP              = 30
+DEFAULT_CLIMATE_ROTARY_STEP_WIDTH   = 1
 
 
 shys_m5_dial_ns = cg.esphome_ns.namespace('shys_m5_dial')
@@ -118,7 +119,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_CLIMATE_TEMP_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_CLIMATE_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                     cv.Optional(CONF_DEVICE_MODE_TEMP_MIN_TEMP, default=DEFAULT_WHITE_MIN_TEMP): cv.int_range(0, 500),
                     cv.Optional(CONF_DEVICE_MODE_TEMP_MAX_TEMP, default=DEFAULT_WHITE_MAX_TEMP): cv.int_range(0, 500)
                 }))

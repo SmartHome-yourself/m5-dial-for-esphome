@@ -9,6 +9,10 @@
   * can compile and upload my `M5DialFirst.yaml` but it shows **DISCONNECTED** after **Offline**- no wifi, bit display is working
   * wifi credentials in clear not via secrets!
   * example scans wifi sucessfully!
+  * wifi connects but HA API does not
+  * After Update esphome it works nearly
+    1. UI is usable and log is informative
+    1. HA lights are not responding - sending wrong commands?
 * Try another `yaml` with only access to wifi and display?
 * Change paths to my fork
 

@@ -13,11 +13,19 @@
   * After Update esphome it works nearly
     1. UI is usable and log is informative
     1. HA lights are not responding - sending wrong commands?
+* 🚧 Change paths to my fork in github online
+* Change paths to local files off my fork 
 * Try another `yaml` with only access to wifi and display?
-* Change paths to my fork
 
 ## first goals
 
 * add temperature control for lights
 * dive deeper into custom code components
   
+
+## understanding the code
+
+* uses the M5Dial lib from ... in `C:\Users\Wolfgang\.esphome\build\m5dial\.piolibdeps\m5dial\M5Dial\src`
+  * there are `M5Dial.h` and `M5Dial.cpp` with build class `M5Dial` with all technical components as public members
+* looks like the code really sends commands to HA, but without serial connection it _doesn't connect to HA_
+* should Doxygen the code in `C:\Users\Wolfgang\.esphome\build\m5dial\` 

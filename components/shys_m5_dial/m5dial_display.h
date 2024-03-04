@@ -94,13 +94,13 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     if(currentDevice.isDimmEnabled()){
-                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), RED);
-                        gfx->fillRect(0, height-(height*currentValue/100), width, height, YELLOW);
+                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0x8080B0); // RED);
+                        gfx->fillRect(0, height-(height*currentValue/100), width, height, , 0xFFE080); // YELLOW);
 
                         gfx->setTextSize(3);
                         gfx->drawString(String(currentValue),

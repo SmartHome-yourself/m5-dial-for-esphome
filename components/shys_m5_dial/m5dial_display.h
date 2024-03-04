@@ -92,30 +92,31 @@ namespace esphome
                     uint16_t height = this->getHeight();
                     uint16_t width  = this->getWidth();
 
-                    gfx->setTextColor(MAROON);
+                    gfx->setTextColor(BLACK);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeSans12pt7b);
+                    gfx->setFont(&fonts::FreeSansBold24pt7b);
+                    gfx->setTextSize(1);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     if(currentDevice.isDimmEnabled()){
-                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xff95); // YELLOW);
+                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xff55); // YELLOW);
                         gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0xb5f9);      // RED);
 
-                        gfx->setTextSize(3);
+                        //gfx->setTextSize(2);
                         gfx->drawString(String(currentValue),
                                         width / 2,
                                         height / 2 - 30);
                     } else {
-                        gfx->fillRect(0, 0, width, height, currentValue>0?0xff95:0xb5f9);    // YELLOW:RED);
+                        gfx->fillRect(0, 0, width, height, currentValue>0?0xff55:0xb5f9);    // YELLOW:RED);
 
-                        gfx->setTextSize(3);
+                        //gfx->setTextSize(2);
                         gfx->drawString(currentValue>0?"on":"off",
                                         width / 2,
                                         height / 2 - 30);                        
                     }
                     
-                    gfx->setTextSize(1);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
                     gfx->drawString(currentDevice.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);

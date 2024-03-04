@@ -107,7 +107,7 @@ namespace esphome
                                         width / 2,
                                         height / 2 - 30);
                     } else {
-                        gfx->fillRect(0, 0, width, height, currentValue>0?YELLOW:RED);
+                        gfx->fillRect(0, 0, width, height, currentValue>0?0x8080B0:0xFFE080);    // YELLOW:RED);
 
                         gfx->setTextSize(3);
                         gfx->drawString(currentValue>0?"on":"off",

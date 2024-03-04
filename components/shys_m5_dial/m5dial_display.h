@@ -94,13 +94,15 @@ namespace esphome
 
                     gfx->setTextColor(BLACK);
                     gfx->setTextDatum(middle_center);
+                    // how much space do this fonts use?
                     gfx->setFont(&fonts::FreeSansBold24pt7b);
                     gfx->setTextSize(1);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     if(currentDevice.isDimmEnabled()){
-                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xff55); // YELLOW);
+                        // https://rgbcolorpicker.com/565#google_vignette
+                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xfef7); // YELLOW);
                         gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0xb5f9);      // RED);
 
                         //gfx->setTextSize(2);
@@ -108,7 +110,7 @@ namespace esphome
                                         width / 2,
                                         height / 2 - 30);
                     } else {
-                        gfx->fillRect(0, 0, width, height, currentValue>0?0xff55:0xb5f9);    // YELLOW:RED);
+                        gfx->fillRect(0, 0, width, height, currentValue>0?0xfef7:0xb5f9);    // YELLOW:RED);
 
                         //gfx->setTextSize(2);
                         gfx->drawString(currentValue>0?"on":"off",
@@ -131,9 +133,9 @@ namespace esphome
                 void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
                     // ein schmales Farbdreieck zeichnen
                     // in 4 Schritten, wirkungsvoller (breiter, einseitig) und schneller (4 statt 5 Linien) als bisherige Variante
-                    for(int i=0;i>-4;i--){
-                        coord c1 = getColorCoord(r1, degree+(i*.25));
-                        coord c2 = getColorCoord(r2, degree+(i*.25));
+                    for(int i=0;i>-5;i--){
+                        coord c1 = getColorCoord(r1, degree+(i*.20));
+                        coord c2 = getColorCoord(r2, degree+(i*.20));
                         M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
                     }
                 }

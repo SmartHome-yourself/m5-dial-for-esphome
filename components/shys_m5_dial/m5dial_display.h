@@ -128,17 +128,9 @@ namespace esphome
 
 
                 void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
-                    for(int i=0;i<2;i++){
-                        coord c1 = getColorCoord(r1, degree-(i*.25));
-                        coord c2 = getColorCoord(r2, degree-(i*.25));
-                        M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    }
-                    
-                    coord c1 = getColorCoord(r1, degree);
-                    coord c2 = getColorCoord(r2, degree);
-                    M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-
-                    for(int i=0;i<2;i++){
+                    // ein schmales Farbdreieck zeichnen
+                    // in 4 Schritten, wirkungsvoller (breiter, einseitig) und schneller (4 statt 5 Linien) als bisherige Variante
+                    for(int i=0;i>-4;i--){
                         coord c1 = getColorCoord(r1, degree+(i*.25));
                         coord c2 = getColorCoord(r2, degree+(i*.25));
                         M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);

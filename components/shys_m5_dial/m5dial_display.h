@@ -102,15 +102,15 @@ namespace esphome
 
                     if(currentDevice.isDimmEnabled()){
                         // https://rgbcolorpicker.com/565#google_vignette
-                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xfef7); // YELLOW);
-                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0xb5f9);      // RED);
+                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xfeb5); // YELLOW);
+                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0x94f8);      // RED);
 
                         //gfx->setTextSize(2);
                         gfx->drawString(String(currentValue),
                                         width / 2,
                                         height / 2 - 30);
                     } else {
-                        gfx->fillRect(0, 0, width, height, currentValue>0?0xfef7:0xb5f9);    // YELLOW:RED);
+                        gfx->fillRect(0, 0, width, height, currentValue>0?0xfeb5:0x94f8);    // YELLOW:RED);
 
                         //gfx->setTextSize(2);
                         gfx->drawString(currentValue>0?"on":"off",
@@ -133,11 +133,29 @@ namespace esphome
                 void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
                     // ein schmales Farbdreieck zeichnen
                     // in 4 Schritten, wirkungsvoller (breiter, einseitig) und schneller (4 statt 5 Linien) als bisherige Variante
-                    for(int i=0;i>-5;i--){
-                        coord c1 = getColorCoord(r1, degree+(i*.20));
-                        coord c2 = getColorCoord(r2, degree+(i*.20));
+
+                    float step=0.6;
+                    int to=((int) 1.0/step)*-1;
+
+                    // void fillTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, const T &color)
+                    for(int i=0;i>0*to;i--){
+                        coord c1 = getColorCoord(r1, degree+(i*step));
+                        coord c2 = getColorCoord(r2, degree+(i*step));
                         M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
+                        M5Dial.Display.drawLine(c1.x-1, c1.y, c2.x, c2.y, color);
+                        M5Dial.Display.drawLine(c1.x, c1.y-1, c2.x, c2.y, color);
+                        M5Dial.Display.drawLine(c1.x+1, c1.y, c2.x, c2.y, color);
+                        M5Dial.Display.drawLine(c1.x, c1.y+1, c2.x, c2.y, color);
                     }
+                    coord c1 = getColorCoord(r1, degree);
+                    coord c2 = getColorCoord(r2, degree-step);
+                    coord c3 = getColorCoord(r2, degree+step);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
+                    
+                    c1 = getColorCoord(r1, degree-step);
+                    c2 = getColorCoord(r2, degree-step-step);
+                    c3 = getColorCoord(r2, degree);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
                 }
 
                 void refreshColorMenu(uint16_t currentValue, HaDevice currentDevice){

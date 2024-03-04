@@ -20,6 +20,10 @@
 
 ## first goals
 
+* ✅ nicer colors ([RGB565 color picker](https://rgbcolorpicker.com/565#google_vignette)) and better fonts
+  * FreeSansBold24 braucht 55k!
+* 🚧 nicer colorwheel - how can i get rid of those missing colors in the wheel at 45°. 
+  * Mal am PC durchrechnen und ggf. auch zeichnen (mit Processing) wieviele Linien in welchem Abstand nötig sind, ggf. abhängig vom Winkel
 * add temperature control for lights
 * 🚧 dive deeper into custom code components
 * [m5dial quick start](https://docs.m5stack.com/en/quick_start/m5dial/arduino) Docs

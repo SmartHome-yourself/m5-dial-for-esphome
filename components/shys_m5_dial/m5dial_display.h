@@ -99,8 +99,8 @@ namespace esphome
                     gfx->startWrite();                      // Secure SPI bus
 
                     if(currentDevice.isDimmEnabled()){
-                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0x8080B0);      // RED);
                         gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xFFE080); // YELLOW);
+                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0x8080B0);      // RED);
 
                         gfx->setTextSize(3);
                         gfx->drawString(String(currentValue),

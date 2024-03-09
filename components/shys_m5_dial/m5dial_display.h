@@ -92,30 +92,33 @@ namespace esphome
                     uint16_t height = this->getHeight();
                     uint16_t width  = this->getWidth();
 
-                    gfx->setTextColor(MAROON);
+                    gfx->setTextColor(BLACK);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    // how much space do this fonts use?
+                    gfx->setFont(&fonts::FreeSansBold24pt7b);
+                    gfx->setTextSize(1);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     if(currentDevice.isDimmEnabled()){
-                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), RED);
-                        gfx->fillRect(0, height-(height*currentValue/100), width, height, YELLOW);
+                        // https://rgbcolorpicker.com/565#google_vignette
+                        gfx->fillRect(0, height-(height*currentValue/100), width, height, 0xfeb5); // YELLOW);
+                        gfx->fillRect(0, 0, width, height-(height*currentValue/100), 0x94f8);      // RED);
 
-                        gfx->setTextSize(3);
+                        //gfx->setTextSize(2);
                         gfx->drawString(String(currentValue),
                                         width / 2,
                                         height / 2 - 30);
                     } else {
-                        gfx->fillRect(0, 0, width, height, currentValue>0?YELLOW:RED);
+                        gfx->fillRect(0, 0, width, height, currentValue>0?0xfeb5:0x94f8);    // YELLOW:RED);
 
-                        gfx->setTextSize(3);
+                        //gfx->setTextSize(2);
                         gfx->drawString(currentValue>0?"on":"off",
                                         width / 2,
                                         height / 2 - 30);                        
                     }
                     
-                    gfx->setTextSize(1);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
                     gfx->drawString(currentDevice.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -128,9 +131,7 @@ namespace esphome
 
 
                 void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
-                    float step=0.6;
-                    
-                    // void fillTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, const T &color)
+
                     coord c1 = getColorCoord(r1, degree);
                     coord c2 = getColorCoord(r2, degree-step);
                     coord c3 = getColorCoord(r2, degree+step);
@@ -139,7 +140,8 @@ namespace esphome
                     c1 = getColorCoord(r1, degree);
                     c2 = getColorCoord(r1, degree-step-step);
                     c3 = getColorCoord(r2, degree-step);
-                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);                    
+
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
                 }
 
                 void refreshColorMenu(uint16_t currentValue, HaDevice currentDevice){
@@ -150,7 +152,7 @@ namespace esphome
 
                     gfx->setTextColor(complementary_color);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
                     gfx->startWrite();                    // Secure SPI bus
                     gfx->fillCircle(width/2, height/2, 70, getColorByDegree(currentValue));
@@ -205,7 +207,7 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -296,7 +298,7 @@ namespace esphome
 
                     gfx->setTextColor(LIGHTGREY);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -316,7 +318,7 @@ namespace esphome
 
                     gfx->setTextColor(WHITE);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -326,6 +328,9 @@ namespace esphome
                     gfx->drawString("DISCONNECTED",
                                     width / 2,
                                     height / 2);
+                    gfx->drawString("from HA",
+                                    width / 2,
+                                    height / 2+14);
 
                     gfx->endWrite();                      // Release SPI bus
                 }

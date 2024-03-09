@@ -1,4 +1,9 @@
-# M5 Stack Dial Custom Component für ESPHome
+# My Fork of M5 Stack Dial Custom Component für ESPHome
+
+Trying to improve and add functions.
+
+## [Original Repository](https://github.com/SmartHome-yourself/m5-dial-for-esphome) on github from [SmartHome yourself](https://github.com/SmartHome-yourself) 
+
 ![image](https://github.com/SmartHome-yourself/m5-dial-for-esphome/assets/705724/6d268fe4-ef71-40bb-b70c-797453b1d06b)
 Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen)
   

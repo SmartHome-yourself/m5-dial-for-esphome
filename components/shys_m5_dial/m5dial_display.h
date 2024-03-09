@@ -152,9 +152,9 @@ namespace esphome
                     coord c3 = getColorCoord(r2, degree+step);
                     M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
                     
-                    c1 = getColorCoord(r1, degree-step);
-                    c2 = getColorCoord(r2, degree-step-step);
-                    c3 = getColorCoord(r2, degree);
+                    c1 = getColorCoord(r1, degree);
+                    c2 = getColorCoord(r1, degree-step-step);
+                    c3 = getColorCoord(r2, degree-step);
                     M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
                 }
 
@@ -166,7 +166,7 @@ namespace esphome
 
                     gfx->setTextColor(complementary_color);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
                     gfx->startWrite();                    // Secure SPI bus
                     gfx->fillCircle(width/2, height/2, 70, getColorByDegree(currentValue));
@@ -221,7 +221,7 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -312,7 +312,7 @@ namespace esphome
 
                     gfx->setTextColor(LIGHTGREY);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -332,7 +332,7 @@ namespace esphome
 
                     gfx->setTextColor(WHITE);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+                    gfx->setFont(&fonts::FreeSans12pt7b);
 
 //                    gfx->clear();
                     gfx->startWrite();                      // Secure SPI bus
@@ -342,6 +342,9 @@ namespace esphome
                     gfx->drawString("DISCONNECTED",
                                     width / 2,
                                     height / 2);
+                    gfx->drawString("from HA",
+                                    width / 2,
+                                    height / 2+14);
 
                     gfx->endWrite();                      // Release SPI bus
                 }

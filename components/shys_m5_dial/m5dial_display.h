@@ -128,21 +128,18 @@ namespace esphome
 
 
                 void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
-                    for(int i=0;i<2;i++){
-                        coord c1 = getColorCoord(r1, degree-(i*.25));
-                        coord c2 = getColorCoord(r2, degree-(i*.25));
-                        M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    }
+                    float step=0.6;
                     
+                    // void fillTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, const T &color)
                     coord c1 = getColorCoord(r1, degree);
-                    coord c2 = getColorCoord(r2, degree);
-                    M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-
-                    for(int i=0;i<2;i++){
-                        coord c1 = getColorCoord(r1, degree+(i*.25));
-                        coord c2 = getColorCoord(r2, degree+(i*.25));
-                        M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    }
+                    coord c2 = getColorCoord(r2, degree-step);
+                    coord c3 = getColorCoord(r2, degree+step);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
+                    
+                    c1 = getColorCoord(r1, degree);
+                    c2 = getColorCoord(r1, degree-step-step);
+                    c3 = getColorCoord(r2, degree-step);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);                    
                 }
 
                 void refreshColorMenu(uint16_t currentValue, HaDevice currentDevice){

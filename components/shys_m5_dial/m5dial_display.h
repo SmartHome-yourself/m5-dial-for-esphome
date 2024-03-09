@@ -83,6 +83,12 @@ namespace esphome
                     gfx->drawString("DISCONNECTED",
                                     width / 2,
                                     height / 2);
+<<<<<<< Updated upstream
+=======
+                    gfx->drawString("from HA",
+                                    width / 2,
+                                    height / 2+22);
+>>>>>>> Stashed changes
 
                     gfx->endWrite();                      // Release SPI bus
                 }

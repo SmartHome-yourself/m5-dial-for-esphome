@@ -17,6 +17,7 @@ esphome:
       - FS
       - Wire
       - EEPROM
+      - ArduinoJson
       - m5stack/M5Unified
       - m5stack/M5Dial
 

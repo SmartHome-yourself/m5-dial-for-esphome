@@ -22,40 +22,30 @@ namespace esphome
                     }
                     
                 }
-/*
-                void publishState(const std::string& newState){
-                    this->stateIsOn = (strcmp(newState.c_str(), "on") == 0);
-                    
-                    if(this->stateIsOn){
-                        haApi.turnFanOn(this->device.getEntityId().c_str());
-                    } else {
-                        haApi.turnFanOff(this->device.getEntityId().c_str());
-                    }
-                }
-*/
+
                 void sendValueToHomeAssistant(int value) override {
                     haApi.setFanSpeed(this->device.getEntityId(), value);
                 }
 
-                void showFanMenu(LovyanGFX* gfx, uint16_t currentValue){
+                void showFanMenu(M5DialDisplay& display, uint16_t currentValue){
+                    LovyanGFX* gfx = display.getGfx();
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue), RED);
                     gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
 
-                    gfx->setTextSize(3);
+                    display.setFontsize(3);
                     gfx->drawString((String(currentValue) + "%").c_str(),
                                     width / 2,
                                     height / 2 - 30);
                     
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -101,7 +91,7 @@ namespace esphome
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Speed-Modus");
-                    this->showFanMenu(display.getGfx(), getValue());
+                    this->showFanMenu(display, getValue());
                     
                     this->displayRefreshNeeded = false;
                 }

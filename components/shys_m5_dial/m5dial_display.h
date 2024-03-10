@@ -14,6 +14,9 @@ namespace esphome
                 unsigned long lastEvent = 0;
                 uint16_t lastMode = -1;
 
+                std::string fontName = "FreeMono12pt7b";
+                float fontFactor = 1;
+
             public:
                 void setTimeToScreenOff(int value){
                     this->timeToScreenOff = value;
@@ -29,8 +32,16 @@ namespace esphome
                     return M5Dial.Display.width();
                 }
 
-                LovyanGFX* getGfx(){
+                LovyanGFX* getGfx() {
                     return gfx;
+                }
+
+                void setFontName(std::string name){
+                    this->fontName = name;
+                }
+
+                void setFontFactor(float factor){
+                    this->fontFactor = factor;
                 }
 
                 bool isDisplayOn(){
@@ -41,11 +52,11 @@ namespace esphome
                     if (esphome::millis() - lastEvent > timeToScreenOff ) {
                         if(M5Dial.Display.getBrightness()>0){
                             M5Dial.Display.setBrightness(0);
-                            ESP_LOGI("SLEEP", "Sleep after %d ms", timeToScreenOff);
+                            ESP_LOGI("DISPLAY", "Sleep after %d ms", timeToScreenOff);
                         }
                     } else if ( M5Dial.Display.getBrightness()<=0 ) {
                         M5Dial.Display.setBrightness(100);
-                        ESP_LOGI("SLEEP", "Display on");
+                        ESP_LOGI("DISPLAY", "Display on");
                     }
                 }
 
@@ -55,12 +66,13 @@ namespace esphome
 
                     gfx->setTextColor(LIGHTGREY);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+
+                    this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
                     gfx->fillRect(0, 0, width, height, DARKGREY);
                     
-                    gfx->setTextSize(2);
+                    this->setFontsize(2);
                     gfx->drawString("OFFLINE",
                                     width / 2,
                                     height / 2);
@@ -74,12 +86,13 @@ namespace esphome
 
                     gfx->setTextColor(WHITE);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+
+                    this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
                     gfx->fillRect(0, 0, width, height, BLUE);
                     
-                    gfx->setTextSize(1);
+                    this->setFontsize(1);
                     gfx->drawString("DISCONNECTED",
                                     width / 2,
                                     height / 2);
@@ -93,22 +106,20 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
+
+                    this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
                     gfx->fillRect(0, 0, width, height, ORANGE);
                     
-                    gfx->setTextSize(2);
+                    this->setFontsize(2);
+
                     gfx->drawString("UNKNOWN",
                                     width / 2,
                                     height / 2);
 
                     gfx->endWrite();                      // Release SPI bus
                 }
-
-                
-
-
 
                 float getDegByCoord(uint16_t x, uint16_t y){
                     float mx = M5Dial.Display.width()/2;
@@ -120,6 +131,23 @@ namespace esphome
                     return angle;
                 }
 
+                void setFontsize(float size) {
+                    getGfx()->setTextSize(size * this->fontFactor);
+                }
+
+                int getRowHeight(float fontSize){
+                    return (int)this->fontFactor * fontSize;
+                }
+
+                void setFontByName(const std::string& name) {
+                    if (FONT_MAP.find(name) != FONT_MAP.end()) {
+                        this->setFontName(name);
+                    } else {
+                        this->setFontName("FreeMono12pt7b");
+                        ESP_LOGE("DISPLAY", "Font '%s' not found, using default font: 'FreeMono12pt7b'", name.c_str());
+                    }
+                    getGfx()->setFont(FONT_MAP[this->fontName]);
+                }
         };
     }
 }

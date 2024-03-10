@@ -153,6 +153,16 @@ namespace esphome
         this->rotaryStepWidth = value;
       }
 
+      void setFontName(std::string value){
+        ESP_LOGI("DEVICE", "setFontName %s", value);
+        m5DialDisplay->setFontName(value);
+      }
+
+      void setFontFactor(int value){
+        ESP_LOGI("DEVICE", "setFontFactor %i", value);
+        m5DialDisplay->setFontFactor(value);
+      }
+
 
      /**
       * 

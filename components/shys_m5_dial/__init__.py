@@ -20,6 +20,8 @@ CONF_LONG_PRESS_DURATION            = "long_press_duration"
 CONF_SEND_VALUE_DELAY               = "send_value_delay"
 CONF_SEND_VALUE_LOCK                = "send_value_lock"
 CONF_ROTARY_STEP_WIDTH              = "rotary_step_width"
+CONF_FONT                           = "font"
+CONF_FONT_FACTOR                    = "font_factor"
 
 # ALLGEMEINE MODE PARAMETER
 CONF_DEVICE_MODE_ENABLE             = "enable"
@@ -65,6 +67,8 @@ DEFAULT_LONG_PRESS_DURATION         = 1200
 DEFAULT_SEND_VALUE_DELAY            = 1200
 DEFAULT_SEND_VALUE_LOCK             = 3000
 DEFAULT_ROTARY_STEP_WIDTH           = 10
+DEFAULT_FONT                        = "FreeMono12pt7b"
+DEFAULT_FONT_FACTOR                 = 1
 DEFAULT_WHITE_MIN_KELVIN            = 2000
 DEFAULT_WHITE_MAX_KELVIN            = 6500
 DEFAULT_WHITE_MIN_TEMP              = 4
@@ -85,6 +89,8 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_SEND_VALUE_DELAY, default=DEFAULT_SEND_VALUE_DELAY): cv.int_range(0, 999999),
     cv.Optional(CONF_SEND_VALUE_LOCK, default=DEFAULT_SEND_VALUE_LOCK): cv.int_range(0, 999999),
     cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_ROTARY_STEP_WIDTH): cv.int_range(0, 100),
+    cv.Optional(CONF_FONT, default=DEFAULT_FONT): cv.string,
+    cv.Optional(CONF_FONT_FACTOR, default=DEFAULT_FONT_FACTOR): cv.float_range(0.1, 10.0),
 
     cv.Optional(CONF_DEVICES, default=dict()): cv.All(dict({
     
@@ -187,6 +193,14 @@ def to_code(config):
     if CONF_ROTARY_STEP_WIDTH in config:
         rotaryStepWidth = config[CONF_ROTARY_STEP_WIDTH]
         cg.add(var.setRotaryStepWidth(rotaryStepWidth))
+
+    if CONF_FONT in config:
+        fontname = config[CONF_FONT]
+        cg.add(var.setFontName(fontname))
+
+    if CONF_FONT_FACTOR in config:
+        fontfactor = config[CONF_FONT_FACTOR]
+        cg.add(var.setFontFactor(fontfactor))
 
     if CONF_DEVICES in config:
         confDevices = config[CONF_DEVICES]

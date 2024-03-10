@@ -47,7 +47,9 @@ namespace esphome
                 }
 
 
-                void showTunableWhiteMenu(LovyanGFX* gfx, uint16_t currentValue){
+                void showTunableWhiteMenu(M5DialDisplay& display, uint16_t currentValue){
+                    LovyanGFX* gfx = display.getGfx();
+
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
 
@@ -55,7 +57,6 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
 
                     gfx->startWrite();                      // Secure SPI bus
 
@@ -63,12 +64,12 @@ namespace esphome
 
                     gfx->drawLine(0, ypos, width, ypos, RED );
 
-                    gfx->setTextSize(3);
+                    display.setFontsize(3);
                     gfx->drawString((String(currentValue) + "K").c_str(),
                                     width / 2,
                                     height / 2 - 30);
 
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -89,7 +90,7 @@ namespace esphome
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Tunable White-Modus");
-                    this->showTunableWhiteMenu(display.getGfx(), getValue());
+                    this->showTunableWhiteMenu(display, getValue());
                 }
 
                 void registerHAListener() override {

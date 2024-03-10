@@ -20,7 +20,9 @@ namespace esphome
                     haApi.setClimateTemperature(this->device.getEntityId(), value);
                 }
 
-                void showTemperatureMenu(LovyanGFX* gfx){
+                void showTemperatureMenu(M5DialDisplay& display){
+                    LovyanGFX* gfx = display.getGfx();
+
                     uint16_t currentValue = getValue();
 
                     uint16_t height = gfx->height();
@@ -28,19 +30,18 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
-
+                    
                     gfx->startWrite();                      // Secure SPI bus
 
                     gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue) , RED);
                     gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
 
-                    gfx->setTextSize(3);
+                    display.setFontsize(3);
                     gfx->drawString(String(currentValue).c_str(),
                                     width / 2,
                                     height / 2 - 30);                        
                     
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -57,7 +58,7 @@ namespace esphome
                 }
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
-                    this->showTemperatureMenu(display.getGfx());
+                    this->showTemperatureMenu(display);
                     ESP_LOGD("DISPLAY", "Temperature-Modus");
                 }
 

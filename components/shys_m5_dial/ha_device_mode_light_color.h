@@ -90,16 +90,6 @@ namespace esphome
                 }
 
                 void drawColorCircleLine(LovyanGFX* gfx, float degree, float r1, float r2, uint32_t color) {
-                    /*
-                    for(int i=0;i<2;i++){
-                        coord c1 = getColorCoord(gfx, r1, degree-(i*.25));
-                        coord c2 = getColorCoord(gfx, r2, degree-(i*.25));
-                        M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    }
-                    coord c1 = getColorCoord(gfx, r1, degree);
-                    coord c2 = getColorCoord(gfx, r2, degree);
-                    M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    */
                     uint16_t step = 1;
                     coord c1 = getColorCoord(gfx, r1, degree);
                     coord c2 = getColorCoord(gfx, r2, degree-step);
@@ -111,17 +101,11 @@ namespace esphome
                     c2 = getColorCoord(gfx, r1, degree-step-step);
                     c3 = getColorCoord(gfx, r2, degree-step);
                     M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
-
-                    /*
-                    for(int i=0;i<2;i++){
-                        coord c1 = getColorCoord(gfx, r1, degree+(i*.25));
-                        coord c2 = getColorCoord(gfx, r2, degree+(i*.25));
-                        M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
-                    }
-                    */
                 }
 
-                void refreshColorMenu(LovyanGFX* gfx){
+                void refreshColorMenu(M5DialDisplay& display){
+                    LovyanGFX* gfx = display.getGfx();
+
                     int currentValue = getValue();
                     uint32_t complementary_color = getComplementaryByDegree(currentValue);
 
@@ -130,17 +114,16 @@ namespace esphome
 
                     gfx->setTextColor(complementary_color);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
 
                     gfx->startWrite();                    // Secure SPI bus
                     gfx->fillCircle(width/2, height/2, 70, getColorByDegree(currentValue));
 
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(String(currentValue),
                                     width / 2,
                                     height / 2 - 20);
 
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -152,7 +135,9 @@ namespace esphome
                     gfx->endWrite();                      // Release SPI bus
                 }
 
-                void showColorMenu(LovyanGFX* gfx){
+                void showColorMenu(M5DialDisplay& display){
+                    LovyanGFX* gfx = display.getGfx();
+
                     int currentValue = getValue();
                     uint32_t complementary_color = getComplementaryByDegree(currentValue);
 
@@ -169,7 +154,7 @@ namespace esphome
 
                     gfx->endWrite();                      // Release SPI bus
 
-                    refreshColorMenu(gfx);
+                    refreshColorMenu(display);
                 }
 
 
@@ -182,9 +167,9 @@ namespace esphome
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Farbwahl-Modus");
                     if(init){
-                        showColorMenu(display.getGfx());
+                        showColorMenu(display);
                     } else {
-                        refreshColorMenu(display.getGfx());
+                        refreshColorMenu(display);
                     }
                 }
 

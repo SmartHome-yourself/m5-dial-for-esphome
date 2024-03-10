@@ -35,6 +35,8 @@ shys_m5_dial:
   screenOffTime: 45000
   rotaryStepWidth: 5
   longPressDuration: 1200
+  font: FreeSans12pt7b
+  font_factor: 1.2
 
   devices:
     lights:
@@ -139,6 +141,14 @@ Der hier eingestellte Wert gilt für alle Modi, bei denen keine abweichende Schr
 **longPressDuration (optional)** *(Default: 1200)*  
 Gibt die Dauer an, ab wie viel Millisekunden ein Tastendruck als Long-Press gelten soll.  
   
+**font (optional)** *(Default: FreeMono12pt7b)*  
+Gibt die zu verwendende Schriftart an.  
+Alle zur Verfügung stehenden Schriften sind in einer Map in [globals.h](components/shys_m5_dial/globals.h) definiert.  
+  
+**font_factor (optional)** *(Default: 1)*  
+Gibt den Faktor an, der auf die Schriftgröße angewendet werden soll.  
+*Gültige Werte: 0.1 - 10.0*
+  
 &nbsp;  
   
 ------
@@ -207,7 +217,7 @@ Durch setzen auf true wird der Modus für die Entität aktiviert.
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Helligkeits-Modus dieser Light Entität.  
-*Gültige Werte 1-100*  
+*Gültige Werte 1 - 100*  
   
 &nbsp;
   
@@ -238,15 +248,15 @@ Durch setzen auf true wird der Modus für die Entität aktiviert.
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Weiß-Ton Modus dieser Light Entität.  
-*Gültige Werte 1-500*  
+*Gültige Werte 1 - 500*  
   
 **min_kelvin (optional)** *(Default: 2000)*  
 Gibt den Minimalwert in Kelvin für die Weiß-Ton Steuerung an. 
-*Gültige Werte 1000-10000*  
+*Gültige Werte 1000 - 10000*  
   
 **max_kelvin (optional)** *(Default: 6500)*  
 Gibt den Maximalwert in Kelvin für die Weiß-Ton Steuerung an. 
-*Gültige Werte 1000-10000*  
+*Gültige Werte 1000 - 10000*  
   
 &nbsp;
   
@@ -275,7 +285,7 @@ Durch setzen auf true wird der Modus für die Entität aktiviert.
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Farbwahl-Modus dieser Light Entität.  
-*Gültige Werte 1-100*  
+*Gültige Werte 1 - 100*  
   
 &nbsp;  
   
@@ -324,7 +334,7 @@ shys_m5_dial:
 **rotary_step_width (optional)** *Default: 1*  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Bei Climates gilt die 1 als Default, egal was als allgemeiner Standard in der Component eingestellt wurde.  
-*Gültige Werte 1-100*  
+*Gültige Werte 1 - 100*  
   
 **min_temperature (optional)** *Default: 4*  
 Legt die minimale Temperatur fest, die am Dial für diese Climate-Entität eingestellt werden kann.  
@@ -376,7 +386,7 @@ shys_m5_dial:
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
-*Gültige Werte 1-100*  
+*Gültige Werte 1 - 100*  
   
 &nbsp;  
   
@@ -432,7 +442,7 @@ Läuft der Lüfter rückwärts, erhöht links drehen die Geschwindigkeit und rec
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
 Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
-*Gültige Werte 1-100*  
+*Gültige Werte 1 - 100*  
   
   
 &nbsp;  

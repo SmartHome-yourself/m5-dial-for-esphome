@@ -10,25 +10,26 @@ namespace esphome
                     haApi.turnLightOn(this->device.getEntityId(), value);
                 }
 
-                void showBrightnessMenu(LovyanGFX* gfx, uint16_t currentValue){
+                void showBrightnessMenu(M5DialDisplay& display, uint16_t currentValue){
+                    LovyanGFX* gfx = display.getGfx();
+
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
 
                     gfx->setTextColor(MAROON);
                     gfx->setTextDatum(middle_center);
-                    gfx->setFont(&fonts::FreeMono12pt7b);
 
                     gfx->startWrite();                      // Secure SPI bus
 
                     gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue), RED);
                     gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
 
-                    gfx->setTextSize(3);
+                    display.setFontsize(3);
                     gfx->drawString((String(currentValue) + "%").c_str(),
                                     width / 2,
                                     height / 2 - 30);
                     
-                    gfx->setTextSize(1);
+                    display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
                                     height / 2 + 20);
@@ -44,7 +45,7 @@ namespace esphome
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Helligkeits-Modus");
-                    this->showBrightnessMenu(display.getGfx(), getValue());
+                    this->showBrightnessMenu(display, getValue());
                 }
 
                 void registerHAListener() override {

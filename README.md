@@ -1,10 +1,14 @@
-# M5 Stack Dial Custom Component für ESPHome
+#### Language Selection:
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/SmartHome-yourself/m5-dial-for-esphome/blob/main/README.md) 
+[![de](https://img.shields.io/badge/lang-de-blue.svg)](https://github.com/SmartHome-yourself/m5-dial-for-esphome/blob/main/README.de.md)
+  
+# M5 Stack Dial Custom Component for ESPHome
 ![image](https://github.com/SmartHome-yourself/m5-dial-for-esphome/assets/705724/6d268fe4-ef71-40bb-b70c-797453b1d06b)
-Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen?ref=smarthomeyourself)
+More information about the [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen?ref=smarthomeyourself)
   
-Mit dieser Komponente wird der M5 Stack Dial zu einer universal-Fernbedienung für Home Assistant.  
+This component turns the M5 Stack Dial into a universal remote control for Home Assistant.  
   
-Aktuell werden folgende Entitäten unterstützt:  
+Currently supported entities are:  
 - climate  
 - cover  
 - fan  
@@ -12,11 +16,11 @@ Aktuell werden folgende Entitäten unterstützt:
 - switch  
   
 ## Video
-[![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial als Home Assistant Fernbedienung")
+[![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial as Home Assistant Remote Control")
 
 &nbsp;
   
-# Beispiel Konfiguration:
+# Example Configuration:
 ```yaml
 substitutions:
   devicename: "m5-dial"
@@ -89,9 +93,9 @@ shys_m5_dial:
   
 &nbsp;  
   
-# Konfiguration
-In den Substitutions muss auf jeden Fall der `devicename` angegeben werden.  
-Die Funknetzwerk-Verbindung muss entweder über den normalen `wifi:` Abschnitt vollständig konfiguriert werden, oder man kann alternativ auch einfach die WLAN-SSID und das WLAN-Passwort in den Substitutions angeben. 
+# Configuration
+In substitutions, the `devicename` must be specified.  
+The wireless network connection must be fully configured either through the normal `wifi:` section, or alternatively, you can simply specify the WLAN SSID and WLAN password in the substitutions. 
   
 ## Substitutions
 ```
@@ -102,13 +106,13 @@ substitutions:
 ```
   
 **name**  
-Der Hostname des Geräts.  *(default: m5-dial)*  
+The hostname of the device. *(default: m5-dial)*  
 
 **wifi_ssid**  
-Der Hostname des Geräts.  *(default: !secret wifi_ssid)*  
+The hostname of the device. *(default: !secret wifi_ssid)*  
 
 **wifi_password**  
-Der Hostname des Geräts.  *(default: !secret wifi_password)*  
+The hostname of the device. *(default: !secret wifi_password)*  
 
   
 &nbsp;  
@@ -116,8 +120,8 @@ Der Hostname des Geräts.  *(default: !secret wifi_password)*
 -----
 ## Custom-Component
 -----
-## Allgemeine Attribute
-Allgemeine Attribute sind alle Parameter, die direkt unter der Custom-Component "shys_m5_dial" zur Verfügung stehen.  
+## General Attributes
+General attributes are all parameters available directly under the custom component "shys_m5_dial".  
   
 **Code:**
 ```
@@ -129,25 +133,25 @@ shys_m5_dial:
 ```
   
 **name**  
-Legt den Namen der Komponente fest.  
+Sets the name of the component.  
   
 **screenOffTime (optional)** *(Default: 30000)*  
-Gibt an, nach wie viel Millisekunden das Display sich automatisch abschaltet  
+Indicates after how many milliseconds the display automatically turns off.  
   
 **rotaryStepWidth (optional)** *(Default: 10)*  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert gilt für alle Modi, bei denen keine abweichende Schrittweite angegeben wird.  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+The value set here applies to all modes where no different step width is specified.  
   
 **longPressDuration (optional)** *(Default: 1200)*  
-Gibt die Dauer an, ab wie viel Millisekunden ein Tastendruck als Long-Press gelten soll.  
+Indicates the duration, in milliseconds, after which a button press is considered a long press.  
   
 **font (optional)** *(Default: FreeMono12pt7b)*  
-Gibt die zu verwendende Schriftart an.  
-Alle zur Verfügung stehenden Schriften sind in einer Map in [globals.h](components/shys_m5_dial/globals.h) definiert.  
+Specifies the font to be used.  
+All available fonts are defined in a map in [globals.h](components/shys_m5_dial/globals.h).  
   
 **font_factor (optional)** *(Default: 1)*  
-Gibt den Faktor an, der auf die Schriftgröße angewendet werden soll.  
-*Gültige Werte: 0.1 - 10.0*
+Specifies the factor to be applied to the font size.  
+*Valid values: 0.1 - 10.0*
   
 &nbsp;  
   
@@ -155,8 +159,8 @@ Gibt den Faktor an, der auf die Schriftgröße angewendet werden soll.
 
 ## devices
   
-Unter Devices werden alle Entitäten angegeben, die mit dem M5 Dial gesteuert werden sollen.  
-Die Angabe der Entitäten erfolgt in einzelnen Listen je Geräteart (Domain) wie z.B. Lichter, Schalter, Jalousien usw.  
+Under Devices, all entities to be controlled with the M5 Dial are specified.  
+The entities are specified in individual lists per device type (domain) such as lights, switches, covers, etc.  
   
 **Code:**
 ```
@@ -170,9 +174,9 @@ shys_m5_dial:
 ------
   
 ## **LIGHTS**
-Unter "devices - lights" werden alle Light-Entitäten angegeben.  
-Ohne weitere Angaben lässt sich die Lampe über den Dial nur an-/aus-schalten.  
-Um Farbe, Helligkeit oder den Weißwert einstellen zu können muss der jeweilige Mode aktiviert werden.  
+Under "devices - lights" all light entities are specified.  
+Without further specifications, the lamp can only be turned on/off via the Dial.  
+To adjust color, brightness, or white value, the respective mode must be activated.  
   
 **Code:**
 ```
@@ -185,17 +189,17 @@ shys_m5_dial:
 ```
   
 **entity**  
-Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+Specifies the Light Entity ID from Home Assistant to be controlled.  
   
 **name**  
-Der auf dem Display angezeigte Name der Entität.  
+The name of the entity displayed on the screen.  
   
 ## modes (optional)
 #### dimm_mode
-Mit Hilfe des Dimm-Mode lässt sich die Helligkeit der Light-Entität regeln.  
-Ist der Dimm-Mode aktiv, ersetzt dieser den Standard-On/Off-Mode.  
-Die Helligkeit lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schaltet das Licht an/aus.  
+The Dimm Mode allows regulating the brightness of the light entity.  
+When Dimm Mode is active, it replaces the standard On/Off Mode.  
+Brightness can be controlled both via the rotary encoder and touch.  
+A press on the button turns the light on/off.  
   
 **Code:**
 ```
@@ -212,19 +216,21 @@ shys_m5_dial:
 ```
   
 **enable** *(Default: false)*  
-Durch setzen auf true wird der Modus für die Entität aktiviert.  
+Setting to true activates the mode for the entity.  
   
 **rotary_step_width (optional)**  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Helligkeits-Modus dieser Light Entität.  
-*Gültige Werte 1 - 100*  
+Specifies the general step width by which the value changes per step when using the rotary
+
+ encoder.  
+The value set here overrides the general setting and applies only to the brightness mode of this light entity.  
+*Valid values: 1 - 100*  
   
 &nbsp;
   
 #### white_mode
-Mit Hilfe des White-Mode lässt sich der Weißton für die Light-Entität in Kelvin regeln.  
-Der Weiß-Ton lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schaltet das Licht an/aus.  
+The White Mode allows regulating the white tone for the light entity in Kelvin.  
+The white tone can be controlled both via the rotary encoder and touch.  
+A press on the button turns the light on/off.  
   
 **Code:**
 ```
@@ -243,27 +249,27 @@ shys_m5_dial:
 ```  
   
 **enable** *(Default: false)*  
-Durch setzen auf true wird der Modus für die Entität aktiviert.  
+Setting to true activates the mode for the entity.  
   
 **rotary_step_width (optional)**  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Weiß-Ton Modus dieser Light Entität.  
-*Gültige Werte 1 - 500*  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+The value set here overrides the general setting and applies only to the white tone mode of this light entity.  
+*Valid values: 1 - 500*  
   
 **min_kelvin (optional)** *(Default: 2000)*  
-Gibt den Minimalwert in Kelvin für die Weiß-Ton Steuerung an. 
-*Gültige Werte 1000 - 10000*  
+Specifies the minimum value in Kelvin for white tone control. 
+*Valid values: 1000 - 10000*  
   
 **max_kelvin (optional)** *(Default: 6500)*  
-Gibt den Maximalwert in Kelvin für die Weiß-Ton Steuerung an. 
-*Gültige Werte 1000 - 10000*  
+Specifies the maximum value in Kelvin for white tone control. 
+*Valid values: 1000 - 10000*  
   
 &nbsp;
   
 #### rgb_mode
-Mit Hilfe des RGB-Mode (Farbwahl) lässt sich die Farbe für die Light-Entität auswählen.  
-Die Farbe lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schaltet das Licht an/aus.
+The RGB Mode (color selection) allows selecting the color for the light entity.  
+Color can be controlled both via the rotary encoder and touch.  
+A press on the button turns the light on/off.
   
 **Code:**
 ```
@@ -280,19 +286,19 @@ shys_m5_dial:
 ```
   
 **enable** *Default: false*  
-Durch setzen auf true wird der Modus für die Entität aktiviert.
+Setting to true activates the mode for the entity.
   
 **rotary_step_width (optional)**  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Farbwahl-Modus dieser Light Entität.  
-*Gültige Werte 1 - 100*  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+The value set here overrides the general setting and applies only to the color selection mode of this light entity.  
+*Valid values: 1 - 100*  
   
 &nbsp;  
   
 ------
   
 ## **CLIMATES**
-Unter "devices - climates" werden alle Climate-Entitäten angegeben.  
+Under "devices - climates" all climate entities are specified.  
   
 **Code:**
 ```
@@ -305,16 +311,16 @@ shys_m5_dial:
 ```
     
 **entity**  
-Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+Specifies the Climate Entity ID from Home Assistant to be controlled.  
   
 **name**  
-Der auf dem Display angezeigte Name der Entität.  
+The name of the entity displayed on the screen.  
   
 ## modes (optional)
 #### temp_mode
-Mit Hilfe des Temp-Mode lässt sich die Temperatur der Climate-Entität regeln.  
-Die Temperatur lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schalten die Heizung an/aus.  
+The Temp Mode allows regulating the temperature of the climate entity.  
+Temperature can be controlled both via the rotary encoder and touch.  
+A press on the button turns the heater on/off.  
   
 **Code:**
 ```
@@ -332,22 +338,22 @@ shys_m5_dial:
 ```
   
 **rotary_step_width (optional)** *Default: 1*  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Bei Climates gilt die 1 als Default, egal was als allgemeiner Standard in der Component eingestellt wurde.  
-*Gültige Werte 1 - 100*  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+For climates, 1 is the default, regardless of what is set as the general standard in the component.  
+*Valid values: 1 - 100*  
   
 **min_temperature (optional)** *Default: 4*  
-Legt die minimale Temperatur fest, die am Dial für diese Climate-Entität eingestellt werden kann.  
+Sets the minimum temperature that can be set for this climate entity on the Dial.  
   
 **max_temperature (optional)** *Default: 30*  
-Legt die maximale Temperatur fest, die am Dial für diese Climate-Entität eingestellt werden kann.
+Sets the maximum temperature that can be set for this climate entity on the Dial.
   
 &nbsp;  
   
 ------
   
 ## **COVER**
-Unter "devices - cover" werden alle Cover-Entitäten angegeben.  
+Under "devices - cover" all cover entities are specified.  
   
 **Code:**
 ```
@@ -360,15 +366,15 @@ shys_m5_dial:
 ```
   
 **entity**  
-Angabe der Light-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+Specifies the Cover Entity ID from Home Assistant to be controlled.  
   
 **name**  
-Der auf dem Display angezeigte Name der Entität.  
+The name of the entity displayed on the screen.  
   
 ## modes (optional)
 #### position_mode
-Mit Hilfe des Position-Mode lässt sich die Position der Cover-Entität steuern.  
-Die Position lässt sich sowohl über den Drehregler als auch per Touch steuern.  
+The Position Mode allows controlling the position of the cover entity.  
+Position can be controlled both via the rotary encoder and touch.  
 
 **Code:**
 ```
@@ -384,16 +390,16 @@ shys_m5_dial:
 ```
   
 **rotary_step_width (optional)**  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
-*Gültige Werte 1 - 100*  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+The value set here overrides the general setting and applies only to the position mode of this cover entity.  
+*Valid values: 1 - 100*  
   
 &nbsp;  
   
 ------
   
 ## **FANS**
-Unter "devices - cover" werden alle Fan-Entitäten angegeben.  
+Under "devices - cover" all fan entities are specified.  
   
 **Code:**
 ```
@@ -406,16 +412,16 @@ shys_m5_dial:
 ```
   
 **entity**  
-Angabe der Fan-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+Specifies the Fan Entity ID from Home Assistant to be controlled.  
   
 **name**  
-Der auf dem Display angezeigte Name des Ventilators.  
+The name of the fan displayed on the screen.  
   
 ## modes (optional)
 #### speed_mode
-Mit Hilfe des Speed-Mode lässt sich die Geschwindigkeit der Fan-Entität steuern.  
-Die Geschwindigkeit lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schalten den Ventilator an/aus.
+The Speed Mode allows controlling the speed of the fan entity.  
+Speed can be controlled both via the rotary encoder and touch.  
+A press on the button turns the fan on/off.
   
 **Code:**
 ```
@@ -432,17 +438,17 @@ shys_m5_dial:
 ```
   
 **changeable_direction (optional)**  *(Default: false)*  
-Gibt an, ob der Ventilator zwei Laufrichtungen hat und somit zwischen vorwärts und rückwärts umgestellt werden kann.  
-False = Nur eine Laufrichtung. Drehen nach rechts erhöht die Geschwindigkeit, Drehen nach links reduziert die Geschwindigkeit.
-True = Zwei Laufrichtungen. Drehen nach rechts erhöht für Vorwärts die Geschwindigkeit. Drehen nach links reduziert die Geschwindigkeit für Vorwärts.  
-Man kann allerdings jetzt über 0 hinweg drehen und somit die Drehrichtung zu ändern.  
-Läuft der Lüfter rückwärts, erhöht links drehen die Geschwindigkeit und rechts drehen reduziert diese
-*Gültige Werte true / false*  
+Indicates whether the fan has two directions of rotation and can therefore be switched between forward and reverse.  
+False = Only one direction of rotation. Turning right increases the speed, turning left reduces the speed.
+True = Two directions of rotation. Turning right increases the speed for forward, turning left reduces the speed for forward.  
+However, you can now turn past 0 and thus change the direction of rotation.  
+If the fan is running in reverse, turning left increases the speed and turning right reduces it.
+*Valid values: true / false*  
   
 **rotary_step_width (optional)**  
-Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
-*Gültige Werte 1 - 100*  
+Specifies the general step width by which the value changes per step when using the rotary encoder.  
+The value set here overrides the general setting and applies only to the speed mode of this fan entity.  
+*Valid values: 1 - 100*  
   
   
 &nbsp;  
@@ -453,14 +459,16 @@ Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gi
 ------  
   
 ## Advanced
-Die folgenden Attribute sind zwar vorhanden, sollten aber eigentlich nicht geändert werden müssen.  
+The following attributes are present, but generally should not need to be changed.  
   
 **send_value_delay**  
-Gibt die Verzögerung in Millisekunden an, die bei Wertänderung gewartet wird, bevor die Änderung an Home Assistant übertragen wird.  
-Das ist gerade bei Verwendung des Rotary-Encoders wichtig um nicht unnötig viele API-Aufrufe zu erzeugen. *(Default: 1200)*
+Specifies the delay in milliseconds to wait after a value change before
+
+ transmitting the change to Home Assistant.  
+This is especially important when using the rotary encoder to avoid generating unnecessary API calls. *(Default: 1200)*
   
 **send_value_lock**  
-Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor der nächste API Aufruf erfolgen darf. *(Default: 3000)*  
+Specifies how long to wait after an API call before the next API call can be made. *(Default: 3000)*  
   
   
 ------  
@@ -468,5 +476,3 @@ Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor der nächst
     
 &nbsp;
   
-
-

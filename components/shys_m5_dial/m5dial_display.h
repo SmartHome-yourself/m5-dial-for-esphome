@@ -97,6 +97,10 @@ namespace esphome
                                     width / 2,
                                     height / 2);
 
+                    gfx->drawString("from HA",
+                                    width / 2,
+                                    height / 2+22);
+
                     gfx->endWrite();                      // Release SPI bus
                 }
 

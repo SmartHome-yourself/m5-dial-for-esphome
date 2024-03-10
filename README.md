@@ -3,7 +3,13 @@
 Mehr Infos zum [M5 Stack Dial](https://shop.m5stack.com/products/m5stack-dial-esp32-s3-smart-rotary-knob-w-1-28-round-touch-screen?ref=smarthomeyourself)
   
 Mit dieser Komponente wird der M5 Stack Dial zu einer universal-Fernbedienung für Home Assistant.  
-Aktuell werden nur Light-Entitäten unterstützt, in Zukunft sollen aber auch weitere Gerätearten darüber steuerbar sein.  
+  
+Aktuell werden folgende Entitäten unterstützt:  
+- climate  
+- cover  
+- fan  
+- light  
+- switch  
   
 ## Video
 [![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial als Home Assistant Fernbedienung")

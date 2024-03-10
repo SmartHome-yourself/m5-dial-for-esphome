@@ -90,21 +90,35 @@ namespace esphome
                 }
 
                 void drawColorCircleLine(LovyanGFX* gfx, float degree, float r1, float r2, uint32_t color) {
+                    /*
                     for(int i=0;i<2;i++){
                         coord c1 = getColorCoord(gfx, r1, degree-(i*.25));
                         coord c2 = getColorCoord(gfx, r2, degree-(i*.25));
                         M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
                     }
-                    
                     coord c1 = getColorCoord(gfx, r1, degree);
                     coord c2 = getColorCoord(gfx, r2, degree);
                     M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
+                    */
+                    uint16_t step = 1;
+                    coord c1 = getColorCoord(gfx, r1, degree);
+                    coord c2 = getColorCoord(gfx, r2, degree-step);
+                    coord c3 = getColorCoord(gfx, r2, degree+step);
 
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
+
+                    c1 = getColorCoord(gfx, r1, degree);
+                    c2 = getColorCoord(gfx, r1, degree-step-step);
+                    c3 = getColorCoord(gfx, r2, degree-step);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
+
+                    /*
                     for(int i=0;i<2;i++){
                         coord c1 = getColorCoord(gfx, r1, degree+(i*.25));
                         coord c2 = getColorCoord(gfx, r2, degree+(i*.25));
                         M5Dial.Display.drawLine(c1.x, c1.y, c2.x, c2.y, color);
                     }
+                    */
                 }
 
                 void refreshColorMenu(LovyanGFX* gfx){

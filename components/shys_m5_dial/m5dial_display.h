@@ -18,6 +18,9 @@ namespace esphome
                 float fontFactor = 1;
 
             public:
+                M5DialDisplay() {
+                }
+
                 void setTimeToScreenOff(int value){
                     this->timeToScreenOff = value;
                 }
@@ -148,6 +151,15 @@ namespace esphome
                     }
                     getGfx()->setFont(FONT_MAP[this->fontName]);
                 }
+
+                void drawBitmap(const uint8_t* bmp, int size, uint8_t x, uint8_t y, uint8_t width, uint8_t height){
+                    M5Dial.Display.drawJpg(bmp, size, x, y, width, height, 0, 0);
+                }
+
+                void drawBitmapTransparent(const uint16_t* bmp, uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint32_t transparentColor){
+                    M5Dial.Display.pushImage(x, y, width, height, bmp, transparentColor);
+                }
+
         };
     }
 }

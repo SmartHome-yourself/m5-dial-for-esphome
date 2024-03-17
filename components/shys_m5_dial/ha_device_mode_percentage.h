@@ -6,7 +6,7 @@ namespace esphome
     {
         class HaDeviceModePercentage: public esphome::shys_m5_dial::HaDeviceMode {
             protected:
-                void showPercentageMenu(M5DialDisplay& display, uint16_t currentValue){
+                void showPercentageMenu(M5DialDisplay& display){
                     LovyanGFX* gfx = display.getGfx();
 
                     uint16_t height = gfx->height();
@@ -17,11 +17,11 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue) , RED);
-                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
+                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(getValue()) , RED);
+                    gfx->fillRect(0, this->getDisplayPositionY(getValue()), width, height, YELLOW);
 
                     display.setFontsize(3);
-                    gfx->drawString((String(currentValue) + "%").c_str(),
+                    gfx->drawString((String(getValue()) + "%").c_str(),
                                     width / 2,
                                     height / 2 - 30);
                     
@@ -41,7 +41,7 @@ namespace esphome
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Percentage-Modus");
-                    showPercentageMenu(display, round((float)getValue()));
+                    showPercentageMenu(display);
                 }
                 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {

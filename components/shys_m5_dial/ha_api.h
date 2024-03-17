@@ -12,6 +12,22 @@ namespace esphome
                 esphome::api::HomeassistantServiceMap resp_kv;
                 
             public:
+
+                void updateEntity(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "homeassistant.update_entity";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGD("HA_API", "update Entity: %s", entity.c_str());
+                }
+
 // ---------------------------------
 //              LIGHT
 // ---------------------------------
@@ -330,8 +346,179 @@ namespace esphome
 
 
 
+// ---------------------------------
+//           MEDIA PLAYER
+// ---------------------------------
+                void setMediaPlayerVolume(const std::string& entity, int volume) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    if(volume < 0 || volume > 100){
+                        return;
+                    }
+
+                    resp.service = "media_player.volume_set";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+                    resp_kv.key = "volume_level";
+                    resp_kv.value = String((float)volume/100).c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    
+                    ESP_LOGI("HA_API", "media player set volume %i for %s", volume, entity.c_str());
+                }
+
+                void stopMediaPlayer(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "media_player.media_stop";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "media player stop: %s", entity.c_str());
+                }
+
+                void setNextTrackOnMediaPlayer(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "media_player.media_next_track";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "media player next track: %s", entity.c_str());
+                }
+
+                void setPreviousTrackOnMediaPlayer(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "media_player.media_previous_track";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "media player previous track: %s", entity.c_str());
+                }
+
+                void playPauseMediaPlayer(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "media_player.media_play_pause";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "play/pause media player: %s", entity.c_str());
+                }
+
+                void playMediaOnMediaPlayer(const std::string& entity, const std::string& content_id, const std::string& content_type){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "media_player.play_media";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    
+                    resp_kv.key = "media_content_id";
+                    resp_kv.value = content_id.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+                    resp_kv.key = "media_content_type";
+                    resp_kv.value = content_type.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "play media %s on player: %s", content_id.c_str(), entity.c_str());
+                }
+
+                void refreshMediaPlayer(const std::string& entity){
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "homeassistant.update_entity";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+
+                    ESP_LOGI("HA_API", "refresh media player: %s", entity.c_str());
+                }
 
 
+
+
+// ---------------------------------
+//              LOCK
+// ---------------------------------
+                void openLock(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "lock.open";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+             
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "open Lock %s", entity.c_str());
+                }
+
+                void lockLock(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "lock.lock";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "lock Lock %s", entity.c_str());
+                }
+
+                void unlockLock(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "lock.unlock";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "unlock Lock %s", entity.c_str());
+                }
 
         };
 

@@ -28,6 +28,7 @@ namespace esphome
                 bool endlessRotaryValue = false;
 
                 bool displayRefreshNeeded = false;
+                double lastDisplayRefresh = 0;
 
                 HaApi haApi;
                 HaDevice& device;
@@ -154,6 +155,8 @@ namespace esphome
                 virtual bool onButton(M5DialDisplay& display, const char * clickType) {
                     return false;
                 }
+
+                virtual void onLoop(){}
 
 
                 void updateHomeAssistantValue(){

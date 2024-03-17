@@ -156,6 +156,10 @@ namespace esphome
                     return getCurrentMode()->onButton(display, clickType);
                 }
 
+                void onLoop(){
+                    getCurrentMode()->onLoop();
+                }
+
         };
 
     }

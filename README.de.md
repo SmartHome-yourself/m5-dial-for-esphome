@@ -1,6 +1,6 @@
 #### Sprachauswahl:
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/SmartHome-yourself/m5-dial-for-esphome/blob/main/README.md) 
-[![de](https://img.shields.io/badge/lang-de-blue.svg)](https://github.com/SmartHome-yourself/m5-dial-for-esphome/blob/main/README.de.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](README.md) 
+[![de](https://img.shields.io/badge/lang-de-blue.svg)](README.de.md)
   
 # M5 Stack Dial Custom Component für ESPHome
 ![image](https://github.com/SmartHome-yourself/m5-dial-for-esphome/assets/705724/6d268fe4-ef71-40bb-b70c-797453b1d06b)
@@ -17,8 +17,14 @@ Aktuell werden folgende Entitäten unterstützt:
   
 ## Video
 [![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial als Home Assistant Fernbedienung")
-
-&nbsp;
+  
+&nbsp;  
+  
+## Discord
+Für einen schnellen Austausch, Anregungen so wie Info's zum aktuellen Entwicklungsstand steht auch unser Discord zur Verfügung.  
+https://discord.com/channels/293705077812625408/1217503791541387294  
+  
+&nbsp;  
   
 # Beispiel Konfiguration:
 ```yaml
@@ -40,7 +46,7 @@ shys_m5_dial:
   rotaryStepWidth: 5
   longPressDuration: 1200
   font: FreeSans12pt7b
-  font_factor: 1.2
+  font_factor: 1
 
   devices:
     lights:
@@ -89,6 +95,30 @@ shys_m5_dial:
           speed_mode:
             changeable_direction: true
             rotary_step_width: 10
+
+    media_player:
+      - entity: media_player.my_player1
+        name: MediaPlayer 1
+        modes:
+          play_mode:
+            rotary_step_width: 10
+          source_mode:
+            rotary_step_width: 1
+            sources:
+              - name: 1Live
+                content_id: 1Live
+                content_type: TUNEIN
+              - name: WDR2
+                content_id: "http://wdr-wdr2-bergischesland.icecast.wdr.de/wdr/wdr2/bergischesland/mp3/128/stream.mp3"
+                content_type: custom
+
+    lock:
+      - entity: lock.my_lock1
+        name: Lock 1
+        modes:
+          lock_mode:
+            rotary_step_width: 1
+            open_on_button: false
 ```
   
 &nbsp;  
@@ -145,7 +175,7 @@ Der hier eingestellte Wert gilt für alle Modi, bei denen keine abweichende Schr
 **longPressDuration (optional)** *(Default: 1200)*  
 Gibt die Dauer an, ab wie viel Millisekunden ein Tastendruck als Long-Press gelten soll.  
   
-**font (optional)** *(Default: FreeMono12pt7b)*  
+**font (optional)** *(Default: FreeSans12pt7b)*  
 Gibt die zu verwendende Schriftart an.  
 Alle zur Verfügung stehenden Schriften sind in einer Map in [globals.h](components/shys_m5_dial/globals.h) definiert.  
   
@@ -389,7 +419,7 @@ shys_m5_dial:
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Position-Modus dieser Cover-Entität.  
 *Gültige Werte 1 - 100*  
   
 &nbsp;  
@@ -445,8 +475,169 @@ Läuft der Lüfter rückwärts, erhöht links drehen die Geschwindigkeit und rec
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
-Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Temp-Modus dieser Climate Entität.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Speed-Modus dieser Ventilator-Entität.  
 *Gültige Werte 1 - 100*  
+  
+&nbsp;  
+  
+------
+  
+## **MEDIA PLAYER**
+Unter "devices - media_player" werden alle MediaPlayer-Entitäten angegeben.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    media_player:
+      - entity: media_player.my_player1
+        name: MediaPlayer 1
+```
+  
+**entity**  
+Angabe der MediaPlayer-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+  
+**name**  
+Der auf dem Display angezeigte Name des MediaPlayers.  
+  
+## modes (optional)
+#### play_mode
+Mit Hilfe des Play-Mode lässt sich über den Drehregler die Lautstärke regeln, so wie per Touch die Wiedergabe starten/pausieren oder zum nächsten bzw. vorherigen Lied wechseln.  
+Ein Druck auf den Button wechselt zwischen Play und Pause.
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    media_player:
+      - entity: media_player.my_player1
+        name: MediaPlayer 1
+        modes:
+          play_mode:
+            rotary_step_width: 10
+```
+
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Play-Modus dieser MediaPlayer-Entität.  
+*Gültige Werte 1 - 100*  
+  
+  
+&nbsp;  
+  
+#### source_mode
+Mit Hilfe des Source-Mode lässt sich über den Drehregler eine Quelle aus den hinterlegten "Sources" auswählen, die abgespielt werden soll.  
+Ein Druck auf den Button startet die Wiedergabe der ausgewählten Quelle.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    media_player:
+      - entity: media_player.my_player1
+        name: MediaPlayer 1
+        modes:
+          play_mode:
+            rotary_step_width: 10
+          source_mode:
+            rotary_step_width: 1
+            sources:
+              - name: 1Live
+                content_id: 1Live
+                content_type: TUNEIN
+              - name: WDR2
+                content_id: "http://wdr-wdr2-bergischesland.icecast.wdr.de/wdr/wdr2/bergischesland/mp3/128/stream.mp3"
+                content_type: custom
+```
+
+**rotary_step_width (optional)** *(Default: 1)*  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Bei source_mode von media_player gilt die 1 als Default, egal was als allgemeiner Standard in der Component eingestellt wurde.  
+*Gültige Werte 1 - 100*  
+  
+**sources (optional)**
+Eine Liste von Audio-Quellen, die zum Abspielen zur Auswahl stehen sollen.  
+Die Einträge müssen immer die Attribute "name", "content_id" und "content_type" enthalten!  
+
+Beispiele für Amazon Echo (Alexa):  
+```
+              - name: 1Live
+                content_id: 1Live
+                content_type: TUNEIN
+			    
+              - name: Metallica
+				        content_id: metallica
+                content_type: AMAZON_MUSIC
+				
+			        - name: Nothing else matters
+				        content_id: play metallica nothing else matters
+                content_type: custom		
+```
+  
+Beispiel für DLNA Player:  
+```
+              - name: 1Live
+                content_id: "https://wdr-1live-live.icecastssl.wdr.de/wdr/1live/live/mp3/128/stream.mp3"
+                content_type: custom
+```
+  
+&nbsp;  
+  
+------
+  
+## **LOCKS**
+Unter "devices - lock" werden alle Fan-Entitäten angegeben.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    lock:
+      - entity: lock.my_lock1
+        name: Lock 1
+```
+  
+**entity**  
+Angabe der Lock-Entity-ID aus Home Assistant, die gesteuert werden soll.  
+  
+**name**  
+Der auf dem Display angezeigte Name des Schlosses.  
+  
+## modes (optional)
+#### lock_mode
+Mit Hilfe des Lock-Mode lässt sich der Zustand der Lock-Entität steuern.  
+Das Schloss lässt sich über den Drehregler aufschließen, abschließen und öffnen.
+Ein Druck auf den Button schließt normalerweise das Schloss je nach aktuellem Zustand auf oder ab.
+Ist *open_on_button* allerdings auf *true* gesetzt, wird das Schloss wenn es abgeschlossen ist bei Druck auf den Button nicht aufgeschlossen, sondern geöffnet.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    lock:
+      - entity: lock.my_lock1
+        name: Lock 1
+        modes:
+          lock_mode:
+            open_on_button: true
+            rotary_step_width: 10
+```
+  
+**open_on_button (optional)**  *(Default: false)*  
+Durch setzen auf true, öffnet ein Druck auf den Button das Schloss direkt, anstatt nur das Schloss aufzuschließen.  
+Steht der Parameter auf false (oder wird nicht angegeben), wird das Schloss nur aufgeschlossen, aber nicht ganz geöffnet.
+*Gültige Werte true / false*  
+  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Bei lock_mode von lock gilt die 1 als Default, egal was als allgemeiner Standard in der Component eingestellt wurde.  
+Wird hier eine Schrittweite von 2 angegeben, lässt sich durch drehen das Schloss nicht mehr nur aufschließen, sondern wird automatisch direkt geöffnet.  
+*Gültige Werte 1 - 2*  
   
   
 &nbsp;  
@@ -472,5 +663,3 @@ Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor der nächst
     
 &nbsp;
   
-
-

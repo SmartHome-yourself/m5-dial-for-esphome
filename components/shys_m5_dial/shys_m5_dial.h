@@ -10,15 +10,18 @@
 #include "ha_device_cover.h"
 #include "ha_device_switch.h"
 #include "ha_device_fan.h"
+#include "ha_device_mediaplayer.h"
+#include "ha_device_lock.h"
 
 #include "M5Dial.h"
+
+#define MAX_DEVICE_COUNT 50
 
 namespace esphome
 {
   namespace shys_m5_dial
   {
-
-    class ShysM5Dial : public Component
+    class ShysM5Dial : public Component, public esphome::api::CustomAPIDevice
     {
     protected:
       int timeToScreenOff = 30000;
@@ -31,7 +34,7 @@ namespace esphome
 
       // -------------------------------
 
-      HaDevice* devices[10];
+      HaDevice* devices[MAX_DEVICE_COUNT];
       int deviceAnzahl = 0;
 
       int currentDevice = 0;
@@ -53,6 +56,7 @@ namespace esphome
       M5DialRfid* m5DialRfid = new M5DialRfid();
       M5DialRotary* m5DialRotary = new M5DialRotary();
       M5DialTouch* m5DialTouch = new M5DialTouch();
+      M5DialEEPROM* m5DialEEPROM = new M5DialEEPROM();
 
       bool startsWith(const char *pre, const char *str){
           return strncmp(pre, str, strlen(pre)) == 0;
@@ -103,6 +107,11 @@ namespace esphome
       */
       void addDevice(HaDevice* device){
         if (device != nullptr) {
+          if(this->deviceAnzahl >= MAX_DEVICE_COUNT-1){
+            ESP_LOGE("DEVICE", "EXCEED DEVICE COUNT MAXIMUM: %s can not be added!", device->getName().c_str());
+            return;
+          }
+
           ESP_LOGD("DEVICE", "New Device: %s", device->getName().c_str());
 
           devices[deviceAnzahl] = device;
@@ -212,6 +221,21 @@ namespace esphome
      /**
       * 
       */
+      void addMediaPlayer(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceMediaPlayer* mediaPlayer = new HaDeviceMediaPlayer(entity_id, name, modes);
+        addDevice(mediaPlayer);
+      }
+
+
+      void addLock(const std::string& entity_id, const std::string& name, const std::string& modes){
+        HaDeviceLock* lock = new HaDeviceLock(entity_id, name, modes);
+        addDevice(lock);
+      }
+
+
+     /**
+      * 
+      */
       void initDevice(){
         using std::placeholders::_1;
         using std::placeholders::_2;
@@ -229,6 +253,8 @@ namespace esphome
 
         m5DialTouch->on_touch(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchInput, this, _1, _2));
         m5DialTouch->on_swipe(std::bind(&esphome::shys_m5_dial::ShysM5Dial::touchSwipe, this, _1));
+
+        this->registerServices();
       }
 
 
@@ -247,6 +273,8 @@ namespace esphome
           m5DialDisplay->validateTimeout();
 
           devices[currentDevice]->updateHomeAssistantValue();
+
+          devices[currentDevice]->onLoop();
 
           this->refreshDisplay(false);
           lastLoop = 1;
@@ -270,6 +298,32 @@ namespace esphome
       }
 
 
+     /**
+      * 
+      */
+      void registerServices(){
+        register_service(&ShysM5Dial::selectDevice, "selectDevice", {"entity_id"});
+      }
+
+     /**
+      * 
+      */
+      void selectDevice(std::string entityId){
+        bool found = false;
+
+        for(int i=0; i<deviceAnzahl; i++){
+          HaDevice *device = devices[i];
+          if( strcmp(device->getEntityId().c_str(), entityId.c_str()) == 0 ){
+            this->currentDevice = i;
+            this->m5DialDisplay->resetLastEventTimer();
+
+            found = true;
+            ESP_LOGI("SERVICE", "Entity %s selected", entityId.c_str());
+            return;
+          } 
+        }
+        ESP_LOGW("SERVICE", "Entity-ID %s not found", entityId.c_str());
+      }
 
      /**
       * 
@@ -316,7 +370,6 @@ namespace esphome
       void longButtonPress(){
         if(m5DialDisplay->isDisplayOn()){
           m5DialDisplay->resetLastEventTimer();
-          devices[currentDevice]->nextMode();
         }
       }
 
@@ -352,6 +405,7 @@ namespace esphome
           }
         }
       }
+
 
     };
   }

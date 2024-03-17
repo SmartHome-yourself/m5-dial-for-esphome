@@ -14,6 +14,8 @@ Currently supported entities are:
 - fan  
 - light  
 - switch  
+- media_player  
+- lock  
   
 ## Video
 [![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial as Home Assistant Remote Control")
@@ -567,13 +569,13 @@ Example for Amazon Echo (Alexa):
               - name: 1Live
                 content_id: 1Live
                 content_type: TUNEIN
-			    
+
               - name: Metallica
-				        content_id: metallica
+                content_id: metallica
                 content_type: AMAZON_MUSIC
-				
-			        - name: Nothing else matters
-				        content_id: play metallica nothing else matters
+
+              - name: Nothing else matters
+                content_id: play metallica nothing else matters
                 content_type: custom				
 ```
   

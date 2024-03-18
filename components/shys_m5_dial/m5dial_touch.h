@@ -27,56 +27,77 @@ namespace esphome
 
             public:
                 void on_touch(std::function<void(uint16_t, uint16_t)> callback){
+                    ESP_LOGD("DEVICE", "register on_touch Callback");
                     this->touch_action = callback;
                 }
                 void on_swipe(std::function<void(const char*)> callback){
+                    ESP_LOGD("DEVICE", "register on_swipe Callback");
                     this->swipe_action = callback;
                 }
 
                 void handleTouch(){
                     auto t = M5Dial.Touch.getDetail();
+                    auto count = M5.Touch.getCount();
+                    if (!count)
+                    {
+                        return;
+                    }
+
                     if (prev_state != t.state) {
                         prev_state = t.state;
 
+                        if(TOUCH_STATE_NAME[t.state] == nullptr){
+                            return;
+                        }
+
                         if(strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_NONE) != 0 && 
                            strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_TMP) != 0 ){
-                            ESP_LOGD("TOUCH", "Touch Event: %s ( %i / %i )", TOUCH_STATE_NAME[t.state], t.x, t.y);
+                           ESP_LOGD("TOUCH", "Touch Event: %s ( %i / %i )", TOUCH_STATE_NAME[t.state], t.x, t.y);
                         }
                         
                         if( strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_FLICK_BEGIN) == 0){
                             swipeCoord.x = t.x;
                             swipeCoord.y = t.y;
                         
+                            M5.Display.waitDisplay();
                         } else if( strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_FLICK_END) == 0){
-                            uint16_t h = swipeCoord.x > t.x?swipeCoord.x - t.x:t.x - swipeCoord.x;
-                            uint16_t v = swipeCoord.y > t.y?swipeCoord.y - t.y:t.y - swipeCoord.y;
+                            uint16_t h = swipeCoord.x > t.x ? swipeCoord.x - t.x : t.x - swipeCoord.x;
+                            uint16_t v = swipeCoord.y > t.y ? swipeCoord.y - t.y : t.y - swipeCoord.y;
                             
                             const char* swipeDirection;
                             if(v>h && v>M5Dial.Display.height()/4 ){
                                 if(swipeCoord.y > t.y){
+                                    ESP_LOGD("TOUCH", "Swipe UP");
                                     swipeDirection = TOUCH_SWIPE_UP;
                                 } else {
+                                    ESP_LOGD("TOUCH", "Swipe DOWN");
                                     swipeDirection = TOUCH_SWIPE_DOWN;
                                 }
                             } else if (h>M5Dial.Display.width()/4) {
                                 if(swipeCoord.x < t.x){
+                                    ESP_LOGD("TOUCH", "Swipe RIGHT");
                                     swipeDirection = TOUCH_SWIPE_RIGHT;
                                 } else {
+                                    ESP_LOGD("TOUCH", "Swipe LEFT");
                                     swipeDirection = TOUCH_SWIPE_LEFT;
                                 }
                             } else {
+                                ESP_LOGD("TOUCH", "Swipe NONE");
                                 swipeDirection = TOUCH_SWIPE_NONE;
                             }
-
+                            
                             if(swipeDirection == TOUCH_SWIPE_NONE){
                                 this->touch_action(t.x, t.y);
+                                ESP_LOGI("TOUCH", "%s: %i / %i", "Touch: ", t.x, t.y);
                             } else {
                                 this->swipe_action(swipeDirection);
+                                ESP_LOGI("TOUCH", "Swipe: %s", swipeDirection);
                             }
+
                         } else if( strcmp(TOUCH_STATE_NAME[t.state], TOUCH_STATE_TOUCH_END) == 0){
                             this->touch_action(t.x, t.y);
+                            ESP_LOGI("TOUCH", "%s: %i / %i", "Touch: ", t.x, t.y);
                         }
-
                     }
                 }
 

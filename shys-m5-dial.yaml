@@ -1,12 +1,12 @@
 substitutions:
-  name: !devicename
+  devicename: !devicename
   wifi_ssid: !secret wifi_ssid
   wifi_password: !secret wifi_password  
   ota_password: !secret ota_password
   encryption: !secret api_key
 
 esphome:
-  name: ${name}
+  name: ${deviename}
   name_add_mac_suffix: false
   project:
     name: smarthomeyourself.m5_dial

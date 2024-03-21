@@ -2,6 +2,8 @@ substitutions:
   name: "m5-dial"
   wifi_ssid: !secret wifi_ssid
   wifi_password: !secret wifi_password  
+  ota_password: !secret ota_password
+  encryption: !secret api_key
 
 esphome:
   name: ${name}
@@ -41,7 +43,10 @@ logger:
   level: DEBUG
   
 api:
+  encryption:
+    key: ${encryption}
 ota:
+  password: ${ota_password}
 
 improv_serial:
 captive_portal:

@@ -65,7 +65,7 @@ shys_m5_dial:
             enable: true
             rotary_step_width: 100
             min_kelvin: 2500
-            min_kelvin: 7000
+            max_kelvin: 7000
             
       - entity: light.my_light2
         name: Light 2
@@ -275,7 +275,7 @@ shys_m5_dial:
             enable: true
             rotary_step_width: 100
             min_kelvin: 2500
-            min_kelvin: 7000
+            max_kelvin: 7000
 ```  
   
 **enable** *(Default: false)*  

@@ -44,9 +44,9 @@ packages:
 
 shys_m5_dial:
   name: Dial
-  screenOffTime: 45000
-  rotaryStepWidth: 5
-  longPressDuration: 1200
+  screen_off_time: 45000
+  rotary_step_width: 5
+  long_press_duration: 1200
   font: FreeSans12pt7b
   font_factor: 1
 

@@ -282,16 +282,16 @@ namespace esphome
         } else if(network::is_connected()){
           if(lastLoop != 2){
             ESP_LOGD("HA_API", "API is not connected");
+            m5DialDisplay->showDisconnected();
           }
-          m5DialDisplay->showDisconnected();
           esphome::delay(10);
           lastLoop = 2;
 
         } else {
           if(lastLoop != 3){
             ESP_LOGD("wifi", "Network is not connected");
+            m5DialDisplay->showOffline();
           }
-          m5DialDisplay->showOffline();
           esphome::delay(10);
           lastLoop = 3;          
         }

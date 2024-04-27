@@ -61,7 +61,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, YELLOW);
+                    display.clear();
 
                     display.setFontsize(2);
                     gfx->drawString(this->getLockState().c_str(),
@@ -76,7 +76,11 @@ namespace esphome
                                     width / 2,
                                     height / 2 - 60);  
 
-                    display.drawBitmapTransparent(OPEN_DOOR_IMG, width/2-35, height/2+30, 70, 70, 0xFFFF);
+                    gfx->drawString(String(this->getValue()).c_str(),
+                                    width / 2,
+                                    height / 2 + 15);
+
+                    display.drawBitmapTransparent(DOOR_OPEN_IMG, width/2-35, height/2+30, 70, 70, 0xFFFF);
                     display.setFontsize(.7);
                     gfx->drawString("Open",
                                     width / 2,
@@ -194,6 +198,7 @@ namespace esphome
                     if(openingTime>0 && openingTime + 7000 < esphome::millis()){
                         this->displayRefreshNeeded = true;
                         openingTime = 0;
+                        setReceivedLockState(this->lockState);
                     }
                 }
         };

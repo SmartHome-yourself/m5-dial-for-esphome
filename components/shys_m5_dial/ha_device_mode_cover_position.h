@@ -12,7 +12,10 @@ namespace esphome
                 }
 
             public:
-                HaDeviceModeCoverPosition(HaDevice& device) : HaDeviceModePercentage(device){}
+                HaDeviceModeCoverPosition(HaDevice& device) : HaDeviceModePercentage(device){
+                    this->setLabel("Position");
+                    this->setIcon(COVER_CLOSED_IMG, 4900);
+                }
 
                 void registerHAListener() {
                     std::string attrName = "current_position";

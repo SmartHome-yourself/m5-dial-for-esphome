@@ -11,6 +11,9 @@ namespace esphome
                 esphome::api::HomeassistantServiceResponse resp;
                 esphome::api::HomeassistantServiceMap resp_kv;
                 
+                bool startsWith(const char *pre, const char *str){
+                    return strncmp(pre, str, strlen(pre)) == 0;
+                }                
             public:
 
                 void updateEntity(const std::string& entity){
@@ -519,6 +522,124 @@ namespace esphome
                     esphome::api::global_api_server->send_homeassistant_service_call(resp);
                     ESP_LOGI("HA_API", "unlock Lock %s", entity.c_str());
                 }
+
+
+
+
+// ---------------------------------
+//              NUMBER
+// ---------------------------------
+                void setNumberValue(const std::string& entity, int value) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = this->startsWith("input_number.",entity.c_str())?"input_number.set_value":"number.set_value";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+                    
+                    resp_kv.key = "value";
+                    resp_kv.value = String(value).c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "set Number Value %i for %s", value, entity.c_str());
+                }
+
+
+
+// ---------------------------------
+//              TIMER
+// ---------------------------------
+                void timerStart(const std::string& entity) {
+                    timerStart(entity, 0);
+                }
+
+                void timerStart(const std::string& entity, int durationInSeconds) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "timer.start";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    resp_kv.key = "duration";
+                    resp_kv.value = String(durationInSeconds).c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "start Timer %s", entity.c_str());
+                }
+
+                void timerPause(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "timer.pause";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "pause Timer %s", entity.c_str());
+                }
+
+                void timerCancle(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "timer.cancle";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "cancle Timer %s", entity.c_str());
+                }
+
+                void timerFinish(const std::string& entity) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "timer.finish";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "finish Timer %s", entity.c_str());
+                }
+
+                void timerChange(const std::string& entity, int durationInSeconds) {
+                    esphome::api::HomeassistantServiceResponse resp;
+                    esphome::api::HomeassistantServiceMap resp_kv;
+
+                    resp.service = "timer.change";
+
+                    resp_kv.key = "entity_id";
+                    resp_kv.value = entity.c_str();
+                    resp.data.push_back(resp_kv);
+
+                    resp_kv.key = "duration";
+                    resp_kv.value = String(durationInSeconds).c_str();
+                    resp.data.push_back(resp_kv);
+
+                    esphome::api::global_api_server->send_homeassistant_service_call(resp);
+                    ESP_LOGI("HA_API", "change Timer %s about %i seconds", entity.c_str(), durationInSeconds);
+                }
+
+
+
+
+
+
+
 
         };
 

@@ -57,7 +57,7 @@ shys_m5_dial:
   screensaver: clock
   rotary_step_width: 5
   long_press_duration: 1200
-  font: FreeSans12pt7b
+  font: default
   font_factor: 1
 
   devices:

@@ -145,6 +145,26 @@ shys_m5_dial:
 
 ```
   
+## DEV Branch
+Um den Dev Branch zu verwenden muss der ref Eintrag im packages Abschitt auf dev geändert werden.  
+Ausserdem muss die Konfiguration um den Abschnitt external_component erweitert werden, bei dem dann ebenfalls ref als dev hinterlegt sein muss.  
+Das sähe dann z.B. so aus:  
+```
+packages:
+  m5_tough_package:
+    url: https://github.com/SmartHome-yourself/m5-dial-for-esphome
+    ref: dev
+    file: shys-m5-dial.yaml
+    refresh: 1s
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/SmartHome-yourself/m5-dial-for-esphome/
+      ref: dev
+    components: [shys_m5_dial]
+```
+  
 &nbsp;  
   
 # Konfiguration

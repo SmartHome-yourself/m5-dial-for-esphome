@@ -34,7 +34,7 @@ https://discord.com/channels/293705077812625408/1217503791541387294
 # Example Configuration:
 ```yaml
 substitutions:
-  devicename: "m5-dial"
+  name: "m5-dial"
   wifi_ssid: !secret wifi_ssid
   wifi_password: !secret wifi_password  
 

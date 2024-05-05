@@ -36,6 +36,7 @@ namespace esphome
 
       HaDevice* devices[MAX_DEVICE_COUNT];
       int deviceAnzahl = 0;
+      // device numbers aka indices should be of unsigned type
 
       int currentDevice = 0;
 
@@ -233,6 +234,8 @@ namespace esphome
       }
 
 
+      void addMenu(const std::string& entity_id, const std::string& name, const std::string& modes);
+
      /**
       * 
       */
@@ -257,6 +260,58 @@ namespace esphome
         this->registerServices();
       }
 
+      /**
+       * @brief Get the Device Name At index
+       *        returns last device if index is to large
+       * 
+       * @param index 
+       * @return std::string 
+       */
+      const std::string getDeviceNameAt(uint16_t index){
+        if(index >= deviceAnzahl){
+          index= deviceAnzahl-1;
+        } 
+       
+        return devices[index]->getName();
+      }
+
+      /**
+       * @brief return pointer to the Devicet object at index
+       * 
+       * @param index 
+       * @return HaDevice* 
+       */
+      HaDevice* getDevice(uint16_t index){
+        if(index >= deviceAnzahl){
+          index= deviceAnzahl-1;
+        } 
+       
+        return devices[index];
+      }
+
+      /**
+       * @brief Get the number of used devices
+       * 
+       * @return int 
+       */
+      inline int getDeviceCount(){
+        return deviceAnzahl;
+      }
+
+
+      /**
+       * @brief Set the currentDevice to new value and refresh
+       * 
+       * @param newDev 
+       */
+      void setCurrentDevice(uint16_t newDev){
+        if(newDev >= deviceAnzahl-1){
+          currentDevice = 0;
+        } else {
+          currentDevice=newDev;
+        }
+        refreshDisplay(true);
+      }
 
      /**
       * 
@@ -282,16 +337,20 @@ namespace esphome
         } else if(network::is_connected()){
           if(lastLoop != 2){
             ESP_LOGD("HA_API", "API is not connected");
+            // in if hinein verschoben = don't refresh if already in this state
+            m5DialDisplay->showDisconnected();
+
           }
-          m5DialDisplay->showDisconnected();
           esphome::delay(10);
           lastLoop = 2;
 
         } else {
           if(lastLoop != 3){
             ESP_LOGD("wifi", "Network is not connected");
+            // in if hinein verschoben = don't refresh if already in this state
+            m5DialDisplay->showOffline();
+
           }
-          m5DialDisplay->showOffline();
           esphome::delay(10);
           lastLoop = 3;          
         }

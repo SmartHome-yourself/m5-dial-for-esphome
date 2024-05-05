@@ -73,6 +73,11 @@ CONF_DEVICE_LOCK                      = "lock"
 CONF_DEVICE_LOCK_MODE                 = "lock_mode"
 CONF_DEVICE_LOCK_OPEN_ON_BUTTON       = "open_on_button"
 
+# MENU --- NEW
+CONF_DEVICE_MENU                    = "menus"
+CONF_DEVICE_MENU_SPEED_MODE         = "speed_mode"
+CONF_CHANGEABLE_DIRECTION           = "changeable_direction"
+
 
 # DEFAULTS
 DEFAULT_NAME                           = "M5 Stack Dial"
@@ -211,9 +216,19 @@ CONFIG_SCHEMA = cv.Schema({
                     cv.Optional(CONF_DEVICE_LOCK_OPEN_ON_BUTTON, default=False): cv.boolean
                 }))
             }))
+        })]),
+
+       cv.Optional(CONF_DEVICE_MENU, default=[]): cv.All([dict({
+            cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
+            cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
+
+            cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
+                cv.Optional(CONF_DEVICE_MENU_SPEED_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_CHANGEABLE_DIRECTION, default=False): cv.boolean
+                }))
+            }))
         })])
-
-
 
     }))
 
@@ -316,3 +331,10 @@ def to_code(config):
                                    json.dumps(lockEntry[CONF_DEVICE_MODES]))
                                   )
 
+        if CONF_DEVICE_MENU in confDevices:
+            confMenu = confDevices[CONF_DEVICE_MENU]
+            for fanEntry in confMenu:
+                cg.add(var.addMenu(fanEntry[CONF_DEVICE_ENTRY_ID], 
+                                  fanEntry[CONF_DEVICE_ENTRY_NAME], 
+                                  json.dumps(fanEntry[CONF_DEVICE_MODES]))
+                                 )

@@ -1,24 +1,48 @@
 #pragma once
 #include "M5Dial.h"
 #include "esphome.h"
+#include "default_font_16px.h"
+#include "screensaver.h"
 
+#define FF_DEFAULT &default_font_16px
+
+
+/**
+ * M5Dial Display
+ *--------------------------
+ * Display driver: GC9A01
+ * Resolution: 240x240
+ * Touch driver: FT3267
+ */
 namespace esphome
 {
     namespace shys_m5_dial
     {
         class M5DialDisplay {
             protected:
+                uint16_t backgroundColor = YELLOW;
+
                 LovyanGFX* gfx = &M5Dial.Display;
 
                 int timeToScreenOff = 30000;
                 unsigned long lastEvent = 0;
                 uint16_t lastMode = -1;
 
-                std::string fontName = "FreeMono12pt7b";
+                std::string fontName = "default";  //"FreeMono12pt7b";
                 float fontFactor = 1;
+
+                Screensaver* screensaver = nullptr;
+                bool screensaverRunning = false;
+
+                std::function<void(bool)> display_refresh_action;
 
             public:
                 M5DialDisplay() {
+                }
+
+                void on_display_refresh(std::function<void(bool)> callback){
+                    ESP_LOGD("DEVICE", "register on_swipe Callback");
+                    this->display_refresh_action = callback;
                 }
 
                 void setTimeToScreenOff(int value){
@@ -51,17 +75,56 @@ namespace esphome
                     return M5Dial.Display.getBrightness() > 0;
                 }
 
+                void setBackgroundColor(uint16_t color){
+                    this->backgroundColor = backgroundColor;
+                }
+
+                uint16_t getBackgroundColor(){
+                    return this->backgroundColor;
+                }
+
+                void setScreensaver(Screensaver* saver){
+                    this->screensaver = saver;
+                }
+
+                bool isScreensaverActive(){
+                    return this->screensaver != nullptr;
+                }
+                
+                bool isScreensaverRunning(){
+                    return screensaverRunning;
+                }
+                
+                void resetScreensaverRunning(){
+                    screensaverRunning = false;
+                }
+
                 void validateTimeout(){
                     if (esphome::millis() - lastEvent > timeToScreenOff ) {
-                        if(M5Dial.Display.getBrightness()>0){
-                            M5Dial.Display.setBrightness(0);
-                            ESP_LOGI("DISPLAY", "Sleep after %d ms", timeToScreenOff);
+                        if(this->isScreensaverActive()){
+                            bool forceRefresh = !screensaverRunning;
+                            screensaver->show(*this, forceRefresh);
+                            
+                            screensaverRunning = true;
+                        } else {
+                            if(M5Dial.Display.getBrightness()>0){
+                                M5Dial.Display.setBrightness(0);
+                                ESP_LOGI("DISPLAY", "Sleep after %d ms", timeToScreenOff);
+                            }
+                        } 
+                    } else {
+                        if(screensaverRunning){
+                            this->resetScreensaverRunning();
+                            this->display_refresh_action(true);
                         }
-                    } else if ( M5Dial.Display.getBrightness()<=0 ) {
-                        M5Dial.Display.setBrightness(100);
-                        ESP_LOGI("DISPLAY", "Display on");
+
+                        if ( M5Dial.Display.getBrightness()<=0 ) {
+                            M5Dial.Display.setBrightness(100);
+                            ESP_LOGI("DISPLAY", "Display on");
+                        }
                     }
                 }
+
 
                 void showOffline(){
                     uint16_t height = this->getHeight();
@@ -73,7 +136,7 @@ namespace esphome
                     this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
-                    gfx->fillRect(0, 0, width, height, DARKGREY);
+                    this->clear(DARKGREY);
                     
                     this->setFontsize(2);
                     gfx->drawString("OFFLINE",
@@ -81,6 +144,7 @@ namespace esphome
                                     height / 2);
 
                     gfx->endWrite();                      // Release SPI bus
+                    this->resetScreensaverRunning();
                 }
 
                 void showDisconnected(){
@@ -93,7 +157,7 @@ namespace esphome
                     this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
-                    gfx->fillRect(0, 0, width, height, BLUE);
+                    this->clear(BLUE);
                     
                     this->setFontsize(1);
                     gfx->drawString("DISCONNECTED",
@@ -101,6 +165,7 @@ namespace esphome
                                     height / 2);
 
                     gfx->endWrite();                      // Release SPI bus
+                    this->resetScreensaverRunning();
                 }
 
                 void showUnknown(){
@@ -113,7 +178,8 @@ namespace esphome
                     this->setFontByName(this->fontName);
 
                     gfx->startWrite();                      // Secure SPI bus
-                    gfx->fillRect(0, 0, width, height, ORANGE);
+                    
+                    this->clear(ORANGE);
                     
                     this->setFontsize(2);
 
@@ -122,6 +188,7 @@ namespace esphome
                                     height / 2);
 
                     gfx->endWrite();                      // Release SPI bus
+                    this->resetScreensaverRunning();
                 }
 
                 float getDegByCoord(uint16_t x, uint16_t y){
@@ -129,9 +196,38 @@ namespace esphome
                     float my = M5Dial.Display.height()/2;
 
                     float angle = atan2(y - my, x - mx) * 180.0 / M_PI;
-                    angle = 360 - fmod((angle + 360.0 - 90), 360.0);
-
+                    //angle = 360 - fmod((angle + 360.0 - 90), 360.0);
+                    angle = fmod((angle + 360.0 - 90), 360.0);
                     return angle;
+                }
+
+                float getRadiusFromCoord(float touchX, float touchY) {
+                    float dx = touchX - (getWidth() / 2.0f);
+                    float dy = touchY - (getHeight() / 2.0f);
+                    float radius = sqrt(dx * dx + dy * dy);
+
+                    return radius;
+                }
+
+                coord getColorCoord(float radius, float degree){
+                    coord result;
+                    result.x = radius * sin(degree*M_PI/180) + (gfx->width()/2);
+                    result.y = radius * cos(degree*M_PI/180) + (gfx->height()/2);
+                    return result;
+                }
+
+                void drawColorCircleLine(float degree, float r1, float r2, uint32_t color) {
+                    uint16_t step = 1;
+                    coord c1 = getColorCoord(r1, degree);
+                    coord c2 = getColorCoord(r2, degree-step);
+                    coord c3 = getColorCoord(r2, degree+step);
+
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
+
+                    c1 = getColorCoord(r1, degree);
+                    c2 = getColorCoord(r1, degree-step-step);
+                    c3 = getColorCoord(r2, degree-step);
+                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
                 }
 
                 void setFontsize(float size) {
@@ -146,10 +242,15 @@ namespace esphome
                     if (FONT_MAP.find(name) != FONT_MAP.end()) {
                         this->setFontName(name);
                     } else {
-                        this->setFontName("FreeMono12pt7b");
-                        ESP_LOGE("DISPLAY", "Font '%s' not found, using default font: 'FreeMono12pt7b'", name.c_str());
+                        this->setFontName("default");
+                        ESP_LOGE("DISPLAY", "Font '%s' not found, using default font: 'default'", name.c_str());
                     }
-                    getGfx()->setFont(FONT_MAP[this->fontName]);
+
+                    if(strcmp(name.c_str(), "default")==0){
+                        getGfx()->setFont(FF_DEFAULT);
+                    } else {
+                        getGfx()->setFont(FONT_MAP[this->fontName]);
+                    }
                 }
 
                 void drawBitmap(const uint8_t* bmp, int size, uint8_t x, uint8_t y, uint8_t width, uint8_t height){
@@ -160,6 +261,13 @@ namespace esphome
                     M5Dial.Display.pushImage(x, y, width, height, bmp, transparentColor);
                 }
 
+                void clear(uint16_t bgColor){
+                    M5Dial.Display.fillRect(0, 0, getWidth(), getHeight(), bgColor);
+                }
+
+                void clear(){
+                    this->clear(this->backgroundColor);
+                }
         };
     }
 }

@@ -16,13 +16,25 @@ namespace esphome
                 HaDeviceModeLightColor*             modeColor           = new HaDeviceModeLightColor(*this);
                 HaDeviceModeLightTunableWhite*      modeTunableWhite    = new HaDeviceModeLightTunableWhite(*this);
 
+                bool brightnessModeActive = false;
+                bool whiteModeActive = false;
+
+                bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
+                    if((getCurrentMode() == modeColor) && getRadiusFromCoord(display,x,y)<70){
+                        changeToWhiteMode();
+                        return true;
+                    }
+
+                    ESP_LOGD("DEVICE", "HaDevice.onTouch: %i/%i", x, y);
+                    return getCurrentMode()->onTouch(display, x, y);
+                }
+
             public:
                 HaDeviceLight(const std::string& entity_id, const std::string& name, const std::string& modes) : HaDevice(entity_id, name, modes) {}
 
                 void init() override {
                     ESP_LOGD("HA_DEVICE", "Init Light: %s", this->getEntityId().c_str());
 
-                    bool brightnessModeActive = false;
                     JsonObject dimm_mode;
                     if (this->modeConfig.containsKey("dimm_mode")) {
                         dimm_mode = this->modeConfig["dimm_mode"];
@@ -38,6 +50,14 @@ namespace esphome
 
                         if (dimm_mode.containsKey("rotary_step_width")) {
                             modeBrightness->setRotaryStepWidth(dimm_mode["rotary_step_width"].as<int>());
+                        }
+
+                        if (dimm_mode.containsKey("min_brightness")) {
+                            modeBrightness->setMinValue(dimm_mode["min_brightness"].as<int>());
+                        }
+
+                        if (dimm_mode.containsKey("max_brightness")) {
+                            modeBrightness->setMaxValue(dimm_mode["max_brightness"].as<int>());
                         }
 
                     } else {
@@ -64,6 +84,7 @@ namespace esphome
                         JsonObject white_mode = this->modeConfig["white_mode"];
 
                         if (white_mode.containsKey("enable") && white_mode["enable"].as<bool>()) {
+                            whiteModeActive = true;
                             ESP_LOGD("HA_DEVICE", "White-Mode enabled (steps: %i)", white_mode["rotary_step_width"].as<int>());
 
                             this->addMode(modeTunableWhite);                            
@@ -81,6 +102,24 @@ namespace esphome
                     }
 
                 }
+
+                void changeToWhiteMode(){
+                    if(whiteModeActive){
+                        setCurrentModeIndex(getModeIndex(modeTunableWhite));
+                        haApi.turnLightOnWhite(getEntityId(), modeTunableWhite->getValue());
+
+                    } else {
+                        if(brightnessModeActive){
+                            setCurrentModeIndex(getModeIndex(modeBrightness));
+                            haApi.turnLightOn(getEntityId(), modeBrightness->getValue(), M5Dial.Display.color888(255,255,255));
+
+                        } else {
+                            setCurrentModeIndex(getModeIndex(modeOnOff));
+                            haApi.turnLightOn(getEntityId(), -1, M5Dial.Display.color888(255,255,255));
+                        }
+                    }
+                }
+
 
         };
 

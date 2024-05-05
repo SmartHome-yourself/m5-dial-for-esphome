@@ -15,6 +15,8 @@ namespace esphome
                 std::string entity;
                 std::string name;
 
+                HaApi haApi;
+
                 static const size_t bufferSize = 1024;
                 StaticJsonDocument<bufferSize> jsonBuffer;
                 JsonObject modeConfig;
@@ -28,6 +30,8 @@ namespace esphome
                 int rotaryStepWidth = 10;
 
                 bool modeChanged = true;
+
+                bool locked = false;
 
                 std::vector<HaDeviceMode*> deviceModes = {};
 
@@ -55,6 +59,25 @@ namespace esphome
                         return;
                     }
                     this->modeConfig = jsonBuffer.as<JsonObject>();
+                }
+
+                virtual bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y){
+                    ESP_LOGD("DEVICE", "HaDevice.onTouch: %i/%i", x, y);
+                    return getCurrentMode()->onTouch(display, x, y);
+                }
+
+                virtual bool onRotary(M5DialDisplay& display, const char * direction){
+                    ESP_LOGD("DEVICE", "HaDevice.onRotary: %s", direction);
+                    return getCurrentMode()->onRotary(display, direction);
+                }
+
+                virtual bool onButton(M5DialDisplay& display, const char * clickType){
+                    ESP_LOGD("DEVICE", "HaDevice.onButton: %s", clickType);
+                    return getCurrentMode()->onButton(display, clickType);
+                }
+
+                virtual void onLoop(){
+                    getCurrentMode()->onLoop();
                 }
 
             public:
@@ -105,6 +128,14 @@ namespace esphome
                     return this->currentModeIndex;
                 }
 
+                bool isLocked(){
+                    return this->locked;
+                }
+
+                void setLocked(bool isLocked){
+                    this->locked = isLocked;
+                }
+
                 void nextMode(){
                     if(currentModeIndex >= currentModeCount-1){
                         currentModeIndex = 0;
@@ -123,9 +154,26 @@ namespace esphome
                     modeChanged = true;
                 }
 
+                int getModeIndex(HaDeviceMode* mode){
+                    for(int i=0; i<currentModeCount; i++){
+                        if(this->deviceModes[i] == mode){
+                            return i;
+                        }
+                    }
+
+                    return -1;
+                }
+
+                void setCurrentModeIndex(int newMode){
+                    currentModeIndex = newMode;
+                    modeChanged = true;
+                }
+
                 void refreshDisplay(M5DialDisplay& display, bool deviceChanged){
-                    getCurrentMode()->refreshDisplay(display, deviceChanged || modeChanged);
-                    modeChanged = false;
+                    if(!display.isScreensaverRunning()){
+                        getCurrentMode()->refreshDisplay(display, deviceChanged || modeChanged);
+                        modeChanged = false;
+                    }
                 }
 
                 bool isDisplayRefreshNeeded(){
@@ -136,28 +184,44 @@ namespace esphome
                     getCurrentMode()->updateHomeAssistantValue();
                 }
 
-                bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y){
-                    ESP_LOGD("DEVICE", "HaDevice.onTouch: %i/%i", x, y);
-                    return getCurrentMode()->onTouch(display, x, y);
+                float getRadiusFromCoord(M5DialDisplay& display, float touchX, float touchY) {
+                    return display.getRadiusFromCoord(touchX, touchY);
                 }
 
-                bool onSwipe(M5DialDisplay& display, const char * direction){
-                    ESP_LOGD("DEVICE", "HaDevice.onSwipe: %s", direction);
+                bool doOnSwipe(M5DialDisplay& display, const char * direction){
+                    if(this->isLocked()){
+                        return false;
+                    }
+
                     return false; // getCurrentMode()->onSwipe(display, *this, direction);
                 }
 
-                bool onRotary(M5DialDisplay& display, const char * direction){
-                    ESP_LOGD("DEVICE", "HaDevice.onRotary: %s", direction);
-                    return getCurrentMode()->onRotary(display, direction);
+                bool doOnTouch(M5DialDisplay& display, uint16_t x, uint16_t y){
+                    if(this->isLocked()){
+                        return false;
+                    }
+
+                    return this->onTouch(display, x, y);
                 }
 
-                bool onButton(M5DialDisplay& display, const char * clickType){
-                    ESP_LOGD("DEVICE", "HaDevice.onButton: %s", clickType);
-                    return getCurrentMode()->onButton(display, clickType);
+                bool doOnRotary(M5DialDisplay& display, const char * direction){
+                    if(this->isLocked()){
+                        return false;
+                    }
+
+                    return this->onRotary(display, direction);
                 }
 
-                void onLoop(){
-                    getCurrentMode()->onLoop();
+                bool doOnButton(M5DialDisplay& display, const char * clickType){
+                    if(this->isLocked()){
+                        return false;
+                    }
+
+                    return this->onButton(display, clickType);
+                }
+
+                void doOnLoop(){
+                    this->onLoop();
                 }
 
         };

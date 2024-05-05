@@ -1,5 +1,6 @@
 #pragma once
 #include "m5dial_display.h"
+#include "ha_device_light.h"
 
 namespace esphome
 {
@@ -18,10 +19,6 @@ namespace esphome
                 typedef struct hsl {
                     float h, s, l;
                 } HSL;
-
-                typedef struct coord {
-                    float x, y;
-                } COORD;
 
                 uint32_t getColorByDegree(float degree){
                     return hslToRgb(degree/360.0, 1, .5);
@@ -81,28 +78,6 @@ namespace esphome
                     return M5Dial.Display.color888(result.r, result.g, result.b);
                 }
 
-
-                coord getColorCoord(LovyanGFX* gfx, float radius, float degree){
-                    coord result;
-                    result.x = radius * sin(degree*M_PI/180) + (gfx->width()/2);
-                    result.y = radius * cos(degree*M_PI/180) + (gfx->height()/2);
-                    return result;
-                }
-
-                void drawColorCircleLine(LovyanGFX* gfx, float degree, float r1, float r2, uint32_t color) {
-                    uint16_t step = 1;
-                    coord c1 = getColorCoord(gfx, r1, degree);
-                    coord c2 = getColorCoord(gfx, r2, degree-step);
-                    coord c3 = getColorCoord(gfx, r2, degree+step);
-
-                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
-
-                    c1 = getColorCoord(gfx, r1, degree);
-                    c2 = getColorCoord(gfx, r1, degree-step-step);
-                    c3 = getColorCoord(gfx, r2, degree-step);
-                    M5Dial.Display.fillTriangle(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, color);
-                }
-
                 void refreshColorMenu(M5DialDisplay& display){
                     LovyanGFX* gfx = display.getGfx();
 
@@ -131,7 +106,7 @@ namespace esphome
                                     width / 2,
                                     height / 2 + 50);  
 
-                    drawColorCircleLine(gfx, currentValue, 40, 69, complementary_color);
+                    display.drawColorCircleLine(360-currentValue, 40, 69, complementary_color);
                     gfx->endWrite();                      // Release SPI bus
                 }
 
@@ -146,10 +121,10 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, BLACK);
+                    display.clear(BLACK);
 
                     for (int i=0; i<360; i++){
-                        drawColorCircleLine(gfx, i, 70.0, 130.0, getColorByDegree(i));
+                        display.drawColorCircleLine(360-i, 70.0, 130.0, getColorByDegree(i));
                     }
 
                     gfx->endWrite();                      // Release SPI bus

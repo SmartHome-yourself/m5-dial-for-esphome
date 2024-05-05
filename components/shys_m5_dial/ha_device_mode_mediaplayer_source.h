@@ -29,7 +29,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, YELLOW);
+                    display.clear();
 
                     // Device Name
                     display.setFontsize(1);

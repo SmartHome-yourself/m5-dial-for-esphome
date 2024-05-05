@@ -15,6 +15,7 @@ namespace esphome
                 int value = 0;
                 int minValue = 0;
                 int maxValue = 100;
+                bool minMaxLimitActive = true;
 
                 int rotaryStepWidth = 10;
 
@@ -54,7 +55,7 @@ namespace esphome
                     int newValue = this->getValue() + rotaryStepWidth;
                     newValue = getNextToRotaryStepwidth(newValue);
 
-                    if(newValue > this->maxValue){
+                    if(newValue > this->maxValue && minMaxLimitActive){
                         setValue(endlessRotaryValue?this->minValue:this->maxValue);
                     } else {
                         setValue(newValue);
@@ -65,7 +66,7 @@ namespace esphome
                     int newValue = this->getValue() - rotaryStepWidth;
                     newValue = getNextToRotaryStepwidth(newValue);
 
-                    if(newValue >= this->minValue){
+                    if(newValue >= this->minValue && minMaxLimitActive){
                         setValue(newValue);
                     } else {
                         setValue(endlessRotaryValue?this->maxValue:this->minValue);
@@ -89,7 +90,16 @@ namespace esphome
                 }
 
                 uint16_t getValueForYPosition(uint16_t y){
-                    return this->maxValue - map(y, 0, M5Dial.Display.height(), this->minValue, this->maxValue) + this->minValue;
+                    return this->maxValue - map(y, 0, M5Dial.Display.height(), this->minValue, this->maxValue);
+                }
+
+                uint16_t getValueForAnglePercentageArc(uint16_t angle){
+                    if(angle<60){
+                        angle = 60;
+                    } else if(angle>300){
+                        angle = 300;
+                    }
+                    return this->maxValue - map(angle, 60, 300, 0, this->maxValue-this->minValue);
                 }
 
                 uint16_t getDisplayPositionX(uint16_t currentValue){
@@ -100,15 +110,46 @@ namespace esphome
                     return M5Dial.Display.height() - map(currentValue, this->minValue, this->maxValue, 0, M5Dial.Display.height());
                 }
 
+                float  getAngleFromCoord(M5DialDisplay& display, uint16_t touchX, uint16_t touchY) {
+                    float  dx = touchX - (display.getWidth() / 2.0f);
+                    float  dy = (display.getHeight() / 2.0f) - touchY;
+                    float  angle = (atan2 (dy,dx) * 180 / M_PI) + 90;
 
-                bool defaultOnTouch(M5DialDisplay& display, uint16_t x, uint16_t y)  {
+                    if (angle < 0) {
+                        angle += 360.0f;
+                    }
+
+                    return angle;
+                }
+
+                float getRadiusFromCoord(M5DialDisplay& display, float touchX, float touchY) {
+                    return display.getRadiusFromCoord(touchX, touchY);
+                }
+
+                bool defaultOnTouchY(M5DialDisplay& display, uint16_t x, uint16_t y){
                     if(y > display.getHeight() * .97){
                         y = display.getHeight();
                     } else if (y < display.getHeight() * .03){
                         y = 0;
                     }
-                    
+
                     uint16_t result = this->getValueForYPosition(y);
+                    result = getNextToRotaryStepwidth(result);
+
+                    this->setValue(result); 
+                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
+                    
+                    return true;                    
+                }
+
+                bool defaultOnTouch(M5DialDisplay& display, uint16_t x, uint16_t y)  {
+                    if(getRadiusFromCoord(display,x,y)<70){
+                        return false;
+                    }
+
+                    float angle = getAngleFromCoord(display, x, y);
+
+                    uint16_t result = getValueForAnglePercentageArc(angle);
                     result = getNextToRotaryStepwidth(result);
 
                     this->setValue(result); 
@@ -170,6 +211,13 @@ namespace esphome
                 }
 
                 virtual int getValue(){
+                    if(this->value > this->getMaxValue() && minMaxLimitActive){
+                        return this->getMaxValue();
+                    }
+                    if(this->value < this->getMinValue() && minMaxLimitActive){
+                        return this->getMinValue();
+                    }
+
                     return this->value;
                 }
 
@@ -182,7 +230,6 @@ namespace esphome
                 void setReceivedValue(int val){
                     this->value = val;
                 }
-
 
                 int getMinValue(){
                     return this->minValue;
@@ -214,6 +261,10 @@ namespace esphome
                 
                 void setApiSendLock(int delayInMs){
                     this->apiSendLock = delayInMs;
+                }
+
+                void setMinMaxLimitActive(bool limitActive){
+                    this->minMaxLimitActive = limitActive;
                 }
         };
     }

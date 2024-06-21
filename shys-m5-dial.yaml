@@ -18,7 +18,7 @@ esphome:
       - Wire
       - EEPROM
       - ArduinoJson
-      - m5stack/M5Unified
+      - m5stack/M5Unified@0.1.14
       - m5stack/M5Dial
 
 external_components:

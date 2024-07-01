@@ -1,7 +1,7 @@
 substitutions:
   name: "m5-dial"
   wifi_ssid: !secret wifi_ssid
-  wifi_password: !secret wifi_password  
+  wifi_password: !secret wifi_password
 
 esphome:
   name: ${name}
@@ -9,7 +9,7 @@ esphome:
   project:
     name: smarthomeyourself.m5_dial
     version: "1.0"
-    
+
   platformio_options:
     lib_deps:
       - WiFi
@@ -27,7 +27,7 @@ external_components:
       url: https://github.com/SmartHome-yourself/m5-dial-for-esphome/
       ref: main
     components: [shys_m5_dial]
- 
+
 dashboard_import:
   package_import_url: github://SmartHome-yourself/m5-dial-for-esphome/shys-m5-dial.yaml@main
   import_full_config: false
@@ -39,9 +39,10 @@ esp32:
 
 logger:
   level: DEBUG
-  
+
 api:
 ota:
+  platform: esphome
 
 improv_serial:
 captive_portal:

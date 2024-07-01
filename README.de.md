@@ -24,7 +24,7 @@ Aktuell werden folgende Entitäten unterstützt:
   
 ## Discord
 Für einen schnellen Austausch, Anregungen so wie Info's zum aktuellen Entwicklungsstand steht auch unser Discord zur Verfügung.  
-Einladungs-Link: https://discord.gg/CDerMjj7  
+Einladungs-Link: https://discord.gg/pN7SpK7  
   
 &nbsp;  
   

@@ -51,4 +51,4 @@ wifi:
   ssid: ${wifi_ssid}
   password: ${wifi_password}
   ap:
-    password: "12345678"
+    password: !secret wifi_fallback_password

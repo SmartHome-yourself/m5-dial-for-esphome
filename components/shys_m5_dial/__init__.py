@@ -100,6 +100,11 @@ CONF_DEVICE_TIMER_MODE                = "timer_mode"
 
 
 
+# MENU --- NEW
+CONF_DEVICE_MENU                    = "menus"
+CONF_DEVICE_MENU_SPEED_MODE         = "speed_mode"
+CONF_CHANGEABLE_DIRECTION           = "changeable_direction"
+
 
 # DEFAULTS
 DEFAULT_NAME                           = "M5 Stack Dial"
@@ -414,3 +419,10 @@ async def to_code(config):
                                      timerEntry[CONF_DEVICE_ENTRY_NAME], 
                                      json.dumps(timerEntry[CONF_DEVICE_MODES]))
                                     )
+        if CONF_DEVICE_MENU in confDevices:
+            confMenu = confDevices[CONF_DEVICE_MENU]
+            for fanEntry in confMenu:
+                cg.add(var.addMenu(fanEntry[CONF_DEVICE_ENTRY_ID], 
+                                  fanEntry[CONF_DEVICE_ENTRY_NAME], 
+                                  json.dumps(fanEntry[CONF_DEVICE_MODES]))
+                                 )

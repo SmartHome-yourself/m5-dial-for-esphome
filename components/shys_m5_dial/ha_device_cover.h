@@ -18,10 +18,10 @@ namespace esphome
 
                     this->addMode(modePosition);
 
-                    if (this->modeConfig.containsKey("position_mode")) {
+                    if (this->modeConfig["position_mode"].is<JsonObject>()) {
                         JsonObject position_mode = this->modeConfig["position_mode"];
 
-                        if (position_mode.containsKey("rotary_step_width")) {
+                        if (position_mode["rotary_step_width"].is<int>()) {
                             modePosition->setRotaryStepWidth(position_mode["rotary_step_width"].as<int>());
                         }
                     }

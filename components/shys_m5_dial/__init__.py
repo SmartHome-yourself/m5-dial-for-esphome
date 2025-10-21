@@ -2,11 +2,13 @@ import json
 
 import esphome.codegen as cg
 import esphome.config_validation as cv
+
 from esphome.const import CONF_ID, CONF_NAME
+from esphome.components import time
+
 
 # LIMITS
 MAX_DEVICES = 50
-
 
 # PARAMETER
 CONF_DEVICES                          = "devices"
@@ -15,12 +17,18 @@ CONF_DEVICE_ENTRY_NAME                = "name"
 CONF_DEVICE_MODES                     = "modes"
 
 CONF_SCREEN_OFF_TIME                  = "screen_off_time"
+CONF_SCREENSAVER                      = "screensaver"
 CONF_LONG_PRESS_DURATION              = "long_press_duration"
 CONF_SEND_VALUE_DELAY                 = "send_value_delay"
 CONF_SEND_VALUE_LOCK                  = "send_value_lock"
 CONF_ROTARY_STEP_WIDTH                = "rotary_step_width"
 CONF_FONT                             = "font"
 CONF_FONT_FACTOR                      = "font_factor"
+
+CONF_DISPLAY_ROTATE                   = "display_rotate"
+
+CONF_TIME_COMPONENT                   = "time_component"
+
 
 # ALLGEMEINE MODE PARAMETER
 CONF_DEVICE_MODE_ENABLE               = "enable"
@@ -31,6 +39,10 @@ CONF_DEVICE_LIGHT_RGB_MODE            = "rgb_mode"
 CONF_DEVICE_LIGHT_DIMM_MODE           = "dimm_mode"
 CONF_DEVICE_LIGHT_WHITE_MODE          = "white_mode"
 
+# DIMM-MODE PARAMETER
+CONF_DEVICE_MODE_DIMM_MIN_BRIGHTNESS = "min_brightness"
+CONF_DEVICE_MODE_DIMM_MAX_BRIGHTNESS = "max_brightness"
+
 # WHITE-MODE PARAMETER
 CONF_DEVICE_MODE_WHITE_MIN_KELVIN     = "min_kelvin"
 CONF_DEVICE_MODE_WHITE_MAX_KELVIN     = "max_kelvin"
@@ -39,6 +51,8 @@ CONF_DEVICE_MODE_WHITE_MAX_KELVIN     = "max_kelvin"
 # CLIMATES
 CONF_DEVICE_CLIMATES                  = "climates"
 CONF_DEVICE_CLIMATE_TEMP_MODE         = "temp_mode"
+CONF_DEVICE_CLIMATE_FAN_MODE          = "fan_mode"
+CONF_DEVICE_CLIMATE_FAN_MODES         = "modes"
 
 # TEMP-MODE PARAMETER
 CONF_DEVICE_MODE_TEMP_MIN_TEMP        = "min_temperature"
@@ -68,10 +82,25 @@ CONF_MEDIA_PLAYER_SOURCES             = "sources"
 CONF_CONTENT_ID                       = "content_id"
 CONF_CONTENT_TYPE                     = "content_type"
 
+
 # LOCK
 CONF_DEVICE_LOCK                      = "lock"
 CONF_DEVICE_LOCK_MODE                 = "lock_mode"
 CONF_DEVICE_LOCK_OPEN_ON_BUTTON       = "open_on_button"
+
+
+# NUMBER
+CONF_DEVICE_NUMBER                    = "number"
+CONF_DEVICE_NUMBER_MODE               = "value_mode"
+CONF_DEVICE_NUMBER_UNIT               = "unit"
+
+
+# TIMER
+CONF_DEVICE_TIMER                     = "timer"
+CONF_DEVICE_TIMER_MODE                = "timer_mode"
+
+
+
 
 
 # DEFAULTS
@@ -81,7 +110,7 @@ DEFAULT_LONG_PRESS_DURATION            = 1200
 DEFAULT_SEND_VALUE_DELAY               = 1200
 DEFAULT_SEND_VALUE_LOCK                = 3000
 DEFAULT_ROTARY_STEP_WIDTH              = 10
-DEFAULT_FONT                           = "FreeSans12pt7b"
+DEFAULT_FONT                           = "default"    #"FreeSans12pt7b"
 DEFAULT_FONT_FACTOR                    = 1
 DEFAULT_WHITE_MIN_KELVIN               = 2000
 DEFAULT_WHITE_MAX_KELVIN               = 6500
@@ -90,6 +119,13 @@ DEFAULT_WHITE_MAX_TEMP                 = 30
 DEFAULT_CLIMATE_ROTARY_STEP_WIDTH      = 1
 DEFAULT_MEDIA_PLAYER_ROTARY_STEP_WIDTH = 1
 DEFAULT_LOCK_ROTARY_STEP_WIDTH         = 1
+DEFAULT_SCREENSAVER                    = "clock"
+DEFAULT_CONF_DISPLAY_ROTATE            = 2
+
+
+
+SCREENSAVER = ["off", "clock"]
+
 
 # ------------------------------------------------------
 
@@ -102,16 +138,20 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
 
     cv.Optional(CONF_SCREEN_OFF_TIME, default=DEFAULT_SCREEN_OFF_TIME): cv.int_range(0, 999999),
+    cv.Optional(CONF_SCREENSAVER, default=DEFAULT_SCREENSAVER): cv.one_of(*SCREENSAVER, lower=True),
     cv.Optional(CONF_LONG_PRESS_DURATION, default=DEFAULT_LONG_PRESS_DURATION): cv.int_range(0, 5000),
     cv.Optional(CONF_SEND_VALUE_DELAY, default=DEFAULT_SEND_VALUE_DELAY): cv.int_range(0, 999999),
     cv.Optional(CONF_SEND_VALUE_LOCK, default=DEFAULT_SEND_VALUE_LOCK): cv.int_range(0, 999999),
     cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_ROTARY_STEP_WIDTH): cv.int_range(0, 100),
     cv.Optional(CONF_FONT, default=DEFAULT_FONT): cv.string,
     cv.Optional(CONF_FONT_FACTOR, default=DEFAULT_FONT_FACTOR): cv.float_range(0.1, 10.0),
+    cv.Optional(CONF_DISPLAY_ROTATE, default=DEFAULT_CONF_DISPLAY_ROTATE): cv.int_range(0, 7),
+    
+    cv.Required(CONF_TIME_COMPONENT): cv.use_id(time),
 
     cv.Optional(CONF_DEVICES, default=dict()): cv.All(dict({
     
-        cv.Optional(CONF_DEVICE_LIGHTS, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_LIGHTS, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
@@ -123,20 +163,23 @@ CONFIG_SCHEMA = cv.Schema({
 
                 cv.Optional(CONF_DEVICE_LIGHT_DIMM_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100)
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_DEVICE_MODE_DIMM_MIN_BRIGHTNESS): cv.int_range(1, 100),
+                    cv.Optional(CONF_DEVICE_MODE_DIMM_MAX_BRIGHTNESS): cv.int_range(1, 100)
                 })),
-                
+
                 cv.Optional(CONF_DEVICE_LIGHT_WHITE_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
                     cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                     cv.Optional(CONF_DEVICE_MODE_WHITE_MIN_KELVIN, default=DEFAULT_WHITE_MIN_KELVIN): cv.int_range(1000, 10000),
                     cv.Optional(CONF_DEVICE_MODE_WHITE_MAX_KELVIN, default=DEFAULT_WHITE_MAX_KELVIN): cv.int_range(1000, 10000)                    
                 }))
+               
             }))
-        })]),
+        })),
 
 
-        cv.Optional(CONF_DEVICE_CLIMATES, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_CLIMATES, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
@@ -145,12 +188,19 @@ CONFIG_SCHEMA = cv.Schema({
                     cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_CLIMATE_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                     cv.Optional(CONF_DEVICE_MODE_TEMP_MIN_TEMP, default=DEFAULT_WHITE_MIN_TEMP): cv.int_range(0, 500),
                     cv.Optional(CONF_DEVICE_MODE_TEMP_MAX_TEMP, default=DEFAULT_WHITE_MAX_TEMP): cv.int_range(0, 500)
+                })),
+
+                cv.Optional(CONF_DEVICE_CLIMATE_FAN_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_DEVICE_CLIMATE_FAN_MODES, default=[]): cv.ensure_list(cv.string),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=1): cv.int_range(1, 5)                  
                 }))
+
             }))
-        })]),
+            
+        })),
 
 
-        cv.Optional(CONF_DEVICE_COVER, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_COVER, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
@@ -159,16 +209,16 @@ CONFIG_SCHEMA = cv.Schema({
                     cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
                 }))
             }))
-        })]),
+        })),
 
 
-        cv.Optional(CONF_DEVICE_SWITCH, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_SWITCH, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string
-        })]),
+        })),
 
 
-        cv.Optional(CONF_DEVICE_FAN, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_FAN, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
@@ -178,10 +228,10 @@ CONFIG_SCHEMA = cv.Schema({
                     cv.Optional(CONF_CHANGEABLE_DIRECTION, default=False): cv.boolean
                 }))
             }))
-        })]),
+        })),
 
 
-        cv.Optional(CONF_DEVICE_MEDIA_PLAYER, default=[]): cv.All([dict({
+        cv.Optional(CONF_DEVICE_MEDIA_PLAYER, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
@@ -192,42 +242,70 @@ CONFIG_SCHEMA = cv.Schema({
 
                 cv.Optional(CONF_DEVICE_MEDIA_PLAYER_SOURCE_MODE , default=dict()): cv.All(dict({
                     cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_MEDIA_PLAYER_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
-                    cv.Optional(CONF_MEDIA_PLAYER_SOURCES, default=[]): cv.All([dict({
+                    cv.Optional(CONF_MEDIA_PLAYER_SOURCES, default=[]): cv.ensure_list(dict({
                         cv.Required(CONF_NAME): cv.string,
                         cv.Required(CONF_CONTENT_ID): cv.string,
                         cv.Required(CONF_CONTENT_TYPE): cv.string,
-                    })])
+                    }))
                 })),
             }))
-        })]),
+        })),
 
-        cv.Optional(CONF_DEVICE_LOCK, default=[]): cv.All([dict({
+
+        cv.Optional(CONF_DEVICE_LOCK, default=[]): cv.ensure_list(dict({
             cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
             cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_LOCK_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_LOCK_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_LOCK_ROTARY_STEP_WIDTH): cv.int_range(1, 2),
                     cv.Optional(CONF_DEVICE_LOCK_OPEN_ON_BUTTON, default=False): cv.boolean
                 }))
             }))
-        })])
+        })),
 
+
+        cv.Optional(CONF_DEVICE_NUMBER, default=[]): cv.ensure_list(dict({
+            cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
+            cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
+
+            cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
+                cv.Optional(CONF_DEVICE_NUMBER_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_DEVICE_NUMBER_UNIT): cv.string,
+                }))
+            }))
+        })),
+
+
+        cv.Optional(CONF_DEVICE_TIMER, default=[]): cv.ensure_list(dict({
+            cv.Required(CONF_DEVICE_ENTRY_ID): cv.string,
+            cv.Required(CONF_DEVICE_ENTRY_NAME): cv.string,
+
+            cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
+                cv.Optional(CONF_DEVICE_TIMER_MODE, default=dict()): cv.All(dict({
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                }))
+            }))
+        })),
 
 
     }))
 
-
 }).extend(cv.COMPONENT_SCHEMA)
 
 
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
+    await cg.register_component(var, config)
 
     if CONF_SCREEN_OFF_TIME in config:
         screenOffTime = config[CONF_SCREEN_OFF_TIME]
         cg.add(var.setScreenOffTime(screenOffTime))
+
+    if CONF_SCREENSAVER in config:
+        screensaver = config[CONF_SCREENSAVER]
+        cg.add(var.setScreensaver(screensaver))
 
     if CONF_LONG_PRESS_DURATION in config:
         longPressDuration = config[CONF_LONG_PRESS_DURATION]
@@ -252,6 +330,16 @@ def to_code(config):
     if CONF_FONT_FACTOR in config:
         fontfactor = config[CONF_FONT_FACTOR]
         cg.add(var.setFontFactor(fontfactor))
+
+    if CONF_DISPLAY_ROTATE in config:
+        displayRotate = config[CONF_DISPLAY_ROTATE]
+        cg.add(var.setDisplayRotation(displayRotate))
+
+    if CONF_TIME_COMPONENT in config:
+        time_component = await cg.get_variable(config[CONF_TIME_COMPONENT])
+        cg.add(var.setTimeComponent(time_component))
+
+
 
     if CONF_DEVICES in config:
         confDevices = config[CONF_DEVICES]
@@ -316,3 +404,20 @@ def to_code(config):
                                    json.dumps(lockEntry[CONF_DEVICE_MODES]))
                                   )
 
+
+        if CONF_DEVICE_NUMBER in confDevices:
+            confNumber = confDevices[CONF_DEVICE_NUMBER]
+            for numberEntry in confNumber:
+                cg.add(var.addNumber(numberEntry[CONF_DEVICE_ENTRY_ID], 
+                                     numberEntry[CONF_DEVICE_ENTRY_NAME], 
+                                     json.dumps(numberEntry[CONF_DEVICE_MODES]))
+                                    )
+
+
+        if CONF_DEVICE_TIMER in confDevices:
+            confTimer = confDevices[CONF_DEVICE_TIMER]
+            for timerEntry in confTimer:
+                cg.add(var.addTimer(timerEntry[CONF_DEVICE_ENTRY_ID], 
+                                     timerEntry[CONF_DEVICE_ENTRY_NAME], 
+                                     json.dumps(timerEntry[CONF_DEVICE_MODES]))
+                                    )

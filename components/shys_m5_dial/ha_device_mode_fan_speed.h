@@ -5,7 +5,7 @@ namespace esphome
 {
     namespace shys_m5_dial
     {
-        class HaDeviceModeFanSpeed: public esphome::shys_m5_dial::HaDeviceMode {
+        class HaDeviceModeFanSpeed: public esphome::shys_m5_dial::HaDeviceModePercentage {
             protected:
                 bool changeableDirection = false;
                 const char* direction = FAN_DIRECTION_FORWARD;
@@ -27,7 +27,7 @@ namespace esphome
                     haApi.setFanSpeed(this->device.getEntityId(), value);
                 }
 
-                void showFanMenu(M5DialDisplay& display, uint16_t currentValue){
+                void showTwoWayFanMenu(M5DialDisplay& display){
                     LovyanGFX* gfx = display.getGfx();
                     uint16_t height = gfx->height();
                     uint16_t width  = gfx->width();
@@ -37,27 +37,70 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue), RED);
-                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
+                    display.clear();
 
-                    display.setFontsize(3);
-                    gfx->drawString((String(currentValue) + "%").c_str(),
+                    // Round %-Bar
+                    gfx->fillArc(width / 2,
+                                 height / 2,
+                                 115,
+                                 100,
+                                 150,
+                                 390,
+                                 ORANGE
+                                );
+
+                    if(strcmp(this->direction, FAN_DIRECTION_FORWARD) == 0){
+                        gfx->fillArc(width / 2,
+                                     height / 2,
+                                     115,
+                                     100,
+                                     270,
+                                     getValue()==0?270:(((float)120 / this->getMaxValue()) * getValue()) + 270,
+                                     RED
+                                    );
+                    } else {
+                        gfx->fillArc(width / 2,
+                                     height / 2,
+                                     115,
+                                     100,
+                                     getValue()==0?270:270 - (((float)120 / this->getMaxValue()) * getValue()),
+                                     270,
+                                     RED
+                                    );
+                    }
+                   
+                    // Percent
+                    display.setFontsize(1.7);
+                    gfx->drawString((String(getValue()) + "%").c_str(),
                                     width / 2,
-                                    height / 2 - 30);
-                    
+                                    height / 2 - 70);
+
+                    // Direction
+                    display.setFontsize(1);
+                    gfx->drawString(this->direction,
+                                    width / 2,
+                                    height / 2 - 40);  
+
+                    // Icon
+                    if(this->icon != nullptr){
+                        display.drawBitmapTransparent(this->icon, width/2-35, height/2-30, 70, 70, 0xFFFF);
+                    }
+
+                    // Device Name
                     display.setFontsize(1);
                     gfx->drawString(this->device.getName().c_str(),
                                     width / 2,
-                                    height / 2 + 20);
-                    gfx->drawString(this->changeableDirection?direction:"Speed",
-                                    width / 2,
-                                    height / 2 + 50);  
+                                    height / 2 + 90);
+ 
 
                     gfx->endWrite();                      // Release SPI bus
                 }
 
             public:
-                HaDeviceModeFanSpeed(HaDevice& device) : HaDeviceMode(device){}
+                HaDeviceModeFanSpeed(HaDevice& device) : HaDeviceModePercentage(device){
+                    this->setLabel("Fan-Speed");
+                    this->setIcon(FAN_IMG, 4900);
+                }
 
                 void setState(const std::string& newState){
                     this->stateIsOn = (strcmp(newState.c_str(), "on") == 0);
@@ -78,29 +121,40 @@ namespace esphome
                 }
 
                 void setDirection(const std::string& newDirection){
-                    if (strcmp(newDirection.c_str(), FAN_DIRECTION_FORWARD) == 0){
-                        this->direction = FAN_DIRECTION_FORWARD;
-                    } else if (strcmp(newDirection.c_str(), FAN_DIRECTION_REVERSE) == 0){
-                        this->direction = FAN_DIRECTION_REVERSE;
-                    }
+                    if(changeableDirection){
+                        if (strcmp(newDirection.c_str(), FAN_DIRECTION_FORWARD) == 0){
+                            this->direction = FAN_DIRECTION_FORWARD;
+                        } else if (strcmp(newDirection.c_str(), FAN_DIRECTION_REVERSE) == 0){
+                            this->direction = FAN_DIRECTION_REVERSE;
+                        }
 
-                    displayRefreshNeeded = true;
+                        displayRefreshNeeded = true;
+                    }
                     
                     ESP_LOGD("DEVICE", "set direction: %s", this->direction);
                 }
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Speed-Modus");
-                    this->showFanMenu(display, getValue());
+                    if(this->changeableDirection){
+                        this->showTwoWayFanMenu(display);
+                    } else {
+                        this->showPercentageMenu(display);
+                    }
                     
+                    // State
+                    display.setFontsize(1);
+                    display.getGfx()->drawString(this->stateIsOn?"On":"Off",
+                                                 display.getGfx()->width() / 2,
+                                                 display.getGfx()->height() / 2 + 50);  
+
                     this->displayRefreshNeeded = false;
                 }
 
                 void registerHAListener() override {
-                    std::string attrNameState = "";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrNameState, 
+                                optional<std::string>(), 
                                 [this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
@@ -110,10 +164,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got State %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string attrNamePercentage = "percentage";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrNamePercentage, 
+                                optional<std::string>("percentage"), 
                                 [this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
@@ -129,10 +182,9 @@ namespace esphome
                     });
 
                     if(this->changeableDirection){
-                        std::string attrNameDirection = "direction";
                         api::global_api_server->subscribe_home_assistant_state(
                                     this->device.getEntityId().c_str(),
-                                    attrNameDirection, 
+                                    optional<std::string>("direction"), 
                                     [this](const std::string &state) {
                             if(this->isValueModified()){
                                 return;
@@ -164,14 +216,14 @@ namespace esphome
                     if (strcmp(direction, ROTARY_LEFT)==0){
                         if(strcmp(this->direction, FAN_DIRECTION_FORWARD)==0){
                             this->reduceCurrentValue();
-                        } else {
+                        } else if(this->changeableDirection){
                             this->raiseCurrentValue();
                         }
                         
                     } else if (strcmp(direction, ROTARY_RIGHT)==0){
                         if(strcmp(this->direction, FAN_DIRECTION_FORWARD)==0){
                             this->raiseCurrentValue();
-                        } else {
+                        } else if(this->changeableDirection){
                             this->reduceCurrentValue();
                         }
                     }

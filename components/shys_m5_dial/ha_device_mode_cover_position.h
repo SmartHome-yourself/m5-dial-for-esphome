@@ -12,13 +12,15 @@ namespace esphome
                 }
 
             public:
-                HaDeviceModeCoverPosition(HaDevice& device) : HaDeviceModePercentage(device){}
+                HaDeviceModeCoverPosition(HaDevice& device) : HaDeviceModePercentage(device){
+                    this->setLabel("Position");
+                    this->setIcon(COVER_CLOSED_IMG, 4900);
+                }
 
                 void registerHAListener() {
-                    std::string attrName = "current_position";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrName, 
+                                optional<std::string>("current_position"), 
                                 [this](const std::string &state) {
                         if(this->isValueModified()){
                             return;

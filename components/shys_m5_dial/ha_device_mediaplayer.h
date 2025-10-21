@@ -17,22 +17,21 @@ namespace esphome
 
                 void init() override {
                     ESP_LOGD("HA_DEVICE", "Init Media-Player: %s", this->getEntityId().c_str());
-
                     this->addMode(modePlay);
 
                     modeSource->loadMediaContents(this->modeConfig);
                     this->addMode(modeSource);
 
-                    if (this->modeConfig.containsKey("play_mode")) {
+                    if (this->modeConfig["play_mode"].is<JsonObject>()) {
                         JsonObject play_mode = this->modeConfig["play_mode"];
-                        if (play_mode.containsKey("rotary_step_width")) {
+                        if (play_mode["rotary_step_width"].is<int>()) {
                             modePlay->setRotaryStepWidth(play_mode["rotary_step_width"].as<int>());
                         }
                     }
-                    
-                    if (this->modeConfig.containsKey("source_mode")) {
+
+                    if (this->modeConfig["source_mode"].is<JsonObject>()) {
                         JsonObject source_mode = this->modeConfig["source_mode"];
-                        if (source_mode.containsKey("rotary_step_width")) {
+                        if (source_mode["rotary_step_width"].is<int>()) {
                             modeSource->setRotaryStepWidth(source_mode["rotary_step_width"].as<int>());
                         }
                     }

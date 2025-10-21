@@ -18,14 +18,14 @@ namespace esphome
 
                     this->addMode(modeLock);
 
-                    if (this->modeConfig.containsKey("lock_mode")) {
+                    if (this->modeConfig["lock_mode"].is<JsonObject>()) {
                         JsonObject lock_mode = this->modeConfig["lock_mode"];
 
-                        if (lock_mode.containsKey("rotary_step_width")) {
+                        if (lock_mode["rotary_step_width"].is<int>()) {
                             modeLock->setRotaryStepWidth(lock_mode["rotary_step_width"].as<int>());
                         }
 
-                        if(lock_mode.containsKey("open_on_button")){
+                        if(lock_mode["open_on_button"].is<bool>()){
                            modeLock->setOpenOnButton(lock_mode["open_on_button"].as<bool>());
                         }
                     }

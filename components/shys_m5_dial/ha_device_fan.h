@@ -18,14 +18,14 @@ namespace esphome
 
                     this->addMode(modeSpeed);
 
-                    if (this->modeConfig.containsKey("speed_mode")) {
+                    if (this->modeConfig["speed_mode"].is<JsonObject>()) {
                         JsonObject speed_mode = this->modeConfig["speed_mode"];
 
-                        if (speed_mode.containsKey("rotary_step_width")) {
+                        if (speed_mode["rotary_step_width"].is<int>()) {
                             modeSpeed->setRotaryStepWidth(speed_mode["rotary_step_width"].as<int>());
                         }
 
-                        if (speed_mode.containsKey("changeable_direction")) {
+                        if (speed_mode["changeable_direction"].is<bool>()) {
                             modeSpeed->setChangeableDirection(speed_mode["changeable_direction"].as<bool>());
                         }
                     }

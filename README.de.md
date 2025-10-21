@@ -12,10 +12,13 @@ Aktuell werden folgende Entitäten unterstützt:
 - climate  
 - cover  
 - fan  
+- input_number
 - light  
-- switch  
-- media_player  
 - lock  
+- media_player  
+- number  
+- switch  
+- timer  
   
 ## Video
 [![M5 Stack Dial](http://img.youtube.com/vi/4dE7YONEYVk/0.jpg)](https://www.youtube.com/watch?v=4dE7YONEYVk "M5 Dial als Home Assistant Fernbedienung")
@@ -24,14 +27,14 @@ Aktuell werden folgende Entitäten unterstützt:
   
 ## Discord
 Für einen schnellen Austausch, Anregungen so wie Info's zum aktuellen Entwicklungsstand steht auch unser Discord zur Verfügung.  
-Einladungs-Link: https://discord.gg/pN7SpK7  
+https://discord.com/channels/293705077812625408/1217503791541387294  
   
 &nbsp;  
   
 # Beispiel Konfiguration:
 ```yaml
 substitutions:
-  devicename: "m5-dial"
+  name: "m5-dial"
   wifi_ssid: !secret wifi_ssid
   wifi_password: !secret wifi_password  
 
@@ -42,14 +45,23 @@ packages:
     file: shys-m5-dial.yaml
     refresh: 1h
 
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: Europe/Berlin
+    
 shys_m5_dial:
   name: Dial
+  time_component: homeassistant_time
   screen_off_time: 45000
+  screensaver: clock
   rotary_step_width: 5
   long_press_duration: 1200
-  font: FreeSans12pt7b
+  font: default
   font_factor: 1
 
+  display_rotate: 2
+  
   devices:
     lights:
       - entity: light.my_light1
@@ -73,7 +85,7 @@ shys_m5_dial:
     switches:
       - entity: switch.my_switch
         name: Switch 1
-        
+
     climates:
       - entity: climate.my_climate1
         name: Heater
@@ -82,7 +94,20 @@ shys_m5_dial:
             rotary_step_width: 1
             min_temperature: 4
             max_temperature: 30
-            
+      - entity: climate.my_climate1
+        name: Air Conditioning
+        modes:
+          temp_mode:
+            rotary_step_width: 1
+            min_temperature: 16
+            max_temperature: 24
+          fan_mode:
+            rotary_step_width: 1
+            modes:
+              - auto
+              - low
+              - high
+
     covers:
       - entity: cover.my_cover1
         name: Cover 1
@@ -121,6 +146,38 @@ shys_m5_dial:
           lock_mode:
             rotary_step_width: 1
             open_on_button: false
+
+    number:
+      - entity: number.my_number
+        name: Number 1
+
+      - entity: input_number.my_input_number
+        name: Input Number 1
+
+    timer:
+      - entity: timer.my_timer
+        name: Timer 1
+
+```
+  
+## DEV Branch
+Um den Dev Branch zu verwenden muss der ref Eintrag im packages Abschitt auf dev geändert werden.  
+Ausserdem muss die Konfiguration um den Abschnitt external_component erweitert werden, bei dem dann ebenfalls ref als dev hinterlegt sein muss.  
+Das sähe dann z.B. so aus:  
+```
+packages:
+  m5_tough_package:
+    url: https://github.com/SmartHome-yourself/m5-dial-for-esphome
+    ref: dev
+    file: shys-m5-dial.yaml
+    refresh: 1s
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/SmartHome-yourself/m5-dial-for-esphome/
+      ref: dev
+    components: [shys_m5_dial]
 ```
   
 &nbsp;  
@@ -159,16 +216,29 @@ Allgemeine Attribute sind alle Parameter, die direkt unter der Custom-Component 
 ```
 shys_m5_dial:
   name: Dial
+  time_component: homeassistant_time
   screenOffTime: 45000
+  screensaver: clock
   rotaryStepWidth: 5
   longPressDuration: 1200
+  font: default
+  font_factor: 1  
+  display_rotate: 2
 ```
   
 **name**  
 Legt den Namen der Komponente fest.  
   
+**time_component**  
+Hier muss die ID einer Time Komponente angegeben werden, worüber der Dial das Datum und die aktuelle Uhrzeit ermitteln kann.  
+Ich würde hier empfehlen, die Home Assistant Uhrzeit zu verwenden, da diese Komponente auch für die Timer-Steuerung benötigt wird.  
+  
 **screenOffTime (optional)** *(Default: 30000)*  
 Gibt an, nach wie viel Millisekunden das Display sich automatisch abschaltet  
+  
+**screensaver (optional)** *(Default: clock)*  
+Gibt an, ob ein Bildschirmschoner verwendet werden soll, oder nicht.  
+*Gültige Werte: clock, off*
   
 **rotaryStepWidth (optional)** *(Default: 10)*  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
@@ -177,13 +247,19 @@ Der hier eingestellte Wert gilt für alle Modi, bei denen keine abweichende Schr
 **longPressDuration (optional)** *(Default: 1200)*  
 Gibt die Dauer an, ab wie viel Millisekunden ein Tastendruck als Long-Press gelten soll.  
   
-**font (optional)** *(Default: FreeSans12pt7b)*  
+**font (optional)** *(Default: default)*  
 Gibt die zu verwendende Schriftart an.  
-Alle zur Verfügung stehenden Schriften sind in einer Map in [globals.h](components/shys_m5_dial/globals.h) definiert.  
+Beim Standard "default" handelt es sich um eine von mir generierte Schriftart, die auch Umlaute und verschiedene Sonderzeichen enthält.  
+Alle alternativen zur Verfügung stehenden Schriften wie z.B. FreeSans12pt7b sind in einer Map in [globals.h](components/shys_m5_dial/globals.h) definiert.  
+Die alternativen Schriftarten unterstützen allerdings keine Umlaute und Sonderzeichen!  
   
 **font_factor (optional)** *(Default: 1)*  
 Gibt den Faktor an, der auf die Schriftgröße angewendet werden soll.  
 *Gültige Werte: 0.1 - 10.0*
+  
+**display_rotate (optional)** *(Default: 0)*  
+Gibt an, wie oft das Display um 90° gedreht werden soll.  
+*Gültige Werte: 0-3*  
   
 &nbsp;  
   
@@ -244,11 +320,22 @@ shys_m5_dial:
         modes:
           dimm_mode:
             enable: true
+            min_brightness: 0
+            max_brightness: 100
             rotary_step_width: 10
 ```
   
 **enable** *(Default: false)*  
 Durch setzen auf true wird der Modus für die Entität aktiviert.  
+  
+**min_brightness (optional)** *(Default: 0)*  
+Legt den maximal möglichen Helligkeitswert fest auf den herunter gedimmt werden kann.  
+Ggf. nützlich, wenn Leuchtmittel erst ab 10% Helligkeit leuchten und darunter evtl. flackern.  
+*Gültige Werte 0 - 100*  
+  
+**max_brightness (optional)** *(Default: 100)*  
+Legt den maximal möglichen Helligkeitswert fest auf den über den Dial gedimmt werden kann.
+*Gültige Werte 0 - 100*  
   
 **rotary_step_width (optional)**  
 Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
@@ -299,7 +386,8 @@ Gibt den Maximalwert in Kelvin für die Weiß-Ton Steuerung an.
 #### rgb_mode
 Mit Hilfe des RGB-Mode (Farbwahl) lässt sich die Farbe für die Light-Entität auswählen.  
 Die Farbe lässt sich sowohl über den Drehregler als auch per Touch steuern.  
-Ein Druck auf den Button schaltet das Licht an/aus.
+Ein Druck auf den Button schaltet das Licht an/aus.  
+Mit einem Touch auf die Farbfläche in der Mitte wechselt die Lampe wieder zurück in den Weiß-Modus.  
   
 **Code:**
 ```
@@ -380,6 +468,47 @@ Legt die maximale Temperatur fest, die am Dial für diese Climate-Entität einge
   
 &nbsp;  
   
+#### fan_mode
+Mit Hilfe des Fan-Mode lässt sich der Lüfter-Modus der Climate-Entität regeln.  
+Über den Drehregler wird der Modus ausgewählt und durch einen Druck auf den Button aktiviert.  
+  
+In der Regel reicht der Eintrag `fan_mode: {}` unter `modes:` um diese Lüftersteuerung zu aktivieren.  
+Der Modus liest die möglichen Werte automatisch aus dem Attribut `fan_modes` der Entität aus.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    climates:
+      - entity: climate.my_climate2
+        name: Heater
+        modes:
+          fan_mode: {}
+      - entity: climate.my_climate1
+        name: Heater
+        modes:
+          fan_mode:
+            rotary_step_width: 1
+            modes:
+              - auto
+              - low
+              - medium
+              - high
+```
+  
+**rotary_step_width (optional)** *Default: 1*  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Auch beim Fan-Mode gilt die 1 als Default, egal was als allgemeiner Standard in der Component eingestellt wurde.  
+*Gültige Werte 1 - 5*  
+  
+**modes (optional)**  
+Über Modes lässt sich eine Liste an zur Verfügung stehenden Modi festlegen.  
+Werden hier Modi angegeben, findet keine automatische Ermittlung der Modi mehr statt.  
+Dieser Parameter kann also dazu genutzt werden, die zur Verfügung stehenden Modi einzuschränken oder wenn die climate-Entität seine Modi nicht über das Attribut "fan_modes" bereit stellt.  
+  
+&nbsp;  
+  
 ------
   
 ## **COVER**
@@ -429,7 +558,7 @@ Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gi
 ------
   
 ## **FANS**
-Unter "devices - cover" werden alle Fan-Entitäten angegeben.  
+Unter "devices - fans" werden alle Fan-Entitäten angegeben.  
   
 **Code:**
 ```
@@ -641,6 +770,112 @@ Bei lock_mode von lock gilt die 1 als Default, egal was als allgemeiner Standard
 Wird hier eine Schrittweite von 2 angegeben, lässt sich durch drehen das Schloss nicht mehr nur aufschließen, sondern wird automatisch direkt geöffnet.  
 *Gültige Werte 1 - 2*  
   
+&nbsp;  
+  
+------
+  
+## **Number / Input_Number**
+Unter "devices - number" werden alle Number- und Input-Number Entitäten angegeben.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    number:
+      - entity: number.my_number
+        name: Number 1
+        modes:
+          lock_mode:
+            unit: mm
+            rotary_step_width: 10
+            
+      - entity: input_number.my_input_number
+        name: Input Number 1
+```
+  
+**entity**  
+Angabe der Entity-ID der Nummer aus Home Assistant, die gesteuert werden soll.  
+Hier werden sowohl Entitäten der Domain Number als auch von Input-Number unterstützt.
+  
+**name**  
+Der auf dem Display angezeigte Name der Entität.  
+  
+## modes (optional)
+#### value_mode
+Mit Hilfe des Value-Mode lässt sich der Wert der Number-Entität steuern.  
+Der Wert lässt sich sowohl über den Drehregler als auch per Touch festlegen.  
+
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    number:
+      - entity: number.my_number
+        name: Number 1
+        modes:
+          lock_mode:
+            unit: mm
+            rotary_step_width: 10
+```
+  
+**unit (optional)** *(Default: '')*  
+Gibt die Einheit an, die hinter dem Wert der Nummer angezeigt werden soll.  
+  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Value-Modus dieser Number-Entität.  
+*Gültige Werte 1 - 500*  
+  
+&nbsp;  
+  
+------
+  
+## **Timer**
+Unter "devices - timer" werden alle Timer Entitäten angegeben die über den Dial gesteuert werden sollen.  
+  
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    timer:
+      - entity: timer.test_timer
+        name: Test timer
+        modes:
+          timer_mode:
+            rotary_step_width: 10        
+```
+  
+**entity**  
+Angabe der Entity-ID des Timers aus Home Assistant, der gesteuert werden soll.  
+
+**name**  
+Der auf dem Display angezeigte Name der Entität.  
+  
+## modes (optional)
+#### timer_mode
+Mit Hilfe des Position-Mode lässt sich die Position der Cover-Entität steuern.  
+Die Position lässt sich sowohl über den Drehregler als auch per Touch steuern.  
+
+**Code:**
+```
+shys_m5_dial:
+  ...
+  devices:
+    timer:
+      - entity: timer.my_timer
+        name: Timer 1
+        modes:
+          timer_mode:
+            rotary_step_width: 10
+```
+  
+**rotary_step_width (optional)**  
+Gibt die allgemeine Schrittweite an, um die der Wert bei Verwendung des Drehreglers pro Schritt verändert wird.  
+Der hier eingestellte Wert überschreibt den allgemein eingestellten Wert und gilt nur für den Timer-Modus dieser Timer-Entität.  
+*Gültige Werte 1 - 500*  
   
 &nbsp;  
   
@@ -663,5 +898,60 @@ Gibt an, wie lange nach einem API-Aufruf gewartet werden soll, bevor der nächst
 ------  
 ------  
     
+&nbsp;  
+  
+&nbsp;  
+  
+  
+# Dienste in Home Assistant
+Diese Integration stellt verschiedene Dienste in Home Assistant zur Verfügung, um zum Beispiel über Automatisierungen den Dial zu steuern.  
+Die Dienste stehen unmittelbar nach dem Einbinden des Dial in Home Assistant automatisch zur Verfügung.  
+  
+Alle Dienste beginnen mit: **esphome.DEIN_DIAL_NAME_**
+  
+### select_device
+Mit diesem Dienst kann das aktuell aktive Gerät auf dem Dial gewechselt werden.  
+```
+service: esphome.m5_dial_select_device
+data:
+  entity_id: light.my_light
+```
+##### Parameter
+**entity_id**
+Angabe der Entity-ID, die auf dem Dial als aktive Entität ausgewählt werden soll.
+*(Die Entität muss über die Konfiguration in der Komponente hinterlegt sein!)*
+  
+### lock_device
+Über diesen Dienst kann man die Bedienung einer einzelnen Entität für den Dial Sperren.  
+Als Parameter erwartet der Dienst die Angabe der Entity-ID. (Die Entität muss über die Konfiguration in der Komponente hinterlegt sein!)
+```
+service: esphome.m5_dial_lock_device
+data:
+  entity_id: light.my_light
+```
+##### Parameter
+**entity_id**
+Angabe der Entity-ID, für die die Bedienung über den Dial gesperrt werden soll.
+*(Die Entität muss über die Konfiguration in der Komponente hinterlegt sein!)*
+  
+### unlock_device
+Über diesen Dienst kann man eine Sperre der Bedienung über den Dial für eine Entität wieder aufheben.  
+Als Parameter erwartet der Dienst die Angabe der Entity-ID.  (Die Entität muss über die Konfiguration in der Komponente hinterlegt sein!)
+```
+service: esphome.m5_dial_unlock_device
+data:
+  entity_id: light.my_light
+```
+##### Parameter
+**entity_id**
+Angabe der Entity-ID, für die die Bedienung über den Dial gesperrt werden soll.
+*(Die Entität muss über die Konfiguration in der Komponente hinterlegt sein!)*
+  
 &nbsp;
+  
+------  
+------  
+    
+&nbsp;
+  
   

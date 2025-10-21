@@ -27,7 +27,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, currentValue>0?YELLOW:RED);
+                    display.clear(currentValue>0?YELLOW:RED);
 
                     display.setFontsize(3);
                     gfx->drawString(currentValue>0?"on":"off",
@@ -54,10 +54,9 @@ namespace esphome
                 }
 
                 void registerHAListener() override {
-                    std::string attrName = "";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrName, 
+                                optional<std::string>(), 
                                 [this](const std::string &state) {
                                     
                         if(this->isValueModified()){

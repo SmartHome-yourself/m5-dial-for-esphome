@@ -29,7 +29,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, YELLOW);
+                    display.clear();
 
                     // Device Name
                     display.setFontsize(1);
@@ -101,10 +101,10 @@ namespace esphome
                 void loadMediaContents(JsonObject modeConfig){
                     this->mediaContents = {};
 
-                    if (modeConfig.containsKey("source_mode")) {
+                    if (modeConfig["source_mode"].is<JsonObject>()) {
                         JsonObject sourceModeConfig = modeConfig["source_mode"];
 
-                        if (sourceModeConfig.containsKey("sources")) {
+                        if (sourceModeConfig["sources"].is<JsonArray>()) {
                             JsonArray sources = sourceModeConfig["sources"].as<JsonArray>();
 
                             for(JsonObject source : sources){

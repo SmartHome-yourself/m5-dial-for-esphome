@@ -43,7 +43,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    gfx->fillRect(0, 0, width, height, YELLOW);
+                    display.clear();
 
                     // Round Volume Bar
                     gfx->fillArc(width / 2,
@@ -64,38 +64,20 @@ namespace esphome
                                  ORANGE
                                 );
 
+                   
                     // Percent
-                    display.setFontsize(2);
+                    display.setFontsize(1.7);
                     gfx->drawString((String(getValue()) + "%").c_str(),
                                     width / 2,
-                                    height / 2 - 45);
-                    
-                    // Device Name
+                                    height / 2 - 70);
+
+                    // Mode
                     display.setFontsize(1);
-                    gfx->drawString(this->device.getName().c_str(),
+                    gfx->drawString(this->player_state.c_str(),
                                     width / 2,
-                                    height / 2 - 80);
-                                    
+                                    height / 2 - 40);  
 
-                    
-                    // Media-Artist/Title
-                    display.setFontsize(.7);
-                    bool displayTitle = ((millis() / 5000) % 2 == 1);
-                    if(displayTitle){
-                        gfx->drawString(this->media_title.c_str(),
-                                        width / 2,
-                                        height / 2 + 70);                          
-                    } else {
-                        gfx->drawString(this->media_artist.c_str(),
-                                        width / 2,
-                                        height / 2 + 70);
-                    }
-
-                    // Position Bar
-                    gfx->fillRect(width/2-40, height/2+90, 80, 5, ORANGE);
-                    gfx->fillRect(width/2-40, height/2+90, ((float)80 /100* getMediaPositionPct()), 5, RED);
-
-
+                   
 
                     if(strcmp(this->player_state.c_str(), "playing") == 0){
                         // Pause Button
@@ -115,6 +97,34 @@ namespace esphome
                     M5Dial.Display.fillTriangle(width/2-65, height/2-20, width/2-65, height/2+20, width/2-95, height/2, RED);
 
 
+
+                    // Position Bar
+                    gfx->fillRect(width/2-50, height/2+40, 100, 5, ORANGE);
+                    gfx->fillRect(width/2-50, height/2+40, getMediaPositionPct(), 5, RED);
+
+
+                    // Media-Artist/Title
+                    display.setFontsize(.7);
+                    bool displayTitle = ((millis() / 5000) % 2 == 1);
+                    if(displayTitle){
+                        gfx->drawString(this->media_title.c_str(),
+                                        width / 2,
+                                        height / 2 + 65);                          
+                    } else {
+                        gfx->drawString(this->media_artist.c_str(),
+                                        width / 2,
+                                        height / 2 + 65);
+                    }
+
+
+                    // Device Name
+                    display.setFontsize(1);
+                    gfx->drawString(this->device.getName().c_str(),
+                                    width / 2,
+                                    height / 2 + 90);
+                   
+
+
                     gfx->endWrite();                      // Release SPI bus
                 }
 
@@ -129,10 +139,9 @@ namespace esphome
                 }
 
                 void registerHAListener() override {
-                    std::string volAttrName = "volume_level";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                volAttrName, 
+                                optional<std::string>("volume_level"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -154,10 +163,9 @@ namespace esphome
                     });
 
 
-                    std::string stateAttrName = "";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                stateAttrName, 
+                                optional<std::string>(), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -170,10 +178,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got State %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string titleAttrName = "media_title";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                titleAttrName, 
+                                optional<std::string>("media_title"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -186,10 +193,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got Title %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string artistAttrName = "media_artist";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                artistAttrName, 
+                                optional<std::string>("media_artist"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -202,10 +208,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got Artist %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string albumAttrName = "media_album_name";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                albumAttrName, 
+                                optional<std::string>("media_album_name"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -218,10 +223,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got Album %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string durationAttrName = "media_duration";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                durationAttrName, 
+                                optional<std::string>("media_duration"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){
@@ -238,10 +242,9 @@ namespace esphome
                         }
                     });
 
-                    std::string positionAttrName = "media_position";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                positionAttrName, 
+                                optional<std::string>("media_position"), 
                                 [this](const std::string &state) {
                         
                         if(this->isValueModified()){

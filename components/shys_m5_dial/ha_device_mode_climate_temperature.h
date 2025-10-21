@@ -1,10 +1,11 @@
 #pragma once
+#include "ha_device_mode_percentage.h"
 
 namespace esphome
 {
     namespace shys_m5_dial
     {
-        class HaDeviceModeClimateTemperature: public esphome::shys_m5_dial::HaDeviceMode {
+        class HaDeviceModeClimateTemperature: public esphome::shys_m5_dial::HaDeviceModePercentage {
             protected:
                 std::string hvac_mode = "none";
 
@@ -20,53 +21,23 @@ namespace esphome
                     haApi.setClimateTemperature(this->device.getEntityId(), value);
                 }
 
-                void showTemperatureMenu(M5DialDisplay& display){
-                    LovyanGFX* gfx = display.getGfx();
-
-                    uint16_t currentValue = getValue();
-
-                    uint16_t height = gfx->height();
-                    uint16_t width  = gfx->width();
-
-                    gfx->setTextColor(MAROON);
-                    gfx->setTextDatum(middle_center);
-                    
-                    gfx->startWrite();                      // Secure SPI bus
-
-                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue) , RED);
-                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
-
-                    display.setFontsize(3);
-                    gfx->drawString(String(currentValue).c_str(),
-                                    width / 2,
-                                    height / 2 - 30);                        
-                    
-                    display.setFontsize(1);
-                    gfx->drawString(this->device.getName().c_str(),
-                                    width / 2,
-                                    height / 2 + 20);
-                    gfx->drawString("Temperature",
-                                    width / 2,
-                                    height / 2 + 50);  
-
-                    gfx->endWrite();                      // Release SPI bus
-                }
-
             public:
-                HaDeviceModeClimateTemperature(HaDevice& device) : HaDeviceMode(device){
+                HaDeviceModeClimateTemperature(HaDevice& device) : HaDeviceModePercentage(device){
                     this->maxValue = 40;
+                    this->setLabel("Temperature");
+                    this->setIcon(HEATER_ON_IMG, 4900);
+                    this->setUnit("°");
                 }
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
-                    this->showTemperatureMenu(display);
+                    this->showPercentageMenu(display);
                     ESP_LOGD("DISPLAY", "Temperature-Modus");
                 }
 
                 void registerHAListener() override {
-                    std::string attrNameState = "";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrNameState, 
+                                optional<std::string>(), 
                                 [this](const std::string &state) {
 
                         if(this->isValueModified()){
@@ -77,10 +48,9 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got Mode %s for %s", state.c_str(), this->device.getEntityId().c_str());
                     });
 
-                    std::string attrNameTemp = "temperature";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrNameTemp, 
+                                optional<std::string>("temperature"), 
                                 [this](const std::string &state) {
 
                         if(this->isValueModified()){

@@ -4,55 +4,27 @@ namespace esphome
 {
     namespace shys_m5_dial
     {
-        class HaDeviceModeLightBrightness: public esphome::shys_m5_dial::HaDeviceMode {
+        class HaDeviceModeLightBrightness: public esphome::shys_m5_dial::HaDeviceModePercentage {
             protected:
                 void sendValueToHomeAssistant(int value) override {
                     haApi.turnLightOn(this->device.getEntityId(), value);
                 }
 
-                void showBrightnessMenu(M5DialDisplay& display, uint16_t currentValue){
-                    LovyanGFX* gfx = display.getGfx();
-
-                    uint16_t height = gfx->height();
-                    uint16_t width  = gfx->width();
-
-                    gfx->setTextColor(MAROON);
-                    gfx->setTextDatum(middle_center);
-
-                    gfx->startWrite();                      // Secure SPI bus
-
-                    gfx->fillRect(0, 0, width, this->getDisplayPositionY(currentValue), RED);
-                    gfx->fillRect(0, this->getDisplayPositionY(currentValue), width, height, YELLOW);
-
-                    display.setFontsize(3);
-                    gfx->drawString((String(currentValue) + "%").c_str(),
-                                    width / 2,
-                                    height / 2 - 30);
-                    
-                    display.setFontsize(1);
-                    gfx->drawString(this->device.getName().c_str(),
-                                    width / 2,
-                                    height / 2 + 20);
-                    gfx->drawString("Brightness",
-                                    width / 2,
-                                    height / 2 + 50);  
-
-                    gfx->endWrite();                      // Release SPI bus
-                }
-
             public:
-                HaDeviceModeLightBrightness(HaDevice& device) : HaDeviceMode(device){}
+                HaDeviceModeLightBrightness(HaDevice& device) : HaDeviceModePercentage(device){
+                    this->setLabel("Brightness");
+                    this->setIcon(LIGHT_ON_IMG, 4900);
+                }
 
                 void refreshDisplay(M5DialDisplay& display, bool init) override {
                     ESP_LOGD("DISPLAY", "refresh Display: Helligkeits-Modus");
-                    this->showBrightnessMenu(display, getValue());
+                    this->showPercentageMenu(display);
                 }
 
                 void registerHAListener() override {
-                    std::string attrName = "brightness";
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                attrName, 
+                                optional<std::string>("brightness"), 
                                 [this](const std::string &state) {
                         if(this->isValueModified()){
                             return;

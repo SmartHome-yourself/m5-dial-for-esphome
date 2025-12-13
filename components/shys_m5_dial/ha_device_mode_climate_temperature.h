@@ -8,6 +8,7 @@ namespace esphome
         class HaDeviceModeClimateTemperature: public esphome::shys_m5_dial::HaDeviceModePercentage {
             protected:
                 std::string hvac_mode = "none";
+                std::string hvac_action = "off";  // NEW: Actual heating status
                 float current_temperature = 0.0f;
 
                 std::string getHvacMode(){
@@ -16,6 +17,14 @@ namespace esphome
 
                 void setHvacMode(const std::string& newMode){
                     this->hvac_mode = newMode;
+                }
+
+                std::string getHvacAction(){
+                    return this->hvac_action;
+                }
+
+                void setHvacAction(const std::string& newAction){
+                    this->hvac_action = newAction;
                 }
 
                 float getCurrentTemperature(){
@@ -50,6 +59,7 @@ namespace esphome
                     ESP_LOGI("DISPLAY", ">>> SetPoint (target): %.1f° (scaled: %d)", setpointActual, this->getValue());
                     ESP_LOGI("DISPLAY", ">>> Current temp: %.1f°", this->current_temperature);
                     ESP_LOGI("DISPLAY", ">>> HVAC Mode: '%s'", this->hvac_mode.c_str());
+                    ESP_LOGI("DISPLAY", ">>> HVAC Action: '%s'", this->hvac_action.c_str());
 
                     LovyanGFX* gfx = display.getGfx();
 
@@ -197,61 +207,78 @@ namespace esphome
 
                     gfx->setTextColor(MAROON);  // Reset text color
 
-                    // HVAC Mode Status at bottom with background badge
-                    display.setFontsize(1.0);
-                    String modeLabel;
-                    uint16_t modeColor;
-                    uint16_t modeBgColor;
+                    // CENTER: HVAC Action Status (actual heating state) - PROMINENT
+                    display.setFontsize(1.2);  // Larger font for prominence
+                    String actionLabel;
+                    uint16_t actionColor;
+                    uint16_t actionBgColor;
 
-                    if (strcmp(this->hvac_mode.c_str(), "off") == 0) {
-                        modeLabel = "OFF";
-                        modeColor = WHITE;
-                        modeBgColor = DARKGREY;
-                    } else if (strcmp(this->hvac_mode.c_str(), "heat") == 0) {
-                        modeLabel = "HEAT";
-                        modeColor = WHITE;
-                        modeBgColor = RED;
-                    } else if (strcmp(this->hvac_mode.c_str(), "cool") == 0) {
-                        modeLabel = "COOL";
-                        modeColor = WHITE;
-                        modeBgColor = BLUE;
+                    if (strcmp(this->hvac_action.c_str(), "heating") == 0) {
+                        actionLabel = "Heating";
+                        actionColor = WHITE;
+                        actionBgColor = RED;
+                    } else if (strcmp(this->hvac_action.c_str(), "cooling") == 0) {
+                        actionLabel = "Cooling";
+                        actionColor = WHITE;
+                        actionBgColor = BLUE;
+                    } else if (strcmp(this->hvac_action.c_str(), "idle") == 0) {
+                        actionLabel = "Idle";
+                        actionColor = WHITE;
+                        actionBgColor = ORANGE;
                     } else {
-                        modeLabel = this->hvac_mode.c_str();
-                        modeColor = BLACK;
-                        modeBgColor = ORANGE;
+                        // "off" or other
+                        actionLabel = "Off";
+                        actionColor = WHITE;
+                        actionBgColor = DARKGREY;
                     }
 
-                    // Draw mode badge in center area (icon removed)
-                    int labelWidth = 75;
-                    int labelHeight = 26;
-                    int modeY = height / 2 + 25;  // Lowered to avoid touching circles (was +10)
+                    // Draw action badge in center (prominent)
+                    int actionWidth = 100;  // Wider for longer words like "Heating"
+                    int actionHeight = 30;  // Taller for larger font
+                    int actionY = height / 2 + 28;  // Lowered by ~1/4 of height (was +20)
 
-                    gfx->fillRoundRect(width / 2 - labelWidth/2, modeY - labelHeight/2,
-                                       labelWidth, labelHeight, 5, modeBgColor);
+                    gfx->fillRoundRect(width / 2 - actionWidth/2, actionY - actionHeight/2,
+                                       actionWidth, actionHeight, 5, actionBgColor);
 
-                    gfx->setTextColor(modeColor);
-                    gfx->drawString(modeLabel.c_str(),
+                    gfx->setTextColor(actionColor);
+                    gfx->drawString(actionLabel.c_str(),
                                     width / 2,
-                                    modeY + 2);  // Slightly down for better centering
-                    ESP_LOGI("DISPLAY", ">>> Drew mode: %s at y=%d", modeLabel.c_str(), modeY);
+                                    actionY + 2);
+                    ESP_LOGI("DISPLAY", ">>> Drew action status: %s at y=%d", actionLabel.c_str(), actionY);
 
                     gfx->setTextColor(MAROON);  // Reset text color
 
-                    // Device Name at bottom with full-width background bar
-                    int nameY = height / 2 + 95;  // Moved up (was +105)
-                    int nameWidth = width + 20;   // Wider than screen to create bar effect
-                    int nameHeight = 28;          // Taller for more padding (was 22)
+                    // BOTTOM: Device Name + Mode combined in full-width bar
+                    int nameY = height / 2 + 95;
+                    int nameWidth = width + 20;   // Full-width bar
+                    int nameHeight = 28;
 
-                    // Draw full-width background bar (no rounded corners for bar effect)
+                    // Draw full-width background bar
                     gfx->fillRect(width / 2 - nameWidth/2, nameY - nameHeight/2,
                                   nameWidth, nameHeight, NAVY);
 
+                    // Combine device name with mode in parentheses
+                    String modeText;
+                    if (strcmp(this->hvac_mode.c_str(), "off") == 0) {
+                        modeText = " (OFF)";
+                    } else if (strcmp(this->hvac_mode.c_str(), "heat") == 0) {
+                        modeText = " (Heat)";
+                    } else if (strcmp(this->hvac_mode.c_str(), "cool") == 0) {
+                        modeText = " (Cool)";
+                    } else if (strcmp(this->hvac_mode.c_str(), "auto") == 0) {
+                        modeText = " (Auto)";
+                    } else {
+                        modeText = "";
+                    }
+
+                    String nameAndMode = String(this->device.getName().c_str()) + modeText;
+
                     display.setFontsize(0.9);
                     gfx->setTextColor(WHITE);
-                    gfx->drawString(this->device.getName().c_str(),
+                    gfx->drawString(nameAndMode.c_str(),
                                     width / 2,
-                                    nameY + 2);  // Adjusted for taller box
-                    ESP_LOGI("DISPLAY", ">>> Drew device name: %s at y=%d", this->device.getName().c_str(), nameY);
+                                    nameY + 2);
+                    ESP_LOGI("DISPLAY", ">>> Drew device name + mode: %s at y=%d", nameAndMode.c_str(), nameY);
 
                     gfx->endWrite();                      // Release SPI bus
 
@@ -343,6 +370,24 @@ namespace esphome
                             this->displayRefreshNeeded = true;
                             ESP_LOGI("HA_API", ">>> Set displayRefreshNeeded = true");
                         }
+                    });
+
+                    // Subscribe to hvac_action attribute (actual heating status)
+                    api::global_api_server->subscribe_home_assistant_state(
+                                this->device.getEntityId().c_str(),
+                                optional<std::string>("hvac_action"),
+                                [this](const std::string &state) {
+
+                        ESP_LOGI("HA_API", ">>> HVAC_ACTION callback triggered for %s", this->device.getEntityId().c_str());
+                        ESP_LOGI("HA_API", ">>> Received state (hvac_action attribute): '%s'", state.c_str());
+                        ESP_LOGI("HA_API", ">>> Current stored hvac_action before update: '%s'", this->hvac_action.c_str());
+
+                        this->setHvacAction(state.c_str());
+                        ESP_LOGI("HA_API", ">>> Stored hvac_action after update: '%s'", this->hvac_action.c_str());
+                        ESP_LOGI("HA_API", "Got HVAC Action %s for %s", state.c_str(), this->device.getEntityId().c_str());
+
+                        this->displayRefreshNeeded = true;
+                        ESP_LOGI("HA_API", ">>> Set displayRefreshNeeded = true");
                     });
                 }
 

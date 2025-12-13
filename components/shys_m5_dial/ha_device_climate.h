@@ -23,17 +23,23 @@ namespace esphome
                     if (this->modeConfig["temp_mode"].is<JsonObject>()) {
                         JsonObject temp_mode = this->modeConfig["temp_mode"];
 
-                        if (temp_mode["rotary_step_width"].is<int>()) {
-                            modeTemp->setRotaryStepWidth(temp_mode["rotary_step_width"].as<int>());
+                        if (temp_mode["rotary_step_width"].is<float>()) {
+                            // Keep step as actual value (0.5), scaling happens in raiseCurrentValue/reduceCurrentValue
+                            modeTemp->setRotaryStepWidth(temp_mode["rotary_step_width"].as<float>());
+                        } else if (temp_mode["rotary_step_width"].is<int>()) {
+                            // Keep step as actual value (1), scaling happens in raiseCurrentValue/reduceCurrentValue
+                            modeTemp->setRotaryStepWidth((float)temp_mode["rotary_step_width"].as<int>());
                         }
 
 
                         if (temp_mode["min_temperature"].is<int>()) {
-                            modeTemp->setMinValue(temp_mode["min_temperature"].as<int>());
+                            // Scale min temperature by 10 to support fractional steps
+                            modeTemp->setMinValue(temp_mode["min_temperature"].as<int>() * 10);
                         }
 
                         if (temp_mode["max_temperature"].is<int>()) {
-                            modeTemp->setMaxValue(temp_mode["max_temperature"].as<int>());
+                            // Scale max temperature by 10 to support fractional steps
+                            modeTemp->setMaxValue(temp_mode["max_temperature"].as<int>() * 10);
                         }                        
                     }
 
@@ -43,8 +49,10 @@ namespace esphome
                         modeFan->loadFanModes(this->modeConfig);
                         this->addMode(modeFan);                        
 
-                        if (fan_mode["rotary_step_width"].is<int>()) {
-                            modeFan->setRotaryStepWidth(fan_mode["rotary_step_width"].as<int>());
+                        if (fan_mode["rotary_step_width"].is<float>()) {
+                            modeFan->setRotaryStepWidth(fan_mode["rotary_step_width"].as<float>());
+                        } else if (fan_mode["rotary_step_width"].is<int>()) {
+                            modeFan->setRotaryStepWidth((float)fan_mode["rotary_step_width"].as<int>());
                         }
                     }
                 }

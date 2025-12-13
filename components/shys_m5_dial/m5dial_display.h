@@ -20,7 +20,7 @@ namespace esphome
     {
         class M5DialDisplay {
             protected:
-                uint16_t backgroundColor = YELLOW;
+                uint16_t backgroundColor = BLACK;  // Changed from YELLOW for better contrast
 
                 LovyanGFX* gfx = &M5Dial.Display;
 

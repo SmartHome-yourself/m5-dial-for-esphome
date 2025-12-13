@@ -28,7 +28,7 @@ namespace esphome
     protected:
       int timeToScreenOff = 30000;
       int longPressMs = 1200;
-      int rotaryStepWidth = 10;
+      float rotaryStepWidth = 10.0;
       uint16_t displayRefeshPause = 700;
 
       int apiSendDelay = 1000; // Verzögerung nach Wert-Änderung (um nicht jeden Wert beim drehen des Rades zu senden)
@@ -183,8 +183,8 @@ namespace esphome
           this->apiSendLock = delayInMs;
       }
 
-      void setRotaryStepWidth(int value){
-        ESP_LOGI("DEVICE", "setRotaryStepWidth %i", value);
+      void setRotaryStepWidth(float value){
+        ESP_LOGI("DEVICE", "setRotaryStepWidth %.2f", value);
         this->rotaryStepWidth = value;
       }
 

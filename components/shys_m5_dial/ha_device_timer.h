@@ -21,8 +21,10 @@ namespace esphome
 
                     if (this->modeConfig["timer_mode"].is<JsonObject>()) {
                         JsonObject value = this->modeConfig["timer_mode"];
-                        if (value["rotary_step_width"].is<int>()) {
-                            modeTimer->setRotaryStepWidth(value["rotary_step_width"].as<int>());
+                        if (value["rotary_step_width"].is<float>()) {
+                            modeTimer->setRotaryStepWidth(value["rotary_step_width"].as<float>());
+                        } else if (value["rotary_step_width"].is<int>()) {
+                            modeTimer->setRotaryStepWidth((float)value["rotary_step_width"].as<int>());
                         }                     
                     }
                 }

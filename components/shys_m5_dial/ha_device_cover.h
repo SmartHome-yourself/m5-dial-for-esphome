@@ -21,8 +21,10 @@ namespace esphome
                     if (this->modeConfig["position_mode"].is<JsonObject>()) {
                         JsonObject position_mode = this->modeConfig["position_mode"];
 
-                        if (position_mode["rotary_step_width"].is<int>()) {
-                            modePosition->setRotaryStepWidth(position_mode["rotary_step_width"].as<int>());
+                        if (position_mode["rotary_step_width"].is<float>()) {
+                            modePosition->setRotaryStepWidth(position_mode["rotary_step_width"].as<float>());
+                        } else if (position_mode["rotary_step_width"].is<int>()) {
+                            modePosition->setRotaryStepWidth((float)position_mode["rotary_step_width"].as<int>());
                         }
                     }
                 }

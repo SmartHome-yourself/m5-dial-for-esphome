@@ -21,8 +21,10 @@ namespace esphome
                     if (this->modeConfig["lock_mode"].is<JsonObject>()) {
                         JsonObject lock_mode = this->modeConfig["lock_mode"];
 
-                        if (lock_mode["rotary_step_width"].is<int>()) {
-                            modeLock->setRotaryStepWidth(lock_mode["rotary_step_width"].as<int>());
+                        if (lock_mode["rotary_step_width"].is<float>()) {
+                            modeLock->setRotaryStepWidth(lock_mode["rotary_step_width"].as<float>());
+                        } else if (lock_mode["rotary_step_width"].is<int>()) {
+                            modeLock->setRotaryStepWidth((float)lock_mode["rotary_step_width"].as<int>());
                         }
 
                         if(lock_mode["open_on_button"].is<bool>()){

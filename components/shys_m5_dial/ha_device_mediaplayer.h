@@ -24,15 +24,19 @@ namespace esphome
 
                     if (this->modeConfig["play_mode"].is<JsonObject>()) {
                         JsonObject play_mode = this->modeConfig["play_mode"];
-                        if (play_mode["rotary_step_width"].is<int>()) {
-                            modePlay->setRotaryStepWidth(play_mode["rotary_step_width"].as<int>());
+                        if (play_mode["rotary_step_width"].is<float>()) {
+                            modePlay->setRotaryStepWidth(play_mode["rotary_step_width"].as<float>());
+                        } else if (play_mode["rotary_step_width"].is<int>()) {
+                            modePlay->setRotaryStepWidth((float)play_mode["rotary_step_width"].as<int>());
                         }
                     }
 
                     if (this->modeConfig["source_mode"].is<JsonObject>()) {
                         JsonObject source_mode = this->modeConfig["source_mode"];
-                        if (source_mode["rotary_step_width"].is<int>()) {
-                            modeSource->setRotaryStepWidth(source_mode["rotary_step_width"].as<int>());
+                        if (source_mode["rotary_step_width"].is<float>()) {
+                            modeSource->setRotaryStepWidth(source_mode["rotary_step_width"].as<float>());
+                        } else if (source_mode["rotary_step_width"].is<int>()) {
+                            modeSource->setRotaryStepWidth((float)source_mode["rotary_step_width"].as<int>());
                         }
                     }
                 }

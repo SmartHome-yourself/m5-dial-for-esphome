@@ -12,12 +12,15 @@ namespace esphome
         class HaDevice;
         class HaDeviceMode {
             protected:
+                // Values stored scaled by 10 to support fractional steps (e.g., 215 = 21.5°)
+                static constexpr float VALUE_SCALE = 10.0;
+
                 int value = 0;
                 int minValue = 0;
                 int maxValue = 100;
                 bool minMaxLimitActive = true;
 
-                int rotaryStepWidth = 10;
+                float rotaryStepWidth = 10.0;
 
                 int apiSendDelay = 1000;
                 int apiSendLock = 2000;
@@ -40,11 +43,11 @@ namespace esphome
                 }
 
                 bool isApiCallNeeded(){
-                    if ( esphome::millis() - lastApiCall < apiSendLock ) {
+                    if ( !currentValueModified || esphome::millis() - lastValueUpdate < apiSendDelay ) {
                         return false;
                     }
 
-                    if ( esphome::millis() - lastValueUpdate < apiSendDelay ) {
+                    if ( esphome::millis() - lastApiCall < apiSendLock ) {
                         return false;
                     }
 
@@ -52,32 +55,50 @@ namespace esphome
                 }
 
                 void raiseCurrentValue(){
-                    int newValue = this->getValue() + rotaryStepWidth;
-                    newValue = getNextToRotaryStepwidth(newValue);
+                    // Convert from scaled int to actual float value
+                    float actualValue = this->getValue() / VALUE_SCALE;
+                    float stepScaled = rotaryStepWidth;
 
-                    if(newValue > this->maxValue && minMaxLimitActive){
-                        setValue(endlessRotaryValue?this->minValue:this->maxValue);
+                    // Add step and snap to step boundary
+                    float newActualValue = actualValue + stepScaled;
+                    newActualValue = getNextToRotaryStepwidth(newActualValue);
+
+                    // Convert back to scaled int
+                    int newValue = (int)round(newActualValue * VALUE_SCALE);
+                    int scaledMax = (int)round(this->maxValue);
+
+                    if(newValue > scaledMax && minMaxLimitActive){
+                        setValue(endlessRotaryValue ? this->minValue : this->maxValue);
                     } else {
                         setValue(newValue);
                     }
                 }
 
                 void reduceCurrentValue(){
-                    int newValue = this->getValue() - rotaryStepWidth;
-                    newValue = getNextToRotaryStepwidth(newValue);
+                    // Convert from scaled int to actual float value
+                    float actualValue = this->getValue() / VALUE_SCALE;
+                    float stepScaled = rotaryStepWidth;
 
-                    if(newValue >= this->minValue && minMaxLimitActive){
+                    // Subtract step and snap to step boundary
+                    float newActualValue = actualValue - stepScaled;
+                    newActualValue = getNextToRotaryStepwidth(newActualValue);
+
+                    // Convert back to scaled int
+                    int newValue = (int)round(newActualValue * VALUE_SCALE);
+                    int scaledMin = (int)round(this->minValue);
+
+                    if(newValue >= scaledMin && minMaxLimitActive){
                         setValue(newValue);
                     } else {
-                        setValue(endlessRotaryValue?this->maxValue:this->minValue);
+                        setValue(endlessRotaryValue ? this->maxValue : this->minValue);
                     }
                 }
 
-                int getNextToRotaryStepwidth(int val){
-                    if(rotaryStepWidth > 1){
-                        int rst = (val % rotaryStepWidth);
+                float getNextToRotaryStepwidth(float val){
+                    if(rotaryStepWidth > 0.01){  // Support fractional steps
+                        float rst = fmod(val, rotaryStepWidth);
                         if(rst >= (rotaryStepWidth/2)){
-                            val += rotaryStepWidth-rst;
+                            val += rotaryStepWidth - rst;
                         } else {
                             val -= rst;
                         }
@@ -201,12 +222,16 @@ namespace esphome
 
 
                 void updateHomeAssistantValue(){
-                    if(this->isValueModified() && this->isApiCallNeeded() ) {
-                        lastApiCall = esphome::millis();
-
-                        this->sendValueToHomeAssistant(getValue());
-
-                        currentValueModified = false;
+                    if(this->isValueModified() && (esphome::millis() - this->lastValueUpdate > this->apiSendDelay)) {
+                        if (esphome::millis() - this->lastApiCall > this->apiSendLock) {
+                            this->lastApiCall = esphome::millis();
+                            ESP_LOGI("HA_API", "BEFORE sendValueToHomeAssistant");
+                                                ESP_LOGI("HA_API", "Value from this->getValue() is: %d", this->getValue());
+                            /* ESP_LOGI("HA_API", "Entity ID from getDevice().getEntityId() is: %s", this->getDevice().getEntityId().c_str()); */
+                            this->sendValueToHomeAssistant(this->getValue());
+                            ESP_LOGI("HA_API", "AFTER sendValueToHomeAssistant");
+                            this->currentValueModified = false;
+                        }
                     }
                 }
 
@@ -251,7 +276,7 @@ namespace esphome
                     return this->currentValueModified;
                 }
 
-                void setRotaryStepWidth(int stepWidth){
+                void setRotaryStepWidth(float stepWidth){
                     this->rotaryStepWidth = stepWidth;
                 }
 

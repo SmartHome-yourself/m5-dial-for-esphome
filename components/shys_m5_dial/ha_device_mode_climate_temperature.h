@@ -393,7 +393,44 @@ namespace esphome
 
 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {
-                    return defaultOnTouch(display, x, y);        
+                    ESP_LOGI("HA_API", ">>> onTouch called: x=%d, y=%d", x, y);
+
+                    uint16_t height = display.getGfx()->height();
+                    uint16_t width = display.getGfx()->width();
+
+                    // Calculate action badge bounds (same as in showClimateMenu)
+                    int actionWidth = 100;
+                    int actionHeight = 30;
+                    int actionY = height / 2 + 28;
+
+                    int badgeLeft = width / 2 - actionWidth / 2;
+                    int badgeRight = width / 2 + actionWidth / 2;
+                    int badgeTop = actionY - actionHeight / 2;
+                    int badgeBottom = actionY + actionHeight / 2;
+
+                    // Check if touch is within the action badge area
+                    if (x >= badgeLeft && x <= badgeRight && y >= badgeTop && y <= badgeBottom) {
+                        ESP_LOGI("HA_API", ">>> Touch detected on action badge - toggling mode");
+                        ESP_LOGI("HA_API", ">>> Current hvac_mode: '%s'", this->getHvacMode().c_str());
+
+                        // Toggle climate mode
+                        if(strcmp(this->getHvacMode().c_str(), "off")==0){
+                            ESP_LOGI("HA_API", ">>> Mode IS 'off', calling turnClimateOn");
+                            haApi.turnClimateOn(this->device.getEntityId());
+                        } else {
+                            ESP_LOGI("HA_API", ">>> Mode is '%s' (NOT 'off'), calling turnClimateOff", this->getHvacMode().c_str());
+                            haApi.turnClimateOff(this->device.getEntityId());
+                        }
+
+                        this->displayRefreshNeeded = true;
+                        ESP_LOGI("HA_API", ">>> Set displayRefreshNeeded = true after touch toggle");
+
+                        return true;  // Touch handled
+                    }
+
+                    // Touch outside badge - use default handling (arc adjustment)
+                    ESP_LOGD("HA_API", ">>> Touch outside action badge - using default handler");
+                    return defaultOnTouch(display, x, y);
                 }
 
                 bool onRotary(M5DialDisplay& display, const char * direction) override {

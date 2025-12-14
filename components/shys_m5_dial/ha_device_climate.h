@@ -40,7 +40,41 @@ namespace esphome
                         if (temp_mode["max_temperature"].is<int>()) {
                             // Scale max temperature by 10 to support fractional steps
                             modeTemp->setMaxValue(temp_mode["max_temperature"].as<int>() * 10);
-                        }                        
+                        }
+
+                        // Parse and apply color configuration
+                        if (temp_mode["colors"].is<JsonObject>()) {
+                            JsonObject colors = temp_mode["colors"];
+
+                            ESP_LOGI("HA_DEVICE", "Applying color configuration for climate: %s", this->getEntityId().c_str());
+
+                            modeTemp->setColors(
+                                colors["screen_bg"].as<std::string>(),
+                                colors["arc_base"].as<std::string>(),
+                                colors["arc_heating_active"].as<std::string>(),
+                                colors["arc_heating_idle"].as<std::string>(),
+                                colors["arc_cooling"].as<std::string>(),
+                                colors["arc_rest"].as<std::string>(),
+                                colors["current_temp_bg"].as<std::string>(),
+                                colors["current_temp_outline"].as<std::string>(),
+                                colors["current_temp_text"].as<std::string>(),
+                                colors["setpoint_bg"].as<std::string>(),
+                                colors["setpoint_outline"].as<std::string>(),
+                                colors["setpoint_text"].as<std::string>(),
+                                colors["current_temp_marker"].as<std::string>(),
+                                colors["setpoint_marker"].as<std::string>(),
+                                colors["badge_heating_bg"].as<std::string>(),
+                                colors["badge_cooling_bg"].as<std::string>(),
+                                colors["badge_idle_bg"].as<std::string>(),
+                                colors["badge_off_bg"].as<std::string>(),
+                                colors["badge_heating_text"].as<std::string>(),
+                                colors["badge_cooling_text"].as<std::string>(),
+                                colors["badge_idle_text"].as<std::string>(),
+                                colors["badge_off_text"].as<std::string>(),
+                                colors["bottom_bar_bg"].as<std::string>(),
+                                colors["bottom_bar_text"].as<std::string>()
+                            );
+                        }
                     }
 
                     if (this->modeConfig["fan_mode"].is<JsonObject>()) {

@@ -1,0 +1,132 @@
+# Example Climate Color Configuration
+# This file shows how to customize colors for the M5Dial climate display
+
+shys_m5_dial:
+  name: "M5Dial Control"
+  time_component: homeassistant_time
+  screen_off_time: 60000
+  screensaver: clock
+  display_rotate: 0
+
+  devices:
+    climates:
+      # Example 1: Default colors (no colors section needed)
+      - entity: climate.bedroom_thermostat
+        name: "Bedroom"
+        modes:
+          temp_mode:
+            min_temperature: 15
+            max_temperature: 30
+            rotary_step_width: 0.5
+
+      # Example 2: Custom colors - Warm "Fire" theme
+      - entity: climate.living_room_fireplace
+        name: "Fireplace"
+        modes:
+          temp_mode:
+            min_temperature: 15
+            max_temperature: 30
+            rotary_step_width: 0.5
+
+            colors:
+              # Background
+              screen_bg: "0x1a0a00"           # Dark brown/black
+
+              # Arc colors
+              arc_base: "0x4a2511"            # Dark brown
+              arc_heating_active: "0xFF4500"  # Orange-red (heating)
+              arc_heating_idle: "0xFF8C00"    # Dark orange (idle)
+              arc_cooling: "0x4169E1"         # Royal blue
+              arc_rest: "0xCD853F"            # Peru/tan
+
+              # Current temperature display
+              current_temp_bg: "0x8B4513"     # Saddle brown
+              current_temp_outline: "0xFFD700" # Gold
+              current_temp_text: "0xFFFFE0"   # Light yellow
+
+              # Setpoint display
+              setpoint_bg: "0xFF6347"         # Tomato red
+              setpoint_outline: "0xFFD700"    # Gold
+              setpoint_text: "0xFFFFE0"       # Light yellow
+
+              # Arc marker dots
+              current_temp_marker: "0xFFD700" # Gold
+              setpoint_marker: "0xFF4500"     # Orange-red
+
+              # Action badge
+              badge_heating_bg: "0xFF4500"    # Orange-red
+              badge_cooling_bg: "0x4169E1"    # Royal blue
+              badge_idle_bg: "0xFF8C00"       # Dark orange
+              badge_off_bg: "0x696969"        # Dim gray
+              badge_heating_text: "0xFFFFE0"  # Light yellow
+              badge_cooling_text: "0xFFFFFF"  # White
+              badge_idle_text: "0xFFFFE0"     # Light yellow
+              badge_off_text: "0xC0C0C0"      # Silver
+
+              # Bottom bar
+              bottom_bar_bg: "0x8B4513"       # Saddle brown
+              bottom_bar_text: "0xFFD700"     # Gold
+
+      # Example 3: Custom colors - Cool "Arctic" theme
+      - entity: climate.basement_ac
+        name: "AC"
+        modes:
+          temp_mode:
+            min_temperature: 18
+            max_temperature: 26
+            rotary_step_width: 0.5
+
+            colors:
+              # Background
+              screen_bg: "0x001a33"           # Dark navy blue
+
+              # Arc colors
+              arc_base: "0x003366"            # Dark blue
+              arc_heating_active: "0xFF6B6B"  # Light red (heating)
+              arc_heating_idle: "0xFFB347"    # Light orange (idle)
+              arc_cooling: "0x00BFFF"         # Deep sky blue
+              arc_rest: "0x4682B4"            # Steel blue
+
+              # Current temperature display
+              current_temp_bg: "0x1E90FF"     # Dodger blue
+              current_temp_outline: "0x87CEEB" # Sky blue
+              current_temp_text: "0xF0F8FF"   # Alice blue
+
+              # Setpoint display
+              setpoint_bg: "0x4682B4"         # Steel blue
+              setpoint_outline: "0x87CEEB"    # Sky blue
+              setpoint_text: "0xF0F8FF"       # Alice blue
+
+              # Arc marker dots
+              current_temp_marker: "0xADD8E6" # Light blue
+              setpoint_marker: "0x00CED1"     # Dark turquoise
+
+              # Action badge
+              badge_heating_bg: "0xFF6347"    # Tomato (heating)
+              badge_cooling_bg: "0x00BFFF"    # Deep sky blue
+              badge_idle_bg: "0x4682B4"       # Steel blue
+              badge_off_bg: "0x708090"        # Slate gray
+              badge_heating_text: "0xFFFFFF"  # White
+              badge_cooling_text: "0xFFFFFF"  # White
+              badge_idle_text: "0xF0F8FF"     # Alice blue
+              badge_off_text: "0xD3D3D3"      # Light gray
+
+              # Bottom bar
+              bottom_bar_bg: "0x003366"       # Dark blue
+              bottom_bar_text: "0x87CEEB"     # Sky blue
+
+      # Example 4: Partial customization (only override specific colors)
+      - entity: climate.office_heat
+        name: "Office"
+        modes:
+          temp_mode:
+            min_temperature: 18
+            max_temperature: 25
+            rotary_step_width: 0.5
+
+            colors:
+              # Only customize the background and badge colors
+              # All other colors will use defaults
+              screen_bg: "0x0f0f0f"           # Very dark gray
+              badge_heating_bg: "0xFF1493"    # Deep pink
+              badge_heating_text: "0xFFFFFF"  # White

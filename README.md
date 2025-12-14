@@ -411,8 +411,8 @@ The value set here overrides the general setting and applies only to the color s
 ------
   
 ## **CLIMATES**
-Under "devices - climates" all climate entities are specified.  
-  
+Under "devices - climates" all climate entities are specified.
+
 **Code:**
 ```
 shys_m5_dial:
@@ -422,19 +422,27 @@ shys_m5_dial:
       - entity: climate.my_climate1
         name: Heater
 ```
-    
-**entity**  
-Specifies the Climate Entity ID from Home Assistant to be controlled.  
-  
-**name**  
-The name of the entity displayed on the screen.  
-  
+
+**entity**
+Specifies the Climate Entity ID from Home Assistant to be controlled.
+
+**name**
+The name of the entity displayed on the screen.
+
 ## modes (optional)
 #### temp_mode
-The Temp Mode allows regulating the temperature of the climate entity.  
-Temperature can be controlled both via the rotary encoder and touch.  
-A press on the button turns the heater on/off.  
-  
+The Temp Mode allows regulating the temperature of the climate entity.
+Temperature can be controlled both via the rotary encoder and touch.
+A press on the button or tapping the action status badge toggles the heater on/off.
+
+**Features:**
+- 🌡️ Displays current temperature and target setpoint
+- 🎯 Visual arc showing temperature difference
+- 🔥 Real-time heating/cooling/idle status badge
+- 🎨 **Fully customizable colors** - See [Climate Color Customization](#climate-color-customization)
+- 👆 Touch the status badge to toggle heat/off mode
+- 🔢 Supports fractional temperature steps (e.g., 0.5°)
+
 **Code:**
 ```
 shys_m5_dial:
@@ -445,21 +453,25 @@ shys_m5_dial:
         name: Heater
         modes:
           temp_mode:
-            rotary_step_width: 1
+            rotary_step_width: 0.5
             min_temperature: 4
             max_temperature: 30
 ```
-  
-**rotary_step_width (optional)** *Default: 1*  
-Specifies the general step width by which the value changes per step when using the rotary encoder.  
-For climates, 1 is the default, regardless of what is set as the general standard in the component.  
-*Valid values: 1 - 100*  
-  
-**min_temperature (optional)** *Default: 4*  
-Sets the minimum temperature that can be set for this climate entity on the Dial.  
-  
-**max_temperature (optional)** *Default: 30*  
+
+**rotary_step_width (optional)** *Default: 1*
+Specifies the step width by which the temperature changes per encoder step.
+Supports fractional values for precise control (e.g., 0.5 for half-degree steps).
+*Valid values: 0.1 - 100*
+
+**min_temperature (optional)** *Default: 4*
+Sets the minimum temperature that can be set for this climate entity on the Dial.
+
+**max_temperature (optional)** *Default: 30*
 Sets the maximum temperature that can be set for this climate entity on the Dial.
+
+**colors (optional)**
+Customize all display colors for this climate entity.
+See [Climate Color Customization](#climate-color-customization) for full details.
   
 &nbsp;  
   
@@ -944,9 +956,82 @@ Specifies the entity ID for which the operation via the Dial should be unlocked.
   
 &nbsp;
 
-------  
-------  
-    
+------
+------
+
+# Advanced Features & Customization
+
+## Climate Color Customization
+
+The climate display supports full color customization directly from your YAML configuration - no code changes needed!
+
+### Quick Example
+```yaml
+climates:
+  - entity: climate.fireplace
+    name: "Fireplace"
+    modes:
+      temp_mode:
+        min_temperature: 15
+        max_temperature: 30
+        rotary_step_width: 0.5
+
+        colors:
+          screen_bg: "0x1a0a00"           # Dark brown background
+          arc_heating_active: "0xFF4500"  # Orange-red when heating
+          badge_heating_bg: "0xFF0000"    # Red heating badge
+          bottom_bar_text: "0xFFD700"     # Gold text
+          # ... 24 customizable color parameters
+```
+
+### Available Resources
+
+**📖 Complete Documentation**
+- **[CLIMATE_COLOR_README.md](CLIMATE_COLOR_README.md)** - Full color reference guide
+  - All 24 color parameters explained
+  - Color format and usage
+  - Multiple configuration examples
+  - Troubleshooting guide
+
+**🎨 Pre-made Color Themes**
+- **[WARM_PRESETS.yaml](WARM_PRESETS.yaml)** - 5 warm color themes ready to use
+  - Classic Warm (Fire & Embers)
+  - Warm Vibrant (Bright & Energetic)
+  - Warm Subtle (Soft & Refined)
+  - Warm Luxe (Gold & Elegant)
+  - Warm Sunset (Orange & Amber)
+
+- **[CLIMATE_COLOR_EXAMPLE.yaml](CLIMATE_COLOR_EXAMPLE.yaml)** - More theme examples
+  - Cool/Arctic themes
+  - Partial customization examples
+  - Multiple device configurations
+
+**📝 Quick Start Guide**
+- **[HOW_TO_USE_WARM_PRESETS.md](HOW_TO_USE_WARM_PRESETS.md)** - Step-by-step tutorial
+  - Copy-paste instructions
+  - Preset comparison
+  - Customization tips
+
+### Color Categories
+
+Customize these elements:
+- **Screen Background** - Full display background
+- **Temperature Arc** - Base, heating, cooling, and rest segments
+- **Temperature Displays** - Current temp (LEFT) and setpoint (RIGHT) circles
+- **Arc Markers** - Dots showing current temp and setpoint on the arc
+- **Action Badge** - Center status badge (heating/cooling/idle/off)
+- **Bottom Bar** - Device name and mode display
+
+### Benefits
+✅ **No code changes** - Pure YAML configuration
+✅ **Fully backward compatible** - Works with existing configs
+✅ **Partial customization** - Override only what you want
+✅ **Per-device settings** - Different colors for each climate entity
+✅ **24 parameters** - Complete control over every visual element
+
+------
+------
+
 &nbsp;
-  
-  
+
+

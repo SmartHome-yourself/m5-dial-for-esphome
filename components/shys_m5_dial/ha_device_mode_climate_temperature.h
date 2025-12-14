@@ -11,6 +11,32 @@ namespace esphome
                 std::string hvac_action = "off";  // NEW: Actual heating status
                 float current_temperature = 0.0f;
 
+                // Color configuration with defaults matching original hardcoded values
+                uint16_t color_screen_bg = BLACK;
+                uint16_t color_arc_base = DARKGREY;
+                uint16_t color_arc_heating_active = RED;
+                uint16_t color_arc_heating_idle = ORANGE;
+                uint16_t color_arc_cooling = BLUE;
+                uint16_t color_arc_rest = ORANGE;
+                uint16_t color_current_temp_bg = DARKGREY;
+                uint16_t color_current_temp_outline = WHITE;
+                uint16_t color_current_temp_text = WHITE;
+                uint16_t color_setpoint_bg = ORANGE;
+                uint16_t color_setpoint_outline = WHITE;
+                uint16_t color_setpoint_text = WHITE;
+                uint16_t color_current_temp_marker = WHITE;
+                uint16_t color_setpoint_marker = YELLOW;
+                uint16_t color_badge_heating_bg = RED;
+                uint16_t color_badge_cooling_bg = BLUE;
+                uint16_t color_badge_idle_bg = ORANGE;
+                uint16_t color_badge_off_bg = DARKGREY;
+                uint16_t color_badge_heating_text = WHITE;
+                uint16_t color_badge_cooling_text = WHITE;
+                uint16_t color_badge_idle_text = WHITE;
+                uint16_t color_badge_off_text = WHITE;
+                uint16_t color_bottom_bar_bg = NAVY;
+                uint16_t color_bottom_bar_text = WHITE;
+
                 std::string getHvacMode(){
                     return this->hvac_mode;
                 }
@@ -47,8 +73,76 @@ namespace esphome
                 HaDeviceModeClimateTemperature(HaDevice& device) : HaDeviceModePercentage(device){
                     this->maxValue = 400;  // Scaled by 10 (40°C * 10 = 400)
                     this->setLabel("Temperature");
-                    this->setIcon(FIREPLACE_IMG, 4900);
+                    // Icon removed - not displayed in new layout
                     this->setUnit("°");
+                }
+
+                // Helper function to parse hex color string (e.g., "0xFF0000") to uint16_t RGB565
+                uint16_t parseHexColor(const std::string& hexStr) {
+                    if (hexStr.empty()) return 0;
+
+                    // Remove "0x" prefix if present
+                    std::string hex = hexStr;
+                    if (hex.substr(0, 2) == "0x" || hex.substr(0, 2) == "0X") {
+                        hex = hex.substr(2);
+                    }
+
+                    // Parse as 24-bit RGB
+                    uint32_t rgb24 = std::strtoul(hex.c_str(), nullptr, 16);
+
+                    // Convert RGB888 to RGB565
+                    uint8_t r = (rgb24 >> 16) & 0xFF;
+                    uint8_t g = (rgb24 >> 8) & 0xFF;
+                    uint8_t b = rgb24 & 0xFF;
+
+                    uint16_t rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+
+                    ESP_LOGD("CLIMATE_COLOR", "Parsed color '%s' -> RGB888(r=%d,g=%d,b=%d) -> RGB565(0x%04X)",
+                             hexStr.c_str(), r, g, b, rgb565);
+
+                    return rgb565;
+                }
+
+                // Color setter methods
+                void setColors(const std::string& screen_bg, const std::string& arc_base,
+                              const std::string& arc_heating_active, const std::string& arc_heating_idle,
+                              const std::string& arc_cooling, const std::string& arc_rest,
+                              const std::string& current_temp_bg, const std::string& current_temp_outline,
+                              const std::string& current_temp_text, const std::string& setpoint_bg,
+                              const std::string& setpoint_outline, const std::string& setpoint_text,
+                              const std::string& current_temp_marker, const std::string& setpoint_marker,
+                              const std::string& badge_heating_bg, const std::string& badge_cooling_bg,
+                              const std::string& badge_idle_bg, const std::string& badge_off_bg,
+                              const std::string& badge_heating_text, const std::string& badge_cooling_text,
+                              const std::string& badge_idle_text, const std::string& badge_off_text,
+                              const std::string& bottom_bar_bg, const std::string& bottom_bar_text) {
+
+                    if (!screen_bg.empty()) color_screen_bg = parseHexColor(screen_bg);
+                    if (!arc_base.empty()) color_arc_base = parseHexColor(arc_base);
+                    if (!arc_heating_active.empty()) color_arc_heating_active = parseHexColor(arc_heating_active);
+                    if (!arc_heating_idle.empty()) color_arc_heating_idle = parseHexColor(arc_heating_idle);
+                    if (!arc_cooling.empty()) color_arc_cooling = parseHexColor(arc_cooling);
+                    if (!arc_rest.empty()) color_arc_rest = parseHexColor(arc_rest);
+                    if (!current_temp_bg.empty()) color_current_temp_bg = parseHexColor(current_temp_bg);
+                    if (!current_temp_outline.empty()) color_current_temp_outline = parseHexColor(current_temp_outline);
+                    if (!current_temp_text.empty()) color_current_temp_text = parseHexColor(current_temp_text);
+                    if (!setpoint_bg.empty()) color_setpoint_bg = parseHexColor(setpoint_bg);
+                    if (!setpoint_outline.empty()) color_setpoint_outline = parseHexColor(setpoint_outline);
+                    if (!setpoint_text.empty()) color_setpoint_text = parseHexColor(setpoint_text);
+                    if (!current_temp_marker.empty()) color_current_temp_marker = parseHexColor(current_temp_marker);
+                    if (!setpoint_marker.empty()) color_setpoint_marker = parseHexColor(setpoint_marker);
+                    if (!badge_heating_bg.empty()) color_badge_heating_bg = parseHexColor(badge_heating_bg);
+                    if (!badge_cooling_bg.empty()) color_badge_cooling_bg = parseHexColor(badge_cooling_bg);
+                    if (!badge_idle_bg.empty()) color_badge_idle_bg = parseHexColor(badge_idle_bg);
+                    if (!badge_off_bg.empty()) color_badge_off_bg = parseHexColor(badge_off_bg);
+                    if (!badge_heating_text.empty()) color_badge_heating_text = parseHexColor(badge_heating_text);
+                    if (!badge_cooling_text.empty()) color_badge_cooling_text = parseHexColor(badge_cooling_text);
+                    if (!badge_idle_text.empty()) color_badge_idle_text = parseHexColor(badge_idle_text);
+                    if (!badge_off_text.empty()) color_badge_off_text = parseHexColor(badge_off_text);
+                    if (!bottom_bar_bg.empty()) color_bottom_bar_bg = parseHexColor(bottom_bar_bg);
+                    if (!bottom_bar_text.empty()) color_bottom_bar_text = parseHexColor(bottom_bar_text);
+
+                    ESP_LOGI("CLIMATE_COLOR", "Climate colors configured for entity %s", this->device.getEntityId().c_str());
                 }
 
                 void showClimateMenu(M5DialDisplay& display){
@@ -71,7 +165,7 @@ namespace esphome
 
                     gfx->startWrite();                      // Secure SPI bus
 
-                    display.clear();
+                    display.clear(this->color_screen_bg);
 
                     // Calculate arc positions for setpoint and current temperature
                     // getValue() returns scaled int (e.g., 215 for 21.5°)
@@ -102,21 +196,21 @@ namespace esphome
                         float higherArc = (currentTempOnArc < setpointOnArc) ? setpointOnArc : currentTempOnArc;
 
                         // Base arc (from start to current temp position)
-                        gfx->fillArc(width / 2, height / 2, 115, 100, 150, lowerArc, DARKGREY);
+                        gfx->fillArc(width / 2, height / 2, 115, 100, 150, lowerArc, this->color_arc_base);
 
                         // Gap between current temp and setpoint (highlight the difference)
                         uint16_t gapColor;
                         if (currentTempValue < setpointActual) {  // Compare actual values
                             // Need to heat up
-                            gapColor = isHeating ? RED : ORANGE;
+                            gapColor = isHeating ? this->color_arc_heating_active : this->color_arc_heating_idle;
                         } else {
                             // Room is warmer than setpoint
-                            gapColor = BLUE;
+                            gapColor = this->color_arc_cooling;
                         }
                         gfx->fillArc(width / 2, height / 2, 115, 100, lowerArc, higherArc, gapColor);
 
                         // Rest of arc (from setpoint to end)
-                        gfx->fillArc(width / 2, height / 2, 115, 100, higherArc, 390, ORANGE);
+                        gfx->fillArc(width / 2, height / 2, 115, 100, higherArc, 390, this->color_arc_rest);
 
                         ESP_LOGI("DISPLAY", ">>> Drew arcs - base to %.1f, gap %.1f to %.1f, rest to 390", lowerArc, lowerArc, higherArc);
 
@@ -130,7 +224,7 @@ namespace esphome
                         float currentTempRad = currentTempOnArc * PI / 180.0;
                         int currentX = centerX + arcRadius * cos(currentTempRad);
                         int currentY = centerY + arcRadius * sin(currentTempRad);
-                        gfx->fillCircle(currentX, currentY, 5, WHITE);  // Small white circle
+                        gfx->fillCircle(currentX, currentY, 5, this->color_current_temp_marker);  // Small circle
                         gfx->drawCircle(currentX, currentY, 5, BLACK);  // Black outline
 
                         ESP_LOGI("DISPLAY", ">>> Drew current temp marker at angle %.1f (x=%d, y=%d)", currentTempOnArc, currentX, currentY);
@@ -139,7 +233,7 @@ namespace esphome
                         float setpointRad = setpointOnArc * PI / 180.0;
                         int setpointX = centerX + arcRadius * cos(setpointRad);
                         int setpointY = centerY + arcRadius * sin(setpointRad);
-                        gfx->fillCircle(setpointX, setpointY, 8, YELLOW);  // Larger yellow circle
+                        gfx->fillCircle(setpointX, setpointY, 8, this->color_setpoint_marker);  // Larger circle
                         gfx->drawCircle(setpointX, setpointY, 8, BLACK);   // Black outline
 
                         ESP_LOGI("DISPLAY", ">>> Drew setpoint marker at angle %.1f (x=%d, y=%d)", setpointOnArc, setpointX, setpointY);
@@ -163,13 +257,13 @@ namespace esphome
                     int circleRadius = 35;
 
                     // Current temp background circle
-                    gfx->fillCircle(leftX, tempY, circleRadius, DARKGREY);
-                    gfx->drawCircle(leftX, tempY, circleRadius, WHITE);
-                    gfx->drawCircle(leftX, tempY, circleRadius - 1, WHITE);  // Thicker outline
+                    gfx->fillCircle(leftX, tempY, circleRadius, this->color_current_temp_bg);
+                    gfx->drawCircle(leftX, tempY, circleRadius, this->color_current_temp_outline);
+                    gfx->drawCircle(leftX, tempY, circleRadius - 1, this->color_current_temp_outline);  // Thicker outline
 
                     // Current temp text
                     display.setFontsize(1.1);
-                    gfx->setTextColor(WHITE);
+                    gfx->setTextColor(this->color_current_temp_text);
                     char currentTempBuf[16];
                     snprintf(currentTempBuf, sizeof(currentTempBuf), "%.1f", this->current_temperature);
                     gfx->drawString(currentTempBuf,
@@ -186,13 +280,13 @@ namespace esphome
                     int rightX = width / 2 + 45;  // Closer to center (was +50)
 
                     // Setpoint background circle - different color
-                    gfx->fillCircle(rightX, tempY, circleRadius, ORANGE);
-                    gfx->drawCircle(rightX, tempY, circleRadius, WHITE);
-                    gfx->drawCircle(rightX, tempY, circleRadius - 1, WHITE);  // Thicker outline
+                    gfx->fillCircle(rightX, tempY, circleRadius, this->color_setpoint_bg);
+                    gfx->drawCircle(rightX, tempY, circleRadius, this->color_setpoint_outline);
+                    gfx->drawCircle(rightX, tempY, circleRadius - 1, this->color_setpoint_outline);  // Thicker outline
 
                     // Setpoint text
                     display.setFontsize(1.1);
-                    gfx->setTextColor(WHITE);
+                    gfx->setTextColor(this->color_setpoint_text);
                     char setpointBuf[16];
                     snprintf(setpointBuf, sizeof(setpointBuf), "%.1f", setpointActual);
                     gfx->drawString(setpointBuf,
@@ -215,21 +309,21 @@ namespace esphome
 
                     if (strcmp(this->hvac_action.c_str(), "heating") == 0) {
                         actionLabel = "Heating";
-                        actionColor = WHITE;
-                        actionBgColor = RED;
+                        actionColor = this->color_badge_heating_text;
+                        actionBgColor = this->color_badge_heating_bg;
                     } else if (strcmp(this->hvac_action.c_str(), "cooling") == 0) {
                         actionLabel = "Cooling";
-                        actionColor = WHITE;
-                        actionBgColor = BLUE;
+                        actionColor = this->color_badge_cooling_text;
+                        actionBgColor = this->color_badge_cooling_bg;
                     } else if (strcmp(this->hvac_action.c_str(), "idle") == 0) {
                         actionLabel = "Idle";
-                        actionColor = WHITE;
-                        actionBgColor = ORANGE;
+                        actionColor = this->color_badge_idle_text;
+                        actionBgColor = this->color_badge_idle_bg;
                     } else {
                         // "off" or other
                         actionLabel = "Off";
-                        actionColor = WHITE;
-                        actionBgColor = DARKGREY;
+                        actionColor = this->color_badge_off_text;
+                        actionBgColor = this->color_badge_off_bg;
                     }
 
                     // Draw action badge in center (prominent)
@@ -255,7 +349,7 @@ namespace esphome
 
                     // Draw full-width background bar
                     gfx->fillRect(width / 2 - nameWidth/2, nameY - nameHeight/2,
-                                  nameWidth, nameHeight, NAVY);
+                                  nameWidth, nameHeight, this->color_bottom_bar_bg);
 
                     // Combine device name with mode in parentheses
                     String modeText;
@@ -274,7 +368,7 @@ namespace esphome
                     String nameAndMode = String(this->device.getName().c_str()) + modeText;
 
                     display.setFontsize(0.9);
-                    gfx->setTextColor(WHITE);
+                    gfx->setTextColor(this->color_bottom_bar_text);
                     gfx->drawString(nameAndMode.c_str(),
                                     width / 2,
                                     nameY + 2);

@@ -343,7 +343,7 @@ namespace esphome
                     gfx->setTextColor(MAROON);  // Reset text color
 
                     // BOTTOM: Device Name + Mode combined in full-width bar
-                    int nameY = height / 2 + 95;
+                    int nameY = height / 2 + 78;  // Moved higher by ~60% of bar height
                     int nameWidth = width + 20;   // Full-width bar
                     int nameHeight = 28;
 

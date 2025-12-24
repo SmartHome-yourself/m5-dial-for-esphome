@@ -11,6 +11,10 @@ namespace esphome
                 std::string hvac_action = "off";  // NEW: Actual heating status
                 float current_temperature = 0.0f;
 
+                float valueScale() const override {
+                    return 10.0f;
+                }
+
                 // Color configuration with defaults matching original hardcoded values
                 uint16_t color_screen_bg = BLACK;
                 uint16_t color_arc_base = DARKGREY;

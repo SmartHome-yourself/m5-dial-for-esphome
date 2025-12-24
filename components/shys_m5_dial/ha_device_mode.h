@@ -12,9 +12,6 @@ namespace esphome
         class HaDevice;
         class HaDeviceMode {
             protected:
-                // Values stored scaled by 10 to support fractional steps (e.g., 215 = 21.5°)
-                static constexpr float VALUE_SCALE = 10.0;
-
                 int value = 0;
                 int minValue = 0;
                 int maxValue = 100;
@@ -37,6 +34,10 @@ namespace esphome
                 HaApi haApi;
                 HaDevice& device;
 
+                virtual float valueScale() const {
+                    return 1.0f;
+                }
+
 
                 HaDevice& getDevice() const {
                     return this->device; 
@@ -56,7 +57,7 @@ namespace esphome
 
                 void raiseCurrentValue(){
                     // Convert from scaled int to actual float value
-                    float actualValue = this->getValue() / VALUE_SCALE;
+                    float actualValue = this->getValue() / valueScale();
                     float stepScaled = rotaryStepWidth;
 
                     // Add step and snap to step boundary
@@ -64,7 +65,7 @@ namespace esphome
                     newActualValue = getNextToRotaryStepwidth(newActualValue);
 
                     // Convert back to scaled int
-                    int newValue = (int)round(newActualValue * VALUE_SCALE);
+                    int newValue = (int)round(newActualValue * valueScale());
                     int scaledMax = (int)round(this->maxValue);
 
                     if(newValue > scaledMax && minMaxLimitActive){
@@ -76,7 +77,7 @@ namespace esphome
 
                 void reduceCurrentValue(){
                     // Convert from scaled int to actual float value
-                    float actualValue = this->getValue() / VALUE_SCALE;
+                    float actualValue = this->getValue() / valueScale();
                     float stepScaled = rotaryStepWidth;
 
                     // Subtract step and snap to step boundary
@@ -84,7 +85,7 @@ namespace esphome
                     newActualValue = getNextToRotaryStepwidth(newActualValue);
 
                     // Convert back to scaled int
-                    int newValue = (int)round(newActualValue * VALUE_SCALE);
+                    int newValue = (int)round(newActualValue * valueScale());
                     int scaledMin = (int)round(this->minValue);
 
                     if(newValue >= scaledMin && minMaxLimitActive){
@@ -154,11 +155,12 @@ namespace esphome
                         y = 0;
                     }
 
-                    uint16_t result = this->getValueForYPosition(y);
+                    float result = this->getValueForYPosition(y) / valueScale();
                     result = getNextToRotaryStepwidth(result);
+                    int storedValue = (int)round(result * valueScale());
 
-                    this->setValue(result); 
-                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
+                    this->setValue(storedValue);
+                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", storedValue);
                     
                     return true;                    
                 }
@@ -170,11 +172,12 @@ namespace esphome
 
                     float angle = getAngleFromCoord(display, x, y);
 
-                    uint16_t result = getValueForAnglePercentageArc(angle);
+                    float result = getValueForAnglePercentageArc(angle) / valueScale();
                     result = getNextToRotaryStepwidth(result);
+                    int storedValue = (int)round(result * valueScale());
 
-                    this->setValue(result); 
-                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", result);
+                    this->setValue(storedValue);
+                    ESP_LOGD("TOUCH", "Aktuellen Wert auf %i gesetzt", storedValue);
                     
                     return true;                    
                 }

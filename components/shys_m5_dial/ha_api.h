@@ -114,6 +114,7 @@ namespace esphome
                 void turnClimateOn(const std::string& entity){
                     esphome::api::HomeassistantActionRequest resp;
                     resp.set_service(esphome::StringRef("climate.turn_on"));
+                    resp.data.init(1);
                     auto &kv = resp.data.emplace_back();
                     kv.set_key(esphome::StringRef("entity_id"));
                     kv.value = entity;
@@ -124,6 +125,7 @@ namespace esphome
                 void turnClimateOff(const std::string& entity){
                     esphome::api::HomeassistantActionRequest resp;
                     resp.set_service(esphome::StringRef("climate.turn_off"));
+                    resp.data.init(1);
                     auto &kv = resp.data.emplace_back();
                     kv.set_key(esphome::StringRef("entity_id"));
                     kv.value = entity;
@@ -134,6 +136,7 @@ namespace esphome
                 void setClimateTemperature(const std::string& entity, int value){
                     esphome::api::HomeassistantActionRequest resp;
                     resp.set_service(esphome::StringRef("climate.set_temperature"));
+                    resp.data.init(2);
                     
                     auto &kv1 = resp.data.emplace_back();
                     kv1.set_key(esphome::StringRef("entity_id"));

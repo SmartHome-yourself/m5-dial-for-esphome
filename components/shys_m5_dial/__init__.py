@@ -57,6 +57,7 @@ CONF_DEVICE_CLIMATE_FAN_MODES         = "modes"
 # TEMP-MODE PARAMETER
 CONF_DEVICE_MODE_TEMP_MIN_TEMP        = "min_temperature"
 CONF_DEVICE_MODE_TEMP_MAX_TEMP        = "max_temperature"
+CONF_DEVICE_MODE_TEMP_COLORS          = "colors"
 
 
 # COVER
@@ -122,6 +123,32 @@ DEFAULT_LOCK_ROTARY_STEP_WIDTH         = 1
 DEFAULT_SCREENSAVER                    = "clock"
 DEFAULT_CONF_DISPLAY_ROTATE            = 2
 
+# DEFAULT CLIMATE COLORS (matching current hardcoded values)
+DEFAULT_CLIMATE_SCREEN_BG              = "0x000000"  # BLACK
+DEFAULT_CLIMATE_ARC_BASE               = "0x444444"  # DARKGREY
+DEFAULT_CLIMATE_ARC_HEATING_ACTIVE     = "0xFF0000"  # RED
+DEFAULT_CLIMATE_ARC_HEATING_IDLE       = "0xFFA500"  # ORANGE
+DEFAULT_CLIMATE_ARC_COOLING            = "0x0000FF"  # BLUE
+DEFAULT_CLIMATE_ARC_REST               = "0xFFA500"  # ORANGE
+DEFAULT_CLIMATE_CURRENT_TEMP_BG        = "0x444444"  # DARKGREY
+DEFAULT_CLIMATE_CURRENT_TEMP_OUTLINE   = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_CURRENT_TEMP_TEXT      = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_SETPOINT_BG            = "0xFFA500"  # ORANGE
+DEFAULT_CLIMATE_SETPOINT_OUTLINE       = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_SETPOINT_TEXT          = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_CURRENT_TEMP_MARKER    = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_SETPOINT_MARKER        = "0xFFFF00"  # YELLOW
+DEFAULT_CLIMATE_BADGE_HEATING_BG       = "0xFF0000"  # RED
+DEFAULT_CLIMATE_BADGE_COOLING_BG       = "0x0000FF"  # BLUE
+DEFAULT_CLIMATE_BADGE_IDLE_BG          = "0xFFA500"  # ORANGE
+DEFAULT_CLIMATE_BADGE_OFF_BG           = "0x808080"  # DARKGREY
+DEFAULT_CLIMATE_BADGE_HEATING_TEXT     = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_BADGE_COOLING_TEXT     = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_BADGE_IDLE_TEXT        = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_BADGE_OFF_TEXT         = "0xFFFFFF"  # WHITE
+DEFAULT_CLIMATE_BOTTOM_BAR_BG          = "0x000080"  # NAVY
+DEFAULT_CLIMATE_BOTTOM_BAR_TEXT        = "0xFFFFFF"  # WHITE
+
 
 
 SCREENSAVER = ["off", "clock"]
@@ -142,7 +169,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_LONG_PRESS_DURATION, default=DEFAULT_LONG_PRESS_DURATION): cv.int_range(0, 5000),
     cv.Optional(CONF_SEND_VALUE_DELAY, default=DEFAULT_SEND_VALUE_DELAY): cv.int_range(0, 999999),
     cv.Optional(CONF_SEND_VALUE_LOCK, default=DEFAULT_SEND_VALUE_LOCK): cv.int_range(0, 999999),
-    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_ROTARY_STEP_WIDTH): cv.int_range(0, 100),
+    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0),
     cv.Optional(CONF_FONT, default=DEFAULT_FONT): cv.string,
     cv.Optional(CONF_FONT_FACTOR, default=DEFAULT_FONT_FACTOR): cv.float_range(0.1, 10.0),
     cv.Optional(CONF_DISPLAY_ROTATE, default=DEFAULT_CONF_DISPLAY_ROTATE): cv.int_range(0, 7),
@@ -158,19 +185,19 @@ CONFIG_SCHEMA = cv.Schema({
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_LIGHT_RGB_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100)
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0)
                 })),
 
                 cv.Optional(CONF_DEVICE_LIGHT_DIMM_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0),
                     cv.Optional(CONF_DEVICE_MODE_DIMM_MIN_BRIGHTNESS): cv.int_range(1, 100),
                     cv.Optional(CONF_DEVICE_MODE_DIMM_MAX_BRIGHTNESS): cv.int_range(1, 100)
                 })),
 
                 cv.Optional(CONF_DEVICE_LIGHT_WHITE_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_MODE_ENABLE, default=False): cv.boolean,
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 500.0),
                     cv.Optional(CONF_DEVICE_MODE_WHITE_MIN_KELVIN, default=DEFAULT_WHITE_MIN_KELVIN): cv.int_range(1000, 10000),
                     cv.Optional(CONF_DEVICE_MODE_WHITE_MAX_KELVIN, default=DEFAULT_WHITE_MAX_KELVIN): cv.int_range(1000, 10000)                    
                 }))
@@ -185,14 +212,41 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_CLIMATE_TEMP_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_CLIMATE_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_CLIMATE_ROTARY_STEP_WIDTH): cv.float_range(0.1, 500.0),
                     cv.Optional(CONF_DEVICE_MODE_TEMP_MIN_TEMP, default=DEFAULT_WHITE_MIN_TEMP): cv.int_range(0, 500),
-                    cv.Optional(CONF_DEVICE_MODE_TEMP_MAX_TEMP, default=DEFAULT_WHITE_MAX_TEMP): cv.int_range(0, 500)
+                    cv.Optional(CONF_DEVICE_MODE_TEMP_MAX_TEMP, default=DEFAULT_WHITE_MAX_TEMP): cv.int_range(0, 500),
+
+                    cv.Optional(CONF_DEVICE_MODE_TEMP_COLORS, default=dict()): cv.All(dict({
+                        cv.Optional("screen_bg", default=DEFAULT_CLIMATE_SCREEN_BG): cv.string,
+                        cv.Optional("arc_base", default=DEFAULT_CLIMATE_ARC_BASE): cv.string,
+                        cv.Optional("arc_heating_active", default=DEFAULT_CLIMATE_ARC_HEATING_ACTIVE): cv.string,
+                        cv.Optional("arc_heating_idle", default=DEFAULT_CLIMATE_ARC_HEATING_IDLE): cv.string,
+                        cv.Optional("arc_cooling", default=DEFAULT_CLIMATE_ARC_COOLING): cv.string,
+                        cv.Optional("arc_rest", default=DEFAULT_CLIMATE_ARC_REST): cv.string,
+                        cv.Optional("current_temp_bg", default=DEFAULT_CLIMATE_CURRENT_TEMP_BG): cv.string,
+                        cv.Optional("current_temp_outline", default=DEFAULT_CLIMATE_CURRENT_TEMP_OUTLINE): cv.string,
+                        cv.Optional("current_temp_text", default=DEFAULT_CLIMATE_CURRENT_TEMP_TEXT): cv.string,
+                        cv.Optional("setpoint_bg", default=DEFAULT_CLIMATE_SETPOINT_BG): cv.string,
+                        cv.Optional("setpoint_outline", default=DEFAULT_CLIMATE_SETPOINT_OUTLINE): cv.string,
+                        cv.Optional("setpoint_text", default=DEFAULT_CLIMATE_SETPOINT_TEXT): cv.string,
+                        cv.Optional("current_temp_marker", default=DEFAULT_CLIMATE_CURRENT_TEMP_MARKER): cv.string,
+                        cv.Optional("setpoint_marker", default=DEFAULT_CLIMATE_SETPOINT_MARKER): cv.string,
+                        cv.Optional("badge_heating_bg", default=DEFAULT_CLIMATE_BADGE_HEATING_BG): cv.string,
+                        cv.Optional("badge_cooling_bg", default=DEFAULT_CLIMATE_BADGE_COOLING_BG): cv.string,
+                        cv.Optional("badge_idle_bg", default=DEFAULT_CLIMATE_BADGE_IDLE_BG): cv.string,
+                        cv.Optional("badge_off_bg", default=DEFAULT_CLIMATE_BADGE_OFF_BG): cv.string,
+                        cv.Optional("badge_heating_text", default=DEFAULT_CLIMATE_BADGE_HEATING_TEXT): cv.string,
+                        cv.Optional("badge_cooling_text", default=DEFAULT_CLIMATE_BADGE_COOLING_TEXT): cv.string,
+                        cv.Optional("badge_idle_text", default=DEFAULT_CLIMATE_BADGE_IDLE_TEXT): cv.string,
+                        cv.Optional("badge_off_text", default=DEFAULT_CLIMATE_BADGE_OFF_TEXT): cv.string,
+                        cv.Optional("bottom_bar_bg", default=DEFAULT_CLIMATE_BOTTOM_BAR_BG): cv.string,
+                        cv.Optional("bottom_bar_text", default=DEFAULT_CLIMATE_BOTTOM_BAR_TEXT): cv.string,
+                    }))
                 })),
 
                 cv.Optional(CONF_DEVICE_CLIMATE_FAN_MODE, default=dict()): cv.All(dict({
                     cv.Optional(CONF_DEVICE_CLIMATE_FAN_MODES, default=[]): cv.ensure_list(cv.string),
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=1): cv.int_range(1, 5)                  
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=1): cv.float_range(0.1, 5.0)                  
                 }))
 
             }))
@@ -206,7 +260,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_COVER_POSITION_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 500.0),
                 }))
             }))
         })),
@@ -224,7 +278,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_FAN_SPEED_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0),
                     cv.Optional(CONF_CHANGEABLE_DIRECTION, default=False): cv.boolean
                 }))
             }))
@@ -237,11 +291,11 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_MEDIA_PLAYER_PLAY_MODE , default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 100)
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0)
                 })),
 
                 cv.Optional(CONF_DEVICE_MEDIA_PLAYER_SOURCE_MODE , default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_MEDIA_PLAYER_ROTARY_STEP_WIDTH): cv.int_range(1, 100),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_MEDIA_PLAYER_ROTARY_STEP_WIDTH): cv.float_range(0.1, 100.0),
                     cv.Optional(CONF_MEDIA_PLAYER_SOURCES, default=[]): cv.ensure_list(dict({
                         cv.Required(CONF_NAME): cv.string,
                         cv.Required(CONF_CONTENT_ID): cv.string,
@@ -258,7 +312,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_LOCK_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_LOCK_ROTARY_STEP_WIDTH): cv.int_range(1, 2),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH, default=DEFAULT_LOCK_ROTARY_STEP_WIDTH): cv.float_range(0.1, 2.0),
                     cv.Optional(CONF_DEVICE_LOCK_OPEN_ON_BUTTON, default=False): cv.boolean
                 }))
             }))
@@ -271,7 +325,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_NUMBER_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 500.0),
                     cv.Optional(CONF_DEVICE_NUMBER_UNIT): cv.string,
                 }))
             }))
@@ -284,7 +338,7 @@ CONFIG_SCHEMA = cv.Schema({
 
             cv.Optional(CONF_DEVICE_MODES, default=dict()): cv.All(dict({
                 cv.Optional(CONF_DEVICE_TIMER_MODE, default=dict()): cv.All(dict({
-                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.int_range(1, 500),
+                    cv.Optional(CONF_ROTARY_STEP_WIDTH): cv.float_range(0.1, 500.0),
                 }))
             }))
         })),

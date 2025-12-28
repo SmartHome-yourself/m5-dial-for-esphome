@@ -27,7 +27,7 @@ namespace esphome
                 int apiSendDelay = 1000;
                 int apiSendLock = 2000;
 
-                int rotaryStepWidth = 10;
+                float rotaryStepWidth = 10.0;
 
                 bool modeChanged = true;
 
@@ -103,10 +103,10 @@ namespace esphome
                     return getCurrentMode()->getMaxValue();
                 }
 
-                void setRotaryStepWidth(int stepWidth){
+                void setRotaryStepWidth(float stepWidth){
                     this->rotaryStepWidth = stepWidth;
                 }
-                int getRotaryStepWidth(){
+                float getRotaryStepWidth(){
                     return this->rotaryStepWidth;
                 }
                 

@@ -21,8 +21,10 @@ namespace esphome
                     if (this->modeConfig["value_mode"].is<JsonObject>()) {
                         JsonObject value = this->modeConfig["value_mode"];
 
-                        if (value["rotary_step_width"].is<int>()) {
-                            modeValue->setRotaryStepWidth(value["rotary_step_width"].as<int>());
+                        if (value["rotary_step_width"].is<float>()) {
+                            modeValue->setRotaryStepWidth(value["rotary_step_width"].as<float>());
+                        } else if (value["rotary_step_width"].is<int>()) {
+                            modeValue->setRotaryStepWidth((float)value["rotary_step_width"].as<int>());
                         }
                         if (value["unit"].is<std::string>()) {
                             modeValue->setUnit(value["unit"]);

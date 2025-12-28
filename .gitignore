@@ -1,0 +1,25 @@
+# Gitignore settings for ESPHome
+# This is an example and may include too much for your use-case.
+# You can modify this file to suit your needs.
+/.esphome/
+/secrets.yaml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Backup files
+*.backup
+*.before_fractional
+
+# Temporary/working files
+fireplace_icon.h
+d1
+d2
+d3
+*.diff
+*.last
+*.no_crash
+convert_fireplace_icon.py
+fireplace_icon_formatted.txt

@@ -1,0 +1,266 @@
+# WARM COLOR PRESETS FOR CLIMATE DISPLAY
+# Copy and paste the configuration you want into your esphome-web-ee4b7c.yaml
+
+# ========================================================================
+# PRESET 1: CLASSIC WARM (Fire & Embers)
+# Perfect for: Fireplaces, wood stoves, radiant heating
+# ========================================================================
+
+- entity: climate.basement_fireplacecontrol_basement_fireplace
+  name: "Fireplace"
+  modes:
+    temp_mode:
+      min_temperature: 15
+      max_temperature: 30
+      rotary_step_width: 0.5
+
+      colors:
+        # Background
+        screen_bg: "0x1a0a00"              # Very dark brown/black
+
+        # Temperature Arc
+        arc_base: "0x4a2511"               # Dark chocolate brown
+        arc_heating_active: "0xFF4500"     # Bright orange-red (flames)
+        arc_heating_idle: "0xD2691E"       # Chocolate orange (embers)
+        arc_cooling: "0x8B4513"            # Saddle brown
+        arc_rest: "0xCD853F"               # Peru/tan
+
+        # Current Temperature (LEFT)
+        current_temp_bg: "0x5C3317"        # Dark brown
+        current_temp_outline: "0xFFD700"   # Gold
+        current_temp_text: "0xFFF8DC"      # Cornsilk
+
+        # Setpoint (RIGHT)
+        setpoint_bg: "0xD2691E"            # Chocolate orange
+        setpoint_outline: "0xFFD700"       # Gold
+        setpoint_text: "0xFFF8DC"          # Cornsilk
+
+        # Arc Markers
+        current_temp_marker: "0xFFA500"    # Orange
+        setpoint_marker: "0xFF6347"        # Tomato red
+
+        # Action Badge
+        badge_heating_bg: "0xFF4500"       # Orange-red
+        badge_heating_text: "0xFFFAF0"     # Floral white
+        badge_cooling_bg: "0x8B4513"       # Saddle brown
+        badge_cooling_text: "0xF5DEB3"     # Wheat
+        badge_idle_bg: "0xD2691E"          # Chocolate orange
+        badge_idle_text: "0xFFF8DC"        # Cornsilk
+        badge_off_bg: "0x3E2723"           # Very dark brown
+        badge_off_text: "0xA0826D"         # Muted tan
+
+        # Bottom Bar
+        bottom_bar_bg: "0x4a2511"          # Dark chocolate
+        bottom_bar_text: "0xFFD700"        # Gold
+
+
+# ========================================================================
+# PRESET 2: WARM VIBRANT (Brighter & More Energetic)
+# Perfect for: Modern heating systems, high-visibility preference
+# ========================================================================
+
+- entity: climate.basement_fireplacecontrol_basement_fireplace
+  name: "Fireplace"
+  modes:
+    temp_mode:
+      min_temperature: 15
+      max_temperature: 30
+      rotary_step_width: 0.5
+
+      colors:
+        # Background
+        screen_bg: "0x2d1b00"              # Lighter dark brown (more visible)
+
+        # Temperature Arc
+        arc_base: "0x5C4033"               # Medium brown
+        arc_heating_active: "0xFF6347"     # Tomato (vibrant but not harsh)
+        arc_heating_idle: "0xFF8C00"       # Dark orange
+        arc_cooling: "0xA0522D"            # Sienna
+        arc_rest: "0xD2B48C"               # Tan
+
+        # Current Temperature (LEFT)
+        current_temp_bg: "0x704214"        # Rich brown
+        current_temp_outline: "0xFFA500"   # Bright orange
+        current_temp_text: "0xFFFFE0"      # Light yellow
+
+        # Setpoint (RIGHT)
+        setpoint_bg: "0xFF8C00"            # Dark orange
+        setpoint_outline: "0xFFA500"       # Bright orange
+        setpoint_text: "0xFFFFE0"          # Light yellow
+
+        # Arc Markers
+        current_temp_marker: "0xFFD700"    # Gold (high visibility)
+        setpoint_marker: "0xFF4500"        # Orange-red (bright)
+
+        # Action Badge
+        badge_heating_bg: "0xFF6347"       # Tomato
+        badge_heating_text: "0xFFFFFF"     # Pure white
+        badge_cooling_bg: "0xA0522D"       # Sienna
+        badge_cooling_text: "0xFFFFE0"     # Light yellow
+        badge_idle_bg: "0xFF8C00"          # Dark orange
+        badge_idle_text: "0xFFFFFF"        # Pure white
+        badge_off_bg: "0x4a3728"           # Medium dark brown
+        badge_off_text: "0xBDB76B"         # Dark khaki
+
+        # Bottom Bar
+        bottom_bar_bg: "0x5C4033"          # Medium brown
+        bottom_bar_text: "0xFFA500"        # Bright orange
+
+
+# ========================================================================
+# PRESET 3: WARM SUBTLE (Softer & More Refined)
+# Perfect for: Bedrooms, living rooms, calming atmosphere
+# ========================================================================
+
+- entity: climate.basement_fireplacecontrol_basement_fireplace
+  name: "Fireplace"
+  modes:
+    temp_mode:
+      min_temperature: 15
+      max_temperature: 30
+      rotary_step_width: 0.5
+
+      colors:
+        # Background
+        screen_bg: "0x000000"              # Pure black (maximum contrast)
+
+        # Temperature Arc
+        arc_base: "0x3E2723"               # Very dark brown
+        arc_heating_active: "0xE97451"     # Burnt sienna (softer)
+        arc_heating_idle: "0xCC7722"       # Ochre
+        arc_cooling: "0x8B7355"            # Burlywood dark
+        arc_rest: "0xC19A6B"               # Camel
+
+        # Current Temperature (LEFT)
+        current_temp_bg: "0x4E3629"        # Dark walnut
+        current_temp_outline: "0xDAA520"   # Goldenrod
+        current_temp_text: "0xFAF0E6"      # Linen (soft white)
+
+        # Setpoint (RIGHT)
+        setpoint_bg: "0xCC7722"            # Ochre
+        setpoint_outline: "0xDAA520"       # Goldenrod
+        setpoint_text: "0xFAF0E6"          # Linen
+
+        # Arc Markers
+        current_temp_marker: "0xF4A460"    # Sandy brown
+        setpoint_marker: "0xE97451"        # Burnt sienna
+
+        # Action Badge
+        badge_heating_bg: "0xCD5C5C"       # Indian red (softer than bright red)
+        badge_heating_text: "0xFFF5EE"     # Seashell
+        badge_cooling_bg: "0x8B7355"       # Burlywood dark
+        badge_cooling_text: "0xF5DEB3"     # Wheat
+        badge_idle_bg: "0xCC7722"          # Ochre
+        badge_idle_text: "0xFFFAF0"        # Floral white
+        badge_off_bg: "0x2F1F1F"           # Almost black brown
+        badge_off_text: "0x9E9E9E"         # Grey (subtle)
+
+        # Bottom Bar
+        bottom_bar_bg: "0x3E2723"          # Very dark brown
+        bottom_bar_text: "0xDAA520"        # Goldenrod
+
+
+# ========================================================================
+# PRESET 4: WARM LUXE (Gold Accents & Rich Browns)
+# Perfect for: Premium feel, elegant displays
+# ========================================================================
+
+- entity: climate.basement_fireplacecontrol_basement_fireplace
+  name: "Fireplace"
+  modes:
+    temp_mode:
+      min_temperature: 15
+      max_temperature: 30
+      rotary_step_width: 0.5
+
+      colors:
+        # Background
+        screen_bg: "0x1a0a00"              # Very dark brown
+
+        # Temperature Arc
+        arc_base: "0x4a2511"               # Dark chocolate
+        arc_heating_active: "0xFF6347"     # Tomato
+        arc_heating_idle: "0xD2691E"       # Chocolate orange
+        arc_cooling: "0x8B4513"            # Saddle brown
+        arc_rest: "0xB8860B"               # Dark goldenrod (more gold)
+
+        # Current Temperature (LEFT)
+        current_temp_bg: "0x5C3317"        # Dark brown
+        current_temp_outline: "0xFFD700"   # Gold
+        current_temp_text: "0xFFFAF0"      # Floral white
+
+        # Setpoint (RIGHT)
+        setpoint_bg: "0xB8860B"            # Dark goldenrod
+        setpoint_outline: "0xFFD700"       # Gold
+        setpoint_text: "0xFFFAF0"          # Floral white
+
+        # Arc Markers
+        current_temp_marker: "0xDAA520"    # Goldenrod
+        setpoint_marker: "0xFFD700"        # Pure gold
+
+        # Action Badge
+        badge_heating_bg: "0xFF6347"       # Tomato
+        badge_heating_text: "0xFFFFFF"     # Pure white
+        badge_cooling_bg: "0x8B4513"       # Saddle brown
+        badge_cooling_text: "0xFFD700"     # Gold
+        badge_idle_bg: "0xB8860B"          # Dark goldenrod
+        badge_idle_text: "0xFFFAF0"        # Floral white
+        badge_off_bg: "0x3E2723"           # Very dark brown
+        badge_off_text: "0xB8860B"         # Dark goldenrod (gold even when off)
+
+        # Bottom Bar
+        bottom_bar_bg: "0x4a2511"          # Dark chocolate
+        bottom_bar_text: "0xFFD700"        # Pure gold
+
+
+# ========================================================================
+# PRESET 5: WARM SUNSET (Orange & Amber Tones)
+# Perfect for: Evening ambiance, cozy atmosphere
+# ========================================================================
+
+- entity: climate.basement_fireplacecontrol_basement_fireplace
+  name: "Fireplace"
+  modes:
+    temp_mode:
+      min_temperature: 15
+      max_temperature: 30
+      rotary_step_width: 0.5
+
+      colors:
+        # Background
+        screen_bg: "0x0f0500"              # Nearly black with brown tint
+
+        # Temperature Arc
+        arc_base: "0x5E2612"               # Dark reddish brown
+        arc_heating_active: "0xFF8C00"     # Dark orange (sunset)
+        arc_heating_idle: "0xFFAE42"       # Yellow orange
+        arc_cooling: "0xA0522D"            # Sienna
+        arc_rest: "0xFFB347"               # Pastel orange
+
+        # Current Temperature (LEFT)
+        current_temp_bg: "0x7B3F00"        # Chocolate (traditional)
+        current_temp_outline: "0xFFB347"   # Pastel orange
+        current_temp_text: "0xFFF8E7"      # Cosmic latte
+
+        # Setpoint (RIGHT)
+        setpoint_bg: "0xFF8C00"            # Dark orange
+        setpoint_outline: "0xFFB347"       # Pastel orange
+        setpoint_text: "0xFFF8E7"          # Cosmic latte
+
+        # Arc Markers
+        current_temp_marker: "0xFFB347"    # Pastel orange
+        setpoint_marker: "0xFF6700"        # Blaze orange
+
+        # Action Badge
+        badge_heating_bg: "0xFF8C00"       # Dark orange
+        badge_heating_text: "0xFFFAF0"     # Floral white
+        badge_cooling_bg: "0xA0522D"       # Sienna
+        badge_cooling_text: "0xFFE4B5"     # Moccasin
+        badge_idle_bg: "0xFFAE42"          # Yellow orange
+        badge_idle_text: "0x3E2723"        # Dark brown text (contrast)
+        badge_off_bg: "0x3E2723"           # Very dark brown
+        badge_off_text: "0xA0826D"         # Muted tan
+
+        # Bottom Bar
+        bottom_bar_bg: "0x5E2612"          # Dark reddish brown
+        bottom_bar_text: "0xFFB347"        # Pastel orange

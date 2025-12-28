@@ -44,12 +44,17 @@ namespace esphome
                     }
 
                     if(brightnessModeActive){
-                        ESP_LOGD("HA_DEVICE", "Dimm-Mode enabled (steps: %i)", dimm_mode["rotary_step_width"].as<int>());
-                        
+                        float stepWidth = dimm_mode["rotary_step_width"].is<float>() ?
+                                          dimm_mode["rotary_step_width"].as<float>() :
+                                          (float)dimm_mode["rotary_step_width"].as<int>();
+                        ESP_LOGD("HA_DEVICE", "Dimm-Mode enabled (steps: %.2f)", stepWidth);
+
                         this->addMode(modeBrightness);
 
-                        if (dimm_mode["rotary_step_width"].is<int>()) {
-                            modeBrightness->setRotaryStepWidth(dimm_mode["rotary_step_width"].as<int>());
+                        if (dimm_mode["rotary_step_width"].is<float>()) {
+                            modeBrightness->setRotaryStepWidth(dimm_mode["rotary_step_width"].as<float>());
+                        } else if (dimm_mode["rotary_step_width"].is<int>()) {
+                            modeBrightness->setRotaryStepWidth((float)dimm_mode["rotary_step_width"].as<int>());
                         }
 
                         if (dimm_mode["min_brightness"].is<int>()) {
@@ -69,12 +74,17 @@ namespace esphome
                         JsonObject rgb_mode = this->modeConfig["rgb_mode"];
 
                         if (rgb_mode["enable"].is<bool>() && rgb_mode["enable"].as<bool>()) {
-                            ESP_LOGD("HA_DEVICE", "Color-Mode enabled (steps: %i)", rgb_mode["rotary_step_width"].as<int>());
+                            float stepWidth = rgb_mode["rotary_step_width"].is<float>() ?
+                                              rgb_mode["rotary_step_width"].as<float>() :
+                                              (float)rgb_mode["rotary_step_width"].as<int>();
+                            ESP_LOGD("HA_DEVICE", "Color-Mode enabled (steps: %.2f)", stepWidth);
 
                             this->addMode(modeColor);
 
-                            if (rgb_mode["rotary_step_width"].is<int>()) {
-                                modeColor->setRotaryStepWidth(rgb_mode["rotary_step_width"].as<int>());
+                            if (rgb_mode["rotary_step_width"].is<float>()) {
+                                modeColor->setRotaryStepWidth(rgb_mode["rotary_step_width"].as<float>());
+                            } else if (rgb_mode["rotary_step_width"].is<int>()) {
+                                modeColor->setRotaryStepWidth((float)rgb_mode["rotary_step_width"].as<int>());
                             }
                         }
                     }
@@ -85,12 +95,17 @@ namespace esphome
 
                         if (white_mode["enable"].is<bool>() && white_mode["enable"].as<bool>()) {
                             whiteModeActive = true;
-                            ESP_LOGD("HA_DEVICE", "White-Mode enabled (steps: %i)", white_mode["rotary_step_width"].as<int>());
+                            float stepWidth = white_mode["rotary_step_width"].is<float>() ?
+                                              white_mode["rotary_step_width"].as<float>() :
+                                              (float)white_mode["rotary_step_width"].as<int>();
+                            ESP_LOGD("HA_DEVICE", "White-Mode enabled (steps: %.2f)", stepWidth);
 
-                            this->addMode(modeTunableWhite);                            
+                            this->addMode(modeTunableWhite);
 
-                            if (white_mode["rotary_step_width"].is<int>()) {
-                                modeTunableWhite->setRotaryStepWidth(white_mode["rotary_step_width"].as<int>());
+                            if (white_mode["rotary_step_width"].is<float>()) {
+                                modeTunableWhite->setRotaryStepWidth(white_mode["rotary_step_width"].as<float>());
+                            } else if (white_mode["rotary_step_width"].is<int>()) {
+                                modeTunableWhite->setRotaryStepWidth((float)white_mode["rotary_step_width"].as<int>());
                             }
                             if (white_mode["min_kelvin"].is<int>()) {
                                 modeTunableWhite->setMinValue(white_mode["min_kelvin"].as<int>());

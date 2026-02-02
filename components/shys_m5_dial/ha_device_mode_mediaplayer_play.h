@@ -140,9 +140,9 @@ namespace esphome
 
                 void registerHAListener() override {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("volume_level"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("volume_level")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -164,9 +164,9 @@ namespace esphome
 
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -179,9 +179,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("media_title"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("media_title")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -194,9 +194,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("media_artist"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("media_artist")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -209,9 +209,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("media_album_name"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("media_album_name")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -224,9 +224,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("media_duration"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("media_duration")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -243,9 +243,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("media_position"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("media_position")), 
+                                [this](const esphome::StringRef state) {
                         
                         if(this->isValueModified()){
                             return;

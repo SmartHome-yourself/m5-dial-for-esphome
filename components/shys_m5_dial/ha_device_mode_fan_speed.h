@@ -153,9 +153,9 @@ namespace esphome
 
                 void registerHAListener() override {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -165,13 +165,13 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>("percentage"), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
-                        auto val = parse_number<int>(state);
+                        auto val = parse_number<int>(state.str());
                         if (!val.has_value()) {
                             this->setReceivedValue(0);
                             ESP_LOGD("HA_API", "No Percentage value in %s for %s", state.c_str(), this->device.getEntityId().c_str());
@@ -183,9 +183,9 @@ namespace esphome
 
                     if(this->changeableDirection){
                         api::global_api_server->subscribe_home_assistant_state(
-                                    this->device.getEntityId().c_str(),
+                                    this->device.getEntityId(),
                                     optional<std::string>("direction"), 
-                                    [this](const std::string &state) {
+                                    [this](const esphome::StringRef state) {
                             if(this->isValueModified()){
                                 return;
                             }

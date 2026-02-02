@@ -23,13 +23,13 @@ namespace esphome
 
                 void registerHAListener() override {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("brightness"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("brightness")), 
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
-                        auto val = parse_number<int>(state);
+                        auto val = parse_number<int>(state.str());
                         if (!val.has_value()) {
                             this->setReceivedValue(0);
                             ESP_LOGD("HA_API", "No Brightness value in %s for %s", state.c_str(), this->device.getEntityId().c_str());

@@ -152,19 +152,19 @@ namespace esphome
                 void registerHAListener() override {
                     std::string attrName = "hs_color";
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>(attrName), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
                                 
                         if(this->isValueModified()){
                             return;
                         }
 
                         std::string colorString = "";          
-                        std::string::size_type pos = state.find(',');
+                        std::string::size_type pos = state.str().find(',');
                         
                         if (pos != std::string::npos) {
-                            colorString = state.substr(1, pos-1);
+                            colorString = state.str().substr(1, pos-1);
                         }
                         ESP_LOGD("HA_API", "HS_Color value %s for %s", colorString.c_str(), this->device.getEntityId().c_str());
 

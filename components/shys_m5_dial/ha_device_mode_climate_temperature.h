@@ -36,9 +36,9 @@ namespace esphome
 
                 void registerHAListener() override {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
 
                         if(this->isValueModified()){
                             return;
@@ -49,15 +49,15 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("temperature"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("temperature")), 
+                                [this](const esphome::StringRef state) {
 
                         if(this->isValueModified()){
                             return;
                         }
 
-                        auto val = parse_number<float>(state);
+                        auto val = parse_number<float>(state.str());
 
                         if (!val.has_value()) {
                             this->setReceivedValue(0);

@@ -192,9 +192,9 @@ namespace esphome
 
                 void registerHAListener() override {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("color_temp_kelvin"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("color_temp_kelvin")), 
+                                [this](const esphome::StringRef state) {
 
                         if(this->isValueModified()){
                             return;

@@ -145,9 +145,9 @@ namespace esphome
 
                 void registerHAListener() {
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
+                                this->device.getEntityId(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -168,9 +168,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("duration"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("duration")), 
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -182,9 +182,9 @@ namespace esphome
                     });
 
                     api::global_api_server->subscribe_home_assistant_state(
-                                this->device.getEntityId().c_str(),
-                                optional<std::string>("remaining"), 
-                                [this](const std::string &state) {
+                                this->device.getEntityId(),
+                                optional<std::string>(std::string("remaining")), 
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -197,8 +197,8 @@ namespace esphome
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
-                                optional<std::string>("finishes_at"), 
-                                [this](const std::string &state) {
+                                optional<std::string>(std::string("finishes_at")), 
+                                [this](const esphome::StringRef state) {
                         if(this->isValueModified()){
                             return;
                         }

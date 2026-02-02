@@ -85,12 +85,12 @@ namespace esphome
                     if (modeConfig["fan_mode"].is<JsonObject>() && !manualModes) {
                         api::global_api_server->subscribe_home_assistant_state(
                                     this->device.getEntityId().c_str(),
-                                    optional<std::string>("fan_modes"), 
-                                    [this](const std::string &state) {
+                                    optional<std::string>(std::string("fan_modes")), 
+                                    [this](const esphome::StringRef state) {
 
                             ESP_LOGI("HA_API", "Got Climate Fan-Mode %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
-                            std::string str = state;
+                            std::string str = state.str();
                             str.erase(std::remove(str.begin(), str.end(), '['), str.end());
                             str.erase(std::remove(str.begin(), str.end(), ']'), str.end());
                             str.erase(std::remove(str.begin(), str.end(), '\''), str.end());

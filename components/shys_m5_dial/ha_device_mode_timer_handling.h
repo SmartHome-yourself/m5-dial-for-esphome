@@ -147,7 +147,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -165,12 +165,12 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got state %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
                         this->displayRefreshNeeded = true;
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("duration"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -179,12 +179,12 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got duration %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
                         this->displayRefreshNeeded = true;
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("remaining"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -193,12 +193,12 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got remaining %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
                         this->displayRefreshNeeded = true;
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("finishes_at"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -207,7 +207,7 @@ namespace esphome
                         ESP_LOGI("HA_API", "Got finish-time %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
                         this->displayRefreshNeeded = true;
-                    });
+                    }));
                 };
 
 

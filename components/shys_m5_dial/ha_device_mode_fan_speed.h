@@ -155,19 +155,19 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
 
                         this->setState(state);
                         ESP_LOGI("HA_API", "Got State %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("percentage"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -179,20 +179,20 @@ namespace esphome
                             this->setReceivedValue(round((int)val.value()));
                             ESP_LOGI("HA_API", "Got Percentage value %i for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
 
                     if(this->changeableDirection){
                         api::global_api_server->subscribe_home_assistant_state(
                                     this->device.getEntityId().c_str(),
                                     optional<std::string>("direction"), 
-                                    [this](const std::string &state) {
+                                    std::function<void(const std::string&)>([this](const std::string &state) {
                             if(this->isValueModified()){
                                 return;
                             }
 
                             setDirection(state.c_str());
                             ESP_LOGI("HA_API", "Got direction value %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
                     }
                 }
 

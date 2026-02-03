@@ -86,7 +86,7 @@ namespace esphome
                         api::global_api_server->subscribe_home_assistant_state(
                                     this->device.getEntityId().c_str(),
                                     optional<std::string>("fan_modes"), 
-                                    [this](const std::string &state) {
+                                    std::function<void(const std::string&)>([this](const std::string &state) {
 
                             ESP_LOGI("HA_API", "Got Climate Fan-Mode %s for %s", state.c_str(), this->device.getEntityId().c_str());
 
@@ -107,7 +107,7 @@ namespace esphome
 
                             this->fanModes = result;
                             this->setMaxValue(i-1);
-                        });
+                        }));
                     }
                 }
 

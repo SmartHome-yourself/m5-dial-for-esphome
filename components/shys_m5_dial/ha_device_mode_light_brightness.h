@@ -25,7 +25,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("brightness"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -37,7 +37,7 @@ namespace esphome
                             this->setReceivedValue(round((float)val.value()*100/255));
                             ESP_LOGI("HA_API", "Got Brightness value %i for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
                 }
 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {

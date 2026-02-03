@@ -57,7 +57,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                                     
                         if(this->isValueModified()){
                             return;
@@ -67,7 +67,7 @@ namespace esphome
 
                         this->setReceivedValue(newState);
                         ESP_LOGI("HA_API", "Got value %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
                 }
 
                 bool onTouch(M5DialDisplay& display, uint16_t x, uint16_t y) override {

@@ -22,7 +22,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -34,12 +34,12 @@ namespace esphome
                             this->setReceivedValue(val.value());
                             ESP_LOGI("HA_API", "Got value %f for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("min"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -51,12 +51,12 @@ namespace esphome
                             this->setMinValue(val.value());
                             ESP_LOGI("HA_API", "Got min-value %f for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
                     
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("max"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -68,7 +68,7 @@ namespace esphome
                             this->setMaxValue(val.value());
                             ESP_LOGI("HA_API", "Got max-value %f for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });                    
+                    }));                    
                 };
 
                 bool onButton(M5DialDisplay& display, const char * clickType) override {

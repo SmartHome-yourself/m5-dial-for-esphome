@@ -38,7 +38,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
 
                         if(this->isValueModified()){
                             return;
@@ -46,12 +46,12 @@ namespace esphome
 
                         this->setHvacMode(state.c_str());
                         ESP_LOGI("HA_API", "Got Mode %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("temperature"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
 
                         if(this->isValueModified()){
                             return;
@@ -66,7 +66,7 @@ namespace esphome
                             this->setReceivedValue(int(val.value()));
                             ESP_LOGI("HA_API", "Got Temperature value %i for %s", int(val.value()), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
                 }
 
 

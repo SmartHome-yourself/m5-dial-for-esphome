@@ -21,7 +21,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("current_position"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         if(this->isValueModified()){
                             return;
                         }
@@ -33,7 +33,7 @@ namespace esphome
                             this->setReceivedValue(val.value());
                             ESP_LOGI("HA_API", "Got Position value %i for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
                 };
 
                 bool onButton(M5DialDisplay& display, const char * clickType) override {

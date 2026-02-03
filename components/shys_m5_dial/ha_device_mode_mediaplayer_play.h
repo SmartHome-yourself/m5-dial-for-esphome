@@ -142,7 +142,7 @@ namespace esphome
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("volume_level"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -160,13 +160,13 @@ namespace esphome
                             ESP_LOGI("HA_API", "Set Volume value %f for %s", val.value(), this->device.getEntityId().c_str());
 
                         }
-                    });
+                    }));
 
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>(), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -176,12 +176,12 @@ namespace esphome
 
                         this->displayRefreshNeeded = true;
                         ESP_LOGI("HA_API", "Got State %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("media_title"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -191,12 +191,12 @@ namespace esphome
 
                         this->displayRefreshNeeded = true;
                         ESP_LOGI("HA_API", "Got Title %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("media_artist"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -206,12 +206,12 @@ namespace esphome
 
                         this->displayRefreshNeeded = true;
                         ESP_LOGI("HA_API", "Got Artist %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("media_album_name"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -221,12 +221,12 @@ namespace esphome
 
                         this->displayRefreshNeeded = true;
                         ESP_LOGI("HA_API", "Got Album %s for %s", state.c_str(), this->device.getEntityId().c_str());
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("media_duration"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -240,12 +240,12 @@ namespace esphome
                             this->media_duration = (int)val.value();
                             ESP_LOGI("HA_API", "Got Media-Duration %i for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
 
                     api::global_api_server->subscribe_home_assistant_state(
                                 this->device.getEntityId().c_str(),
                                 optional<std::string>("media_position"), 
-                                [this](const std::string &state) {
+                                std::function<void(const std::string&)>([this](const std::string &state) {
                         
                         if(this->isValueModified()){
                             return;
@@ -260,7 +260,7 @@ namespace esphome
                             this->displayRefreshNeeded = true;
                             ESP_LOGI("HA_API", "Got Media-Position value %i for %s", val.value(), this->device.getEntityId().c_str());
                         }
-                    });
+                    }));
 
                 }
 

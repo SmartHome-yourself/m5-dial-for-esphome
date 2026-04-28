@@ -8,15 +8,20 @@ esphome:
   name_add_mac_suffix: false
   project:
     name: smarthomeyourself.m5_dial
-    version: "1.1"
+    version: "1.2"
       
   platformio_options:
     lib_deps:
       - Wire
       - EEPROM
       - ArduinoJson
-      - m5stack/M5Unified@0.1.14
-      - m5stack/M5Dial@1.0.2
+      - m5stack/M5Unified@0.2.14
+      - m5stack/M5Dial@1.0.3
+      - m5stack/M5GFX@0.2.20
+    build_flags:
+      # M5GFX (Bus_EPD) expects esp-idf LCD headers to be in include path.
+      - -I/data/cache/platformio/packages/framework-espidf/components/esp_lcd/include
+
 
 
 external_components:
